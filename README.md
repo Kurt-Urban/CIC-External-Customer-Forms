@@ -2,6 +2,8 @@
 
 The Consolidated Industrial Concern's response to any complaint: more paperwork.
 
+**Live:** https://kurt-urban.github.io/cic-paperwork/
+
 1. The customer opens the site and is handed **Form GC-1**, a customer dissatisfaction form
    for the Concern's goods and services — shipbuilding, trade, cargo delivery. It is always
    the same form, and it always looks the same.
@@ -25,24 +27,18 @@ customer saves on their own machine. They send those to you.
 
 ---
 
-## Publish on GitHub Pages
+## Publishing
 
-GitHub Pages is free for public repositories.
+The site is served by GitHub Pages from the root of `main`. **Every push to `main`
+republishes it** within a minute or so:
 
-1. Create an empty repository on GitHub — e.g. `cic-paperwork`, **public**, without a
-   README.
-2. Push this folder to it:
+```bash
+git push
+```
 
-   ```bash
-   git remote add origin https://github.com/<you>/cic-paperwork.git
-   git push -u origin main
-   ```
-
-3. On GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch →
-   Branch: `main`, folder `/ (root)` → Save.**
-
-A minute later the site is live at `https://<you>.github.io/cic-paperwork/`.
-Every push to `main` republishes it.
+To publish a copy somewhere else: create an empty **public** repository (Pages is free
+for public repositories), push this folder to it, then on GitHub choose
+**Settings → Pages → Deploy from a branch → `main`, `/ (root)`**.
 
 All paths in the site are relative, so it works from that sub-path as-is. `.nojekyll`
 stops GitHub running the files through Jekyll.
