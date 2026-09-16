@@ -7,9 +7,14 @@ The Consolidated Industrial Concern's response to declarations of war: paperwork
 2. They fill it in and press **Save copy & file**. The sheet is turned into a filled-in
    paper copy — typed answers, ticked boxes, a handwritten signature, a rubber stamp and a
    reference number — and downloaded as a PDF.
-3. Only then can they continue, to **Form GC-1a**: a new sheet drawn at random from a
-   166-question bank, with its own title, questions and stationery.
-4. Saving that unlocks GC-1b. And so on.
+3. Only then can they continue, to **Form GC-1a**: a new sheet drawn at random, with its
+   own title, questions and stationery.
+4. Saving that unlocks GC-1b. And so on, indefinitely.
+
+No question is ever shown to the same person twice, but the same things keep being asked
+in different words, often twice on one sheet.
+
+It works for any faction: nothing in it refers to a particular war.
 
 It is a static site. There is no server and nothing is stored anywhere except the PDFs the
 declaring party saves on their own machine. They send those to you.
@@ -58,8 +63,9 @@ Before pushing a change to the forms, run:
 npm run check
 ```
 
-It validates both JSON files and generates 300 random sheets to make sure each one is
-sane — about a page long, no unfilled `{{slots}}`, no duplicate fields.
+It validates both JSON files, flags wordings too alike to pass as different questions,
+and plays out six 60-sheet visitor sessions to confirm that no question ever repeats and
+that every sheet is sane — about a page long, no unfilled `{{slots}}`, no duplicate fields.
 
 ---
 
@@ -71,26 +77,50 @@ sections, which fields are required, the stamp and message after saving, and its
 
 Fields marked `"required": true` must be filled before GC-1 will save. Currently that is the
 party name, the signatory, the signature, and the acknowledgement that filling in the form
-is a form of negotiation.
+may generate further forms.
 
 The `transmittal` line is printed at the foot of the PDF — it is where you tell the
 declaring party what to do with their copy.
 
 ## Editing the random sheets
 
-Everything after GC-1 comes from [`forms/bank.json`](forms/bank.json). Add questions to
-`questions`, section headings to `sectionTitles`, and so on — every pool is just a list,
-and a sheet picks from each at random.
+Everything after GC-1 comes from [`forms/bank.json`](forms/bank.json).
 
-`slots` are word lists substituted into `{{double braces}}` anywhere in the bank, so one
-question like *"Designation of the {{asset}} alleged to have been {{verb}}"* becomes dozens.
-The shipped bank has 166 questions and ~3 × 10¹⁰ slot combinations.
+The bank is organised by **topic** — something the Office wants to know, like the
+faction's name, the grievance, or the losses — and each topic is written many ways:
 
-`page` controls how long a sheet is: 3–4 sections of 2–4 questions, at most one long
-answer box — about one printed page.
+```json
+{ "id": "party-name", "type": "text", "phrasings": [
+  "What is your faction called?",
+  "Legal name of the aggrieved entity",
+  "Please print the name of your faction in capital letters"
+] }
+```
 
-Random sheets never enforce required fields; anything can be saved. That keeps the loop
-moving.
+That is what drives the loop:
+
+- **No question is shown twice.** The site remembers every wording a visitor has seen,
+  including GC-1's, and never shows it to them again.
+- **The same things keep being asked.** Topics come back on later sheets in new words, and
+  almost every sheet asks one or two things twice.
+- **It doesn't run dry.** The shipped bank has 56 topics and 477 wordings, which lasts
+  about 45 sheets before any wording is reused. After that, used wordings come back with a
+  prefix or suffix from `restatePrefixes` / `restateSuffixes` ("Re-confirm: …",
+  "… (for the avoidance of doubt)"), so the text is still new.
+
+To add material, add wordings to the end of an existing topic, or add a new topic.
+Everything else — titles, section headings, footnotes, office strips — is a plain list the
+sheet picks from.
+
+`slots` are word lists substituted into `{{double braces}}`, so
+*"Name the {{asset}} said to have been {{verb}}"* becomes dozens of distinct questions.
+
+`page` controls sheet length: 3–4 sections of 2–3 questions plus the repeated ones, at
+most one long answer box — about one printed page.
+
+Random sheets never enforce required fields, so the loop never stalls.
+
+`npm run check` flags any two wordings so alike they would read as the same question.
 
 Full reference for both files: [docs/form-schema.md](docs/form-schema.md).
 
@@ -101,8 +131,8 @@ Full reference for both files: [docs/form-schema.md](docs/form-schema.md).
 | File | Job |
 | --- | --- |
 | `index.html` | The page. |
-| `assets/app.js` | The loop: GC-1, then a random sheet per step. Remembers the current sheet and the answers typed so far in `sessionStorage`, so a reload does not lose anything. |
-| `assets/generator.js` | Builds a sheet from the bank. Every new sheet gets a fresh random seed. |
+| `assets/app.js` | The loop: GC-1, then a random sheet per step. Keeps the current sheet, the answers typed so far, and every wording already shown in `sessionStorage`, so a reload changes nothing. |
+| `assets/generator.js` | Builds a sheet from the bank: a fresh random seed, no wording the visitor has seen, and a topic or two asked twice. |
 | `assets/theme.js` | Picks the stationery — paper stock, ink, typefaces, letterhead, rules, field style, numbering, watermark — one component per axis. |
 | `assets/cic.css` | Every one of those components, as CSS classes. |
 | `assets/render.js` | Turns a form definition into the sheet on screen. |

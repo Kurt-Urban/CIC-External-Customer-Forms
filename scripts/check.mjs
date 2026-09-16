@@ -2,8 +2,11 @@
 /* ============================================================
    check.mjs - run before pushing.  npm run check
 
-   Validates forms/gc-1.json and forms/bank.json, then generates
-   a few hundred random sheets and checks each one is sane.
+   1. Validates forms/gc-1.json and forms/bank.json.
+   2. Looks for wordings so alike they would read as repeats.
+   3. Plays out long visitor sessions and checks that no question
+      is ever shown twice, that topics do come back reworded, and
+      that every sheet is a sane length.
    No server, no browser.
    ============================================================ */
 
@@ -11,11 +14,12 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateForm, validateBank, normalizeForm, bankReach } from '../assets/schema.js';
-import { generatePage } from '../assets/generator.js';
+import { generatePage, formTexts, normText } from '../assets/generator.js';
 import { deriveTheme, themeSummary, AXES } from '../assets/theme.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SHEETS = Number(process.env.SHEETS) || 300;
+const SESSIONS = Number(process.env.SESSIONS) || 6;
+const SHEETS = Number(process.env.SHEETS) || 60;
 
 let passed = 0;
 let failed = 0;
@@ -24,8 +28,9 @@ function check(name, cond, detail) {
   process.stdout.write('  ' + (cond ? 'PASS' : 'FAIL') + '  ' + name +
     (detail ? (cond ? '  (' : '  — ') + detail + (cond ? ')' : '') : '') + '\n');
 }
-function list(items) {
-  for (const i of items) process.stdout.write('          · ' + i + '\n');
+function list(items, max = 12) {
+  items.slice(0, max).forEach((i) => process.stdout.write('          · ' + i + '\n'));
+  if (items.length > max) process.stdout.write('          · …and ' + (items.length - max) + ' more\n');
 }
 
 async function readJSON(rel) {
@@ -49,87 +54,157 @@ if (!v1.ok) list(v1.errors);
 if (v1.warnings.length) list(v1.warnings.map((w) => 'warning: ' + w));
 
 const n1 = normalizeForm(gc1);
-const fields = n1.sections.flatMap((s) => s.fields);
-const required = fields.filter((f) => f.required).map((f) => f.name);
-check('GC-1 has fields', fields.length > 0,
-  n1.sections.length + ' sections, ' + fields.filter((f) => f.type !== 'static').length +
-  ' fields, required: ' + (required.join(', ') || 'none'));
+const gcFields = n1.sections.flatMap((s) => s.fields).filter((f) => f.type !== 'static');
+check('GC-1 has fields', gcFields.length > 0,
+  n1.sections.length + ' sections, ' + gcFields.length + ' fields, required: ' +
+  (gcFields.filter((f) => f.required).map((f) => f.name).join(', ') || 'none'));
 
-const t1 = deriveTheme(n1);
-const pinned = Object.keys(AXES).filter((k) => k !== 'watermark')
-  .every((k) => Object.prototype.hasOwnProperty.call(n1.style, k));
+const pinned = Object.keys(AXES).every((k) => Object.prototype.hasOwnProperty.call(n1.style, k));
 check('GC-1 look is fully pinned (same every time)', pinned,
-  themeSummary(t1).map(([k, v]) => k + '=' + v).join(' '));
-check('GC-1 ends by generating a random sheet', n1.receipt.next.mode === 'generate');
+  themeSummary(deriveTheme(n1)).map(([k, v]) => k + '=' + v).join(' '));
+check('GC-1 leads into random sheets', n1.receipt.next.mode === 'generate');
 
 /* ---------- bank ---------- */
 
 const bank = await readJSON('forms/bank.json');
 const vb = validateBank(bank);
 check('forms/bank.json is a valid bank', vb.ok, vb.ok ? '' : vb.errors.length + ' error(s)');
-if (!vb.ok) list(vb.errors);
+if (!vb.ok) { list(vb.errors); process.exit(1); }
 if (vb.warnings.length) list(vb.warnings.map((w) => 'warning: ' + w));
 
 const reach = bankReach(bank);
-check('bank has a large pool', reach.questions >= 50,
-  reach.questions + ' questions, ~' + reach.slotCombinations.toExponential(1) + ' slot combinations');
+check('bank asks each thing many ways', reach.phrasings >= 300 && reach.phrasings / reach.topics >= 5,
+  reach.topics + ' topics, ' + reach.phrasings + ' wordings (' +
+  (reach.phrasings / reach.topics).toFixed(1) + ' per topic)');
 
-/* ---------- generated sheets ---------- */
+/* ---------- near-duplicate wordings ---------- */
+
+// Two wordings whose word pairs mostly overlap would read as the same
+// question twice. Compare every bank wording with every other, and with GC-1.
+// Within one topic the bar is higher: deliberate contrasts such as
+// "in order of importance" / "in reverse order of importance" belong there.
+const CROSS_TOPIC = 0.7;
+const SAME_TOPIC = 0.8;
+function bigrams(s) {
+  const w = normText(s.replace(/\{\{\w+\}\}/g, 'x')).split(' ');
+  const out = new Set();
+  for (let i = 0; i < w.length - 1; i++) out.add(w[i] + ' ' + w[i + 1]);
+  if (w.length === 1) out.add(w[0]);
+  return out;
+}
+function similarity(a, b) {
+  let inter = 0;
+  for (const x of a) if (b.has(x)) inter++;
+  return inter / (a.size + b.size - inter || 1);
+}
+
+const wordings = [];
+for (const f of gcFields) if (f.label) wordings.push({ where: 'GC-1', text: f.label });
+for (const t of bank.topics) {
+  t.phrasings.forEach((p) => wordings.push({ where: t.id, text: typeof p === 'string' ? p : p.label }));
+}
+const grams = wordings.map((w) => bigrams(w.text));
+const alike = [];
+for (let i = 0; i < wordings.length; i++) {
+  for (let j = i + 1; j < wordings.length; j++) {
+    const bar = wordings[i].where === wordings[j].where ? SAME_TOPIC : CROSS_TOPIC;
+    if (similarity(grams[i], grams[j]) >= bar) {
+      alike.push(wordings[i].where + ' “' + wordings[i].text + '”  ≈  ' +
+        wordings[j].where + ' “' + wordings[j].text + '”');
+    }
+  }
+}
+check('no two wordings are near-copies of each other', alike.length === 0,
+  alike.length ? alike.length + ' pair(s)' : wordings.length + ' wordings compared');
+if (alike.length) list(alike);
+
+/* ---------- visitor sessions ---------- */
 
 const base = { id: n1.id, code: n1.code, org: n1.org, department: n1.department, title: n1.title, enforceRequired: false };
 const seed = () => Math.random().toString(16).slice(2, 18);
 
+let repeats = [];
 let minF = Infinity;
 let maxF = 0;
-let tooManyLong = 0;
+let overLong = 0;
 let dupNames = 0;
 let leftovers = [];
-let empty = 0;
-const titles = new Set();
+let sheetsWithEcho = 0;
+let firstRestated = [];
+let topicReturns = 0;
+let totalSheets = 0;
 const looks = new Set();
 
-for (let i = 0; i < SHEETS; i++) {
-  const step = 1 + (i % 30);
-  const page = generatePage(bank, base, seed(), step);
-  const pf = page.sections.flatMap((s) => s.fields);
-  const inputs = pf.filter((f) => f.type !== 'static');
+for (let s = 0; s < SESSIONS; s++) {
+  let used = { phrasings: [], texts: formTexts(n1), interjections: [] };
+  const shown = new Map(used.texts.map((t) => [t, 'GC-1']));
+  const topicSeen = new Set();
+  let restatedAt = null;
 
-  minF = Math.min(minF, pf.length);
-  maxF = Math.max(maxF, pf.length);
-  if (pf.filter((f) => f.type === 'textarea').length > 1) tooManyLong++;
-  if (new Set(inputs.map((f) => f.name)).size !== inputs.length) dupNames++;
-  if (!inputs.length) empty++;
+  for (let step = 1; step <= SHEETS; step++) {
+    const page = generatePage(bank, base, seed(), step, used);
+    totalSheets++;
+    const fields = page.sections.flatMap((x) => x.fields);
+    const inputs = fields.filter((f) => f.type !== 'static');
 
-  // Everything shown on the sheet should have had its slots filled.
-  const shown = JSON.stringify([page.title, page.subtitle, page.department, page.instructions,
-    page.finePrint, page.transmittal, page.submitLabel, page.meta, page.officeUse,
-    page.sections.map((s) => [s.title, s.note, s.fields])]);
-  const m = shown.match(/\{\{\w+\}\}/g);
-  if (m) leftovers = leftovers.concat(m);
+    for (const f of inputs) {
+      const key = normText(f.label);
+      if (shown.has(key)) repeats.push('session ' + (s + 1) + ', sheet ' + step + ': “' + f.label + '” (first on ' + shown.get(key) + ')');
+      shown.set(key, 'sheet ' + step);
+      if (topicSeen.has(f.topic)) topicReturns++;
+    }
+    const topicsHere = inputs.map((f) => f.topic);
+    if (new Set(topicsHere).size < topicsHere.length) sheetsWithEcho++;
+    topicsHere.forEach((t) => topicSeen.add(t));
 
-  titles.add(page.title);
-  const t = deriveTheme(page);
-  looks.add([t.stock, t.ink, t.head, t.edge, t.rule, t.fields].join('/'));
+    if (restatedAt === null && page.usage.phrasings.length < inputs.length) restatedAt = step;
 
-  if (step === 1 && i === 0) {
-    check('first random sheet is coded ' + n1.code + 'a', page.code === n1.code + 'a', page.code);
+    minF = Math.min(minF, fields.length);
+    maxF = Math.max(maxF, fields.length);
+    if (inputs.filter((f) => f.type === 'textarea').length > 1) overLong++;
+    if (new Set(inputs.map((f) => f.name)).size !== inputs.length) dupNames++;
+
+    const visible = JSON.stringify([page.title, page.subtitle, page.department, page.instructions,
+      page.finePrint, page.transmittal, page.submitLabel, page.meta, page.officeUse,
+      page.sections.map((x) => [x.title, x.note, x.fields])]);
+    const m = visible.match(/\{\{\w+\}\}/g);
+    if (m) leftovers = leftovers.concat(m);
+
+    const t = deriveTheme(page);
+    looks.add([t.stock, t.ink, t.head, t.edge, t.rule, t.fields].join('/'));
+
+    used = {
+      phrasings: used.phrasings.concat(page.usage.phrasings),
+      texts: used.texts.concat(page.usage.texts),
+      interjections: used.interjections.concat(page.usage.interjections),
+    };
   }
+  firstRestated.push(restatedAt === null ? '>' + SHEETS : restatedAt);
 }
 
-check(SHEETS + ' random sheets are about one page each', minF >= 5 && maxF <= 18,
-  minF + '–' + maxF + ' fields');
-check('never more than one long-answer box per sheet', tooManyLong === 0,
-  tooManyLong ? tooManyLong + ' sheets over' : '');
-check('field names are unique on every sheet', dupNames === 0, dupNames ? dupNames + ' sheets' : '');
-check('no sheet is empty', empty === 0, empty ? empty + ' empty' : '');
-check('every {{slot}} on the sheet is filled in', leftovers.length === 0,
-  leftovers.length ? [...new Set(leftovers)].join(' ') : '');
-check('sheets vary in title', titles.size > 20, titles.size + ' distinct titles');
-check('sheets vary in appearance', looks.size > SHEETS * 0.8, looks.size + ' distinct looks in ' + SHEETS);
+check(SESSIONS + ' visitors × ' + SHEETS + ' sheets: no question is ever shown twice', repeats.length === 0,
+  repeats.length ? repeats.length + ' repeat(s)' : totalSheets + ' sheets');
+if (repeats.length) list(repeats);
 
-const sameA = JSON.stringify(generatePage(bank, base, 'fixed', 3));
-const sameB = JSON.stringify(generatePage(bank, base, 'fixed', 3));
-check('a remembered seed reproduces its sheet (reloads are stable)', sameA === sameB);
+const lastsAtLeast = Math.min(...firstRestated.map((x) => (typeof x === 'number' ? x : Infinity)));
+check('fresh wordings last a long session before any are restated', lastsAtLeast >= 30,
+  'first restatement at sheet ' + firstRestated.join(', '));
+
+check('topics come back, reworded', topicReturns > totalSheets * 5,
+  (topicReturns / totalSheets).toFixed(1) + ' returning topics per sheet');
+check('most sheets ask something twice, differently', sheetsWithEcho >= totalSheets * 0.75,
+  Math.round(100 * sheetsWithEcho / totalSheets) + '% of sheets');
+check('sheets are about one page each', minF >= 6 && maxF <= 18, minF + '–' + maxF + ' items');
+check('never more than one long-answer box per sheet', overLong === 0, overLong ? overLong + ' sheets' : '');
+check('field names are unique on every sheet', dupNames === 0, dupNames ? dupNames + ' sheets' : '');
+check('every {{slot}} shown is filled in', leftovers.length === 0,
+  leftovers.length ? [...new Set(leftovers)].join(' ') : '');
+check('sheets vary in appearance', looks.size > totalSheets * 0.75, looks.size + ' looks in ' + totalSheets);
+
+const used0 = { phrasings: ['party-name#0'], texts: ['x'], interjections: [] };
+check('the same seed and history reproduce the same sheet',
+  JSON.stringify(generatePage(bank, base, 'fixed', 3, used0)) ===
+  JSON.stringify(generatePage(bank, base, 'fixed', 3, used0)));
 
 process.stdout.write('\n  ' + passed + ' passed, ' + failed + ' failed\n\n');
 process.exit(failed ? 1 : 0);

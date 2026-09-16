@@ -181,14 +181,19 @@ export function validateForm(raw) {
 
 /* ---------- question banks ---------- */
 
-/** Pools a bank may define. Only "questions" is mandatory. */
+/** List pools a bank may define. Only "topics" is mandatory. */
 export const BANK_POOLS = [
   'titles', 'subtitles', 'departments', 'metaLines', 'instructions',
-  'sectionTitles', 'sectionNotes', 'questions', 'officeUse', 'officeUseTitles',
+  'sectionTitles', 'sectionNotes', 'officeUse', 'officeUseTitles',
   'finePrint', 'submitLabels', 'stamps', 'receiptMessages', 'receiptFootnotes',
-  'nextLabels', 'transmittals',
+  'nextLabels', 'transmittals', 'interjections', 'restatePrefixes', 'restateSuffixes',
 ];
 
+/**
+ * A bank is a list of topics, each asked several ways:
+ *   { "id": "party-name", "type": "text", "phrasings": ["...", { "label": "...", ... }] }
+ * A phrasing may override any field property of its topic (type, options, ...).
+ */
 export function validateBank(raw) {
   const errors = [];
   const warnings = [];
@@ -196,14 +201,37 @@ export function validateBank(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     return { ok: false, errors: ['The file must contain a single JSON object.'], warnings };
   }
-  if (!Array.isArray(raw.questions) || raw.questions.length === 0) {
-    errors.push('"questions" must be a non-empty array.');
+  if (!Array.isArray(raw.topics) || raw.topics.length === 0) {
+    errors.push('"topics" must be a non-empty array.');
   }
 
-  (Array.isArray(raw.questions) ? raw.questions : []).forEach((q, i) => {
-    const where = 'Question ' + (i + 1);
-    checkField(q, where, errors, warnings);
-    if (q && q.type !== 'static' && !q.label) errors.push(where + ': needs a "label".');
+  const ids = new Set();
+  (Array.isArray(raw.topics) ? raw.topics : []).forEach((t, i) => {
+    const where = 'Topic ' + (i + 1) + (t && t.id ? ' ("' + t.id + '")' : '');
+    if (!t || typeof t !== 'object') { errors.push(where + ' is not an object.'); return; }
+    if (!t.id || !ID_RE.test(String(t.id))) {
+      errors.push(where + ': needs an "id" of lowercase letters, numbers and hyphens.');
+    } else if (ids.has(t.id)) {
+      errors.push(where + ': duplicate topic id.');
+    } else {
+      ids.add(t.id);
+    }
+    if (!Array.isArray(t.phrasings) || t.phrasings.length === 0) {
+      errors.push(where + ': needs a non-empty "phrasings" array.');
+      return;
+    }
+    if (t.phrasings.length < 3) {
+      warnings.push(where + ': only ' + t.phrasings.length + ' phrasings; it will run out quickly.');
+    }
+    t.phrasings.forEach((p, pi) => {
+      const pw = where + ', phrasing ' + (pi + 1);
+      const own = typeof p === 'string' ? { label: p } : p;
+      if (!own || typeof own !== 'object') { errors.push(pw + ' must be a string or an object.'); return; }
+      if (!own.label) { errors.push(pw + ': needs a "label".'); return; }
+      const merged = { ...t, ...own, type: own.type || t.type || 'text' };
+      if (merged.type === 'static') errors.push(pw + ': use "interjections" for static text, not a topic.');
+      else checkField(merged, pw, errors, warnings);
+    });
   });
 
   for (const pool of BANK_POOLS) {
@@ -215,9 +243,9 @@ export function validateBank(raw) {
     errors.push('"slots" must be an object mapping slot names to arrays.');
   }
 
-  const qCount = Array.isArray(raw.questions) ? raw.questions.length : 0;
-  if (qCount > 0 && qCount < 12) {
-    warnings.push('Only ' + qCount + ' questions - sheets will repeat themselves quickly.');
+  const reach = bankReach(raw);
+  if (reach.phrasings > 0 && reach.phrasings < 100) {
+    warnings.push('Only ' + reach.phrasings + ' phrasings - visitors will see restated questions early.');
   }
   if (!Array.isArray(raw.sectionTitles) || !raw.sectionTitles.length) {
     warnings.push('No "sectionTitles"; every section will be headed "Particulars".');
@@ -228,14 +256,15 @@ export function validateBank(raw) {
 
 /** Rough size of a bank's output space. */
 export function bankReach(bank) {
-  const q = (bank.questions || []).length;
+  const topics = Array.isArray(bank.topics) ? bank.topics : [];
+  const phrasings = topics.reduce((n, t) => n + (Array.isArray(t.phrasings) ? t.phrasings.length : 0), 0);
   const slots = bank.slots || {};
   let slotFactor = 1;
   for (const k of Object.keys(slots)) {
     if (Array.isArray(slots[k]) && slots[k].length > 1) slotFactor *= slots[k].length;
     if (slotFactor > 1e12) { slotFactor = 1e12; break; }
   }
-  return { questions: q, slotCombinations: slotFactor };
+  return { topics: topics.length, phrasings, slotCombinations: slotFactor };
 }
 
 /** Spreadsheet-style suffix: 1 -> a, 26 -> z, 27 -> aa. */

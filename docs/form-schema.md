@@ -3,7 +3,7 @@
 Two files drive the site:
 
 - `forms/gc-1.json` — Form GC-1, the fixed first form.
-- `forms/bank.json` — the pools every random sheet after it is drawn from.
+- `forms/bank.json` — the topics and lists every random sheet after it is drawn from.
 
 Run `npm run check` after editing either.
 
@@ -20,7 +20,7 @@ Run `npm run check` after editing either.
   "org": "CONSOLIDATED INDUSTRIAL CONCERN",
   "department": "Office of Interdepartmental Grievance Review",
   "revision": "REV. 47",
-  "meta": ["IN RE: FREQUENCY 0xUNKNOWN"],
+  "meta": ["FILED THIS SESSION"],
   "enforceRequired": true,
   "style": { … },
   "instructions": "**Before you begin:** …",
@@ -154,19 +154,72 @@ set none, so each gets a random combination.
   "id": "cic-core",
   "page": {
     "minSections": 3, "maxSections": 4,
-    "minQuestionsPerSection": 2, "maxQuestionsPerSection": 4,
-    "maxLongAnswers": 1
+    "minQuestionsPerSection": 2, "maxQuestionsPerSection": 3,
+    "maxFields": 15, "maxLongAnswers": 1,
+    "echoChance": 0.95, "interjectionChance": 0.35
   },
-  "slots": { "asset": ["shipyard", "refinery"], "form": ["GC-2", "GC-9"] },
-  "questions": [
-    { "type": "text", "label": "Designation of the {{asset}} alleged to have been removed" }
+  "slots": { "asset": ["ship", "refinery"], "verb": ["destroyed", "taken"] },
+  "topics": [
+    {
+      "id": "losses-asset",
+      "type": "text",
+      "phrasings": [
+        "What did your faction lose?",
+        "Name the {{asset}} said to have been {{verb}}",
+        { "label": "List the property involved", "help": "Do not include coordinates." }
+      ]
+    },
+    {
+      "id": "at-war",
+      "type": "radio",
+      "options": ["Yes", "No", "Unsure"],
+      "phrasings": [
+        "Are you currently at war with the Concern?",
+        { "label": "Is your faction not at war with the Concern?",
+          "options": ["Yes (not at war)", "No (at war)"] }
+      ]
+    }
   ],
+  "restatePrefixes": ["Re-confirm:"],
+  "restateSuffixes": ["(for the avoidance of doubt)"],
+  "interjections": ["*Section intentionally left partly blank.*"],
   "sectionTitles": ["Declaring Party Information", "War Aims"]
 }
 ```
 
-`questions` use the field format above, without `name` (assigned per sheet). Only
-`questions` is required. Each sheet picks at random from each of these lists:
+### Topics
+
+A topic is one thing the Office wants to know. Its properties (`type`, `options`,
+`placeholder`, `help`, `min`, `max`, `rows`, `minWords`, `maxLength`, `disabled`) use the
+field format above and apply to every wording. A wording is either a plain string (the
+label) or an object that overrides any of those properties for itself.
+
+Only `topics` is required. Each `id` must be unique. The site remembers what a visitor has
+seen by topic id and the wording's position in the list, so **add new wordings at the end
+of a list** rather than in the middle.
+
+### How a sheet is drawn
+
+1. Pick 3–4 section headings.
+2. Fill each section with 2–3 wordings the visitor has never seen, from different topics.
+3. With probability `echoChance`, pick one or two topics already on the sheet and ask them
+   again, in another wording, in a later section.
+4. With probability `interjectionChance`, drop in one of the `interjections`.
+5. Nothing already shown to the visitor — on GC-1 or any earlier sheet — is shown again.
+   Once every wording has been used, old ones come back with a restate prefix or suffix.
+
+| `page` setting | Meaning |
+| --- | --- |
+| `minSections`, `maxSections` | sections per sheet |
+| `minQuestionsPerSection`, `maxQuestionsPerSection` | before repeats are added |
+| `maxFields` | cap on questions per sheet |
+| `maxLongAnswers` | cap on `textarea` questions per sheet |
+| `echoChance` | chance a sheet asks something twice |
+| `interjectionChance` | chance of a note from the Office |
+
+### Other pools
+
+Each sheet picks at random from each of these lists:
 
 | Pool | Used for |
 | --- | --- |
@@ -174,7 +227,8 @@ set none, so each gets a random combination.
 | `departments`, `metaLines` | letterhead |
 | `instructions` | the shaded notice |
 | `sectionTitles`, `sectionNotes` | section headings and footnotes |
-| `questions` | the fields |
+| `interjections` | notes dropped between questions |
+| `restatePrefixes`, `restateSuffixes` | re-wording a used question |
 | `officeUse`, `officeUseTitles` | the office strip |
 | `finePrint`, `submitLabels` | beside and on the save button |
 | `transmittals` | foot of the PDF |
@@ -184,5 +238,5 @@ set none, so each gets a random combination.
 `slots.name`. Slot values may contain other slots. The receipt placeholders
 (`{{code}}`, `{{next}}`, `{{file}}`, …) are not slots and are filled in after saving.
 
-**Order.** Questions are drawn in random order, so a question that refers to "the question
-above" may appear first on a sheet. The shipped bank leans into this.
+**Order.** Questions are drawn in random order, so one that refers to "the question
+above" may appear first on a sheet. That is intentional.

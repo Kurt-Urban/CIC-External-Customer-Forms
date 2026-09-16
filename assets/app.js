@@ -5,12 +5,13 @@
    Saving it as a PDF unlocks step 1: a sheet drawn at random from
    forms/bank.json. Saving that unlocks step 2, and so on.
 
-   Where we are is kept in sessionStorage, so a reload shows the
-   same sheet with the answers typed so far.
+   The session remembers every question wording this visitor has been
+   shown, so no sheet repeats one. It also keeps the current sheet and
+   the answers typed so far, so a reload changes nothing.
    ============================================================ */
 
 import { renderForm, collectAnswers, restoreAnswers, validateAnswers, mdInline, escapeHTML } from './render.js';
-import { generatePage } from './generator.js';
+import { generatePage, formTexts } from './generator.js';
 import { letterSuffix } from './schema.js';
 import { saveCopy, printCopy } from './pdf.js';
 
@@ -28,6 +29,8 @@ const state = {
   step: 0,     // 0 = GC-1, 1 = GC-1a, 2 = GC-1b ...
   seed: '',    // random seed of the current generated sheet
   filed: 0,    // copies saved this session
+  page: null,  // the current generated sheet, exactly as first drawn
+  used: null,  // { phrasings, texts, interjections } already shown
   form: null,
   rendered: null,
 };
@@ -55,7 +58,34 @@ function draftKey() {
 }
 
 function saveState() {
-  store(STATE_KEY, { step: state.step, seed: state.seed, filed: state.filed });
+  store(STATE_KEY, {
+    step: state.step, seed: state.seed, filed: state.filed, page: state.page, used: state.used,
+  });
+}
+
+/** A fresh visitor has "seen" only GC-1's own questions. */
+function freshUsage() {
+  return { phrasings: [], texts: formTexts(docs.gc1), interjections: [] };
+}
+
+function drawSheet() {
+  const base = {
+    id: docs.gc1.id,
+    code: baseCode(),
+    org: docs.gc1.org,
+    department: docs.gc1.department,
+    title: docs.gc1.title,
+    enforceRequired: false,
+  };
+  const page = generatePage(docs.bank, base, state.seed, state.step, state.used);
+  const u = page.usage;
+  state.used = {
+    phrasings: state.used.phrasings.concat(u.phrasings),
+    texts: state.used.texts.concat(u.texts),
+    interjections: state.used.interjections.concat(u.interjections),
+  };
+  delete page.usage;
+  state.page = page;
 }
 
 function clearDrafts() {
@@ -121,16 +151,11 @@ async function loadJSON(path) {
 
 function currentDefinition() {
   if (state.step === 0) return docs.gc1;
-
-  const base = {
-    id: docs.gc1.id,
-    code: baseCode(),
-    org: docs.gc1.org,
-    department: docs.gc1.department,
-    title: docs.gc1.title,
-    enforceRequired: false,
-  };
-  return generatePage(docs.bank, base, state.seed, state.step);
+  if (!state.page) {
+    drawSheet();
+    saveState();
+  }
+  return state.page;
 }
 
 function show() {
@@ -263,6 +288,7 @@ function advance() {
   store(draftKey(), undefined);
   state.step += 1;
   state.seed = randomHex(8);
+  drawSheet();
   saveState();
   show();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -274,6 +300,8 @@ function restart() {
   clearDrafts();
   state.step = 0;
   state.seed = '';
+  state.page = null;
+  state.used = freshUsage();
   saveState();
   show();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -292,12 +320,20 @@ async function start() {
     return;
   }
 
+  state.used = freshUsage();
   const saved = recall(STATE_KEY);
   if (saved && Number.isInteger(saved.step) && saved.step >= 0) {
     state.step = saved.step;
     state.seed = typeof saved.seed === 'string' ? saved.seed : '';
     state.filed = Number(saved.filed) || 0;
-    if (state.step > 0 && !state.seed) state.seed = randomHex(8);
+    const u = saved.used;
+    if (u && Array.isArray(u.phrasings) && Array.isArray(u.texts) && Array.isArray(u.interjections)) {
+      state.used = u;
+    }
+    if (state.step > 0) {
+      if (!state.seed) state.seed = randomHex(8);
+      if (saved.page && Array.isArray(saved.page.sections)) state.page = saved.page;
+    }
   }
 
   show();

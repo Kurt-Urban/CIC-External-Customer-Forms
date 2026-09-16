@@ -2,32 +2,925 @@
   "kind": "bank",
   "id": "cic-core",
   "name": "CIC Core Grievance Bank",
-  "description": "Question pool for the Office of Interdepartmental Grievance Review. Slots expand combinatorially, so the supply of paperwork is not meaningfully finite.",
+  "description": "Topics are the things the Office wants to know. Each topic is asked many different ways. A wording is never shown twice to the same visitor; the topic keeps coming back.",
 
   "page": {
     "minSections": 3,
     "maxSections": 4,
     "minQuestionsPerSection": 2,
-    "maxQuestionsPerSection": 4,
-    "maxLongAnswers": 1
+    "maxQuestionsPerSection": 3,
+    "maxFields": 15,
+    "maxLongAnswers": 1,
+    "echoChance": 0.95,
+    "interjectionChance": 0.35
   },
 
   "slots": {
-    "form": ["GC-2", "GC-3", "GC-3a", "GC-4", "GC-5", "GC-7", "GC-9", "GC-11", "GC-12", "GC-14(b)", "GC-22", "GC-31(c)", "GC-40", "GC-44(b)(ii)", "Schedule Q", "Schedule Q-Annex", "Annex 6", "Form P-0", "Form ZZ"],
-    "ledger": ["Ledger 7", "Ledger 7, Column C", "Ledger 7, Column C (reverse)", "the Grey Ledger", "the Unreconciled Ledger", "Appendix N", "the Pending Drawer", "Cabinet 7, Drawer C", "the Overflow Cabinet"],
-    "officer": ["the Deputy Adjunct Registrar", "the Under-Clerk of Grievances", "the Second Assistant Notary", "the Acting Interim Archivist", "the Clerk of Unreconciled Matters", "the Registrar of Hostile Correspondence", "the Custodian of Cabinet 7", "the Deputy Comptroller of Feelings", "the Adjudicator of Vibes", "the Officer of the Day (unfilled)"],
+    "form": ["GC-2", "GC-3", "GC-3a", "GC-4", "GC-5", "GC-7", "GC-9", "GC-11", "GC-12", "GC-14(b)", "GC-22", "GC-31(c)", "GC-40", "GC-44(b)(ii)", "Schedule Q", "Annex 6", "Form P-0"],
+    "ledger": ["Ledger 7", "Ledger 7, Column C", "the Grey Ledger", "the Unreconciled Ledger", "Appendix N", "the Pending Drawer", "Cabinet 7, Drawer C", "the Overflow Cabinet"],
+    "officer": ["the Deputy Adjunct Registrar", "the Under-Clerk of Grievances", "the Second Assistant Notary", "the Acting Interim Archivist", "the Clerk of Unreconciled Matters", "the Custodian of Cabinet 7", "the Deputy Comptroller of Feelings", "the Adjudicator of Vibes", "the Officer of the Day (unfilled)"],
     "dept": ["Interdepartmental Grievance Review", "Hostile Correspondence Intake", "the Office of Retroactive Peace", "Asset Valuation & Mourning", "the Bureau of Declared Intentions", "Non-Combat Operations", "the Directorate of Polite Refusal", "Accounts Receivable (Grievances)", "the Standing Committee on Standing"],
-    "unit": ["business days", "fiscal quarters", "billing cycles", "standard weeks", "notarised fortnights", "audit periods", "working months", "review intervals of indeterminate length"],
-    "asset": ["shipyard", "refinery", "ore barge", "logistics spur", "forward depot", "smelting platform", "survey drone", "cargo hauler", "orbital warehouse", "fuel tender", "mining claim", "relay mast"],
-    "sum": ["4,000 credits", "17,500 credits", "1 credit", "an undisclosed sum", "a sum to be determined by {{officer}}", "220,000 credits", "the contents of a small tin", "no less than 6,000 credits"],
-    "abstract": ["standing", "intent", "aggrievement", "materiality", "proximate cause", "moral position", "commercial injury", "reputational exposure", "narrative coherence"],
-    "verb": ["burned", "scrapped", "erased", "neutralised", "removed", "cleaned up", "marked for deletion", "reduced to constituent components"],
-    "adverb": ["formally", "provisionally", "retroactively", "conditionally", "without prejudice", "in triplicate", "under protest", "for accounting purposes only"],
-    "frequency": ["0xUNKNOWN", "0x0000", "an unlisted band", "the emergency channel (misused)", "a frequency the Office cannot confirm exists"]
+    "unit": ["business days", "fiscal quarters", "billing cycles", "standard weeks", "notarised fortnights", "audit periods", "working months"],
+    "asset": ["ship", "station", "refinery", "ore hauler", "forward base", "assembler bay", "survey drone", "cargo container", "mining outpost", "hangar", "fuel depot", "antenna mast"],
+    "verb": ["destroyed", "damaged", "taken", "disassembled", "rendered inoperable", "moved without permission", "painted an unapproved colour"],
+    "sum": ["4,000 credits", "17,500 credits", "1 credit", "an undisclosed sum", "a sum to be determined by {{officer}}", "220,000 credits", "no less than 6,000 credits"]
   },
 
+  "topics": [
+    {
+      "id": "party-name",
+      "type": "text",
+      "placeholder": "As it will appear in {{ledger}}",
+      "phrasings": [
+        "Declaring party (full name)",
+        "What is your faction called?",
+        "State the full name under which your faction declares hostilities",
+        "Name of the organisation on whose behalf this sheet is completed",
+        "Faction name, written out in full, without abbreviation",
+        "By what name should the Concern refer to you in {{ledger}}?",
+        "Legal name of the aggrieved entity",
+        "What do other factions call your faction?",
+        "Name of the party declaring (not the party declared against)",
+        { "label": "Please print the name of your faction in capital letters", "placeholder": "IN CAPITALS" },
+        "Name of the faction at war with the Concern, if that is you",
+        "Name your faction would like entered on the grievance"
+      ]
+    },
+    {
+      "id": "party-tag",
+      "type": "text",
+      "placeholder": "Three or four characters",
+      "phrasings": [
+        "Faction tag",
+        "Abbreviation used for your faction",
+        "Short designation shown beside your members’ names",
+        "Initials of your faction",
+        "What letters appear before your members’ names?",
+        "Shortened form of the name given elsewhere on this sheet",
+        "Faction identifier (short form)",
+        "If your faction were a ticker symbol, what would it be?"
+      ]
+    },
+    {
+      "id": "signatory",
+      "type": "text",
+      "placeholder": "Rank, callsign, or alias",
+      "phrasings": [
+        "Signatory authorised to bind the declaring party",
+        "Who is completing this sheet?",
+        "Name of the individual filling in this form",
+        "Callsign of the person holding the pen",
+        "Name of the officer responsible for this filing",
+        "State the name of the person answering these questions",
+        "Identity of the person who will sign below",
+        "Filed by",
+        "Name of the member who drew the short straw",
+        "Your name, if different from the name given on the previous sheet",
+        "Name of the person accountable for the accuracy of this sheet"
+      ]
+    },
+    {
+      "id": "signatory-role",
+      "type": "text",
+      "phrasings": [
+        "Position held by the signatory within the declaring party",
+        "Rank held by whoever is filling this in",
+        "By what authority does the signatory sign?",
+        "Title of the individual completing this form",
+        "Is the signatory the leader of the faction? If not, who is?",
+        { "label": "Role of the signatory", "placeholder": "Leader, officer, member, bystander" },
+        "Job title of the person answering",
+        { "label": "Authority under which this sheet is completed", "placeholder": "Cite the instrument, not the feeling" },
+        "Rank of whoever authorised the signatory to sign"
+      ]
+    },
+    {
+      "id": "contact",
+      "type": "text",
+      "phrasings": [
+        { "label": "Relay or channel to which correspondence should be addressed", "placeholder": "Frequency, relay, or carrier pigeon designation" },
+        "How may the Concern contact you?",
+        "Where should replies to this filing be sent?",
+        "Contact details for the declaring party",
+        "Best way to reach the signatory",
+        "Channel through which the Concern may, but will not, respond",
+        "Address for service of further forms",
+        "Where should Form {{form}} be delivered?",
+        "If the Concern needed to send you more paperwork, where would it go?",
+        "Correspondence preference (in the event of correspondence)"
+      ]
+    },
+    {
+      "id": "member-count",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of members in the declaring party",
+        "How many players belong to your faction?",
+        "Headcount of the declaring faction as at the date of this sheet",
+        "Total membership, including inactive members",
+        "Total membership, excluding inactive members",
+        "Number of members who agreed to this declaration",
+        "Number of members who were consulted about this declaration",
+        "Number of members who know this form exists",
+        "How many people are on your side?",
+        "Membership, rounded to the nearest whole person"
+      ]
+    },
+    {
+      "id": "founded",
+      "type": "date",
+      "phrasings": [
+        "Date the declaring party was founded",
+        "When was your faction formed?",
+        "Date of establishment of the aggrieved entity",
+        "Earliest date on which your faction can prove it existed",
+        { "label": "Founding date", "help": "Approximate dates will be treated as exact." },
+        "On what date did your faction come into being?",
+        "Date your faction first appeared in the sector",
+        "Date of formation, incorporation, or first meeting, whichever is earliest"
+      ]
+    },
+    {
+      "id": "at-war",
+      "type": "radio",
+      "options": ["Yes", "No", "Unsure", "Declining to say"],
+      "phrasings": [
+        "Are you currently at war with the Concern?",
+        "Is your faction presently engaged in hostilities against the Concern?",
+        { "label": "State of relations between your faction and the Concern", "options": ["War", "Peace", "Neither", "Both"] },
+        "Does a state of war exist between the parties?",
+        "Is your faction at peace with the Concern?",
+        "Would you describe the present situation as a war?",
+        { "label": "Confirm whether hostilities are ongoing", "options": ["Ongoing", "Concluded", "Not yet begun", "Paused for paperwork"] },
+        "Have you declared war on the Concern?",
+        { "label": "Is the Concern, as far as you are aware, at war with you?", "options": ["Yes", "No", "The Concern does not go to war", "Unsure"] },
+        { "label": "Are you at war with anyone? If so, is it the Concern?", "options": ["Yes, the Concern", "Yes, someone else", "No", "All of the above"] },
+        { "label": "Is your faction not at war with the Concern?", "options": ["Yes (not at war)", "No (at war)", "Yes (at war)", "No (not at war)"] }
+      ]
+    },
+    {
+      "id": "war-start",
+      "type": "date",
+      "phrasings": [
+        "Date on which hostilities were declared",
+        "When did the war begin?",
+        "Date of declaration",
+        "Date the grievance first came to your attention",
+        "Date on which you first felt aggrieved",
+        "Date your faction decided to declare war",
+        "Date on which the Concern was informed of the war",
+        "Date hostilities are deemed to have begun, for accounting purposes",
+        "When did you first consider declaring war?",
+        "Date of the event that led to this filing"
+      ]
+    },
+    {
+      "id": "war-reason",
+      "type": "textarea",
+      "rows": 5,
+      "phrasings": [
+        { "label": "Restate the grievance in no fewer than 500 words, in the first person this time.", "minWords": 500, "placeholder": "Begin with: “On the date in question, the aggrieved party…”" },
+        "Explain why your faction has declared war on the Concern.",
+        "Set out the reasons for hostilities, in order of importance.",
+        "Set out the reasons for hostilities, in reverse order of importance.",
+        "In your own words, what has the Concern done?",
+        "Describe the events leading to this filing as if to someone who was not there.",
+        "Restate your grievance without using the word “war”.",
+        "Summarise the grievance described on your previous sheet, then describe it again in full.",
+        "Explain the grievance to a new clerk who has not read any of your sheets.",
+        "What, specifically, is the problem?",
+        "Describe the grievance in the form of a formal complaint.",
+        "Describe the grievance in the form of an informal complaint.",
+        { "label": "Describe the grievance in no more than 50 words, omitting nothing.", "rows": 3 }
+      ]
+    },
+    {
+      "id": "war-reason-short",
+      "type": "text",
+      "phrasings": [
+        "Reason for declaring war, in ten words or fewer",
+        "Grievance, summarised",
+        "Nature of the dispute (brief)",
+        "In one word, why?",
+        "Headline for your grievance, as it would appear in a newsletter",
+        "Short title for this dispute",
+        "Primary cause of hostilities",
+        "The grievance, as you would describe it to a friend",
+        "What is this war about?",
+        "Reason for this filing (do not refer to earlier sheets)"
+      ]
+    },
+    {
+      "id": "casus-class",
+      "type": "checkboxes",
+      "options": [
+        "Grid or cargo theft",
+        "Territorial dispute",
+        "Commercial dispute (price, delivery, or refusal to sell)",
+        "Aesthetic grievance (paint scheme, ship silhouette, or station lighting)",
+        "Conduct attributed to a member of the Concern",
+        "Damage to property",
+        "Vibes",
+        "Unspecified / classified",
+        "Other — attach Form {{form}}"
+      ],
+      "phrasings": [
+        "Casus belli classification — select all that apply",
+        "Which of the following best describe your grievance?",
+        "Grounds for hostilities (tick every box that applies)",
+        "Grounds for hostilities (tick every box that does not apply)",
+        "Categorise the dispute",
+        "Nature of the grievance, by category",
+        "Categories under which this war should be filed",
+        "Which boxes did you tick on Form GC-1?",
+        "Reasons for war, from the approved list",
+        { "label": "Principal category of grievance (choose one)", "type": "select" },
+        { "label": "Secondary category of grievance (choose one other than the principal)", "type": "select" }
+      ]
+    },
+    {
+      "id": "severity",
+      "type": "select",
+      "options": ["Trivial", "Minor", "Moderate", "Serious", "Grave", "Total"],
+      "phrasings": [
+        "Severity of grievance",
+        "How serious is this matter?",
+        "Grade the grievance on the Office’s standard scale",
+        "Severity, as assessed by the declaring party",
+        "Severity, as you expect the Concern to assess it",
+        "How upset is your faction, on the approved scale?",
+        "Classify the seriousness of the dispute",
+        "Severity of the grievance at the time it arose",
+        "Severity of the grievance now",
+        { "label": "If this grievance were a ship, how much damage would it have taken?", "options": ["None", "Cosmetic", "Structural", "Critical", "Total"] }
+      ]
+    },
+    {
+      "id": "severity-number",
+      "type": "number",
+      "min": 1,
+      "max": 10,
+      "phrasings": [
+        "Rate the seriousness of this war from 1 to 10",
+        "On a scale of 1 to 10, how aggrieved are you?",
+        "Severity score (1 = trivial, 10 = total)",
+        "Severity score (1 = total, 10 = trivial)",
+        "Numerical grievance rating",
+        "How angry are you, out of ten?",
+        "Out of ten, how justified is this war?",
+        "Out of ten, how likely is the Concern to agree with you?",
+        "Score your previous answer about severity, out of ten"
+      ]
+    },
+    {
+      "id": "desired-outcome",
+      "type": "text",
+      "phrasings": [
+        "What outcome does your faction seek?",
+        "Describe the result that would satisfy your faction",
+        "Desired remedy",
+        "What do you want?",
+        "What would the Concern have to do for this war to end?",
+        "State your war aims",
+        { "label": "State your war aims, itemised, with a unit cost for each.", "type": "textarea", "rows": 4 },
+        "Objective of hostilities",
+        "What does victory look like, in practical terms?",
+        "If the Concern agreed to everything, what would it have agreed to?",
+        "Intended end state of the dispute",
+        "What are you hoping to achieve by completing this form?"
+      ]
+    },
+    {
+      "id": "end-condition",
+      "type": "text",
+      "phrasings": [
+        "Conditions under which your faction would end hostilities",
+        "What would end this war?",
+        "Terms for peace",
+        "Minimum acceptable terms",
+        "Maximum acceptable terms",
+        "Under what circumstances would you withdraw your declaration?",
+        "Circumstances in which this filing would become unnecessary",
+        { "label": "What would make you stop filling in these forms?", "help": "There are no such circumstances. Answer anyway." },
+        "Describe peace, briefly"
+      ]
+    },
+    {
+      "id": "end-date",
+      "type": "date",
+      "phrasings": [
+        "Date on which hostilities are expected to end",
+        "When do you expect this war to be over?",
+        "Anticipated conclusion date",
+        "Date by which your faction expects satisfaction",
+        "Date on which you intend to stop filing forms",
+        { "label": "Expected end of dispute", "help": "An estimate is acceptable. A correct estimate is not required." },
+        "Latest date on which this war would still seem worthwhile",
+        "Date on which the matter will, in your view, be resolved"
+      ]
+    },
+    {
+      "id": "losses-value",
+      "type": "number",
+      "min": 0,
+      "placeholder": "e.g. {{sum}}",
+      "phrasings": [
+        "Total value of losses claimed, in credits",
+        "How much has the dispute cost your faction?",
+        "Estimated damages, in credits",
+        "Value of property lost or damaged, in credits",
+        "Amount by which your faction considers itself aggrieved, in credits",
+        "Cost of the grievance to date",
+        "Cost of completing these forms to date, in credits",
+        "Value of the {{asset}} concerned, in credits",
+        "Losses in credits, rounded up",
+        "Losses in credits, rounded down"
+      ]
+    },
+    {
+      "id": "losses-asset",
+      "type": "text",
+      "phrasings": [
+        "Description of any asset lost or damaged",
+        "What did your faction lose?",
+        "Designation of the {{asset}} concerned",
+        "Registry name of the property affected",
+        "Name of the grid, ship, or station involved",
+        "Which of your assets does this grievance concern?",
+        { "label": "List the property involved", "help": "Do not include coordinates." },
+        "State what was {{verb}}",
+        "Name the {{asset}} said to have been {{verb}}",
+        "What was the asset called before the incident?",
+        "What is the asset called now?"
+      ]
+    },
+    {
+      "id": "prior-contact",
+      "type": "radio",
+      "options": ["Yes", "No", "Attempted", "Not applicable"],
+      "phrasings": [
+        "Did your faction contact the Concern before declaring war?",
+        "Were any attempts made to resolve this matter by correspondence?",
+        "Before declaring, did you raise the issue with the Concern?",
+        "Has the Concern been told of this grievance by any means other than this form?",
+        "Was a complaint lodged with the Concern before hostilities began?",
+        "Did you consider writing to the Concern first?",
+        "Is this the first the Concern is hearing of this?",
+        { "label": "Has this dispute been the subject of earlier correspondence?", "options": ["Yes", "No", "Only this correspondence"] },
+        { "label": "Have you tried asking nicely?", "options": ["Yes", "No", "Nicely is subjective"] }
+      ]
+    },
+    {
+      "id": "prior-declarations",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of previous wars declared by your faction",
+        "How many times has your faction declared war on the Concern?",
+        "How many times has your faction declared war on anyone?",
+        "Number of declarations of war issued by the signatory personally",
+        "Previous declarations against the Concern (excluding this one)",
+        "Previous declarations against the Concern (including this one)",
+        "Number of wars your faction has won",
+        "Number of wars your faction has finished",
+        "Grievances filed with the Concern so far, including this sheet"
+      ]
+    },
+    {
+      "id": "allies",
+      "type": "text",
+      "phrasings": [
+        "Names of any factions allied with the declaring party",
+        "Who else is involved on your side?",
+        "Allies, co-belligerents, and associates",
+        "Any party that has agreed to fight alongside you",
+        "Any party that has not yet agreed to fight alongside you but might",
+        "Any faction that would be surprised to learn it is your ally",
+        "Other signatories to this declaration, if any",
+        "Are you acting alone? If not, with whom?",
+        "Third parties with an interest in this dispute"
+      ]
+    },
+    {
+      "id": "mercenaries",
+      "type": "radio",
+      "options": ["Yes", "No", "Undecided", "Already have"],
+      "phrasings": [
+        "Does your faction intend to hire mercenaries?",
+        "Will any part of this war be carried out by contractors?",
+        "Is your faction employing hired fighters in this dispute?",
+        { "label": "Would your faction like to hire mercenaries through the Concern?", "options": ["Yes", "No", "Request a quote", "Only at a discount"] },
+        "Have you considered outsourcing this war?",
+        "Will you be engaging third parties to act on your behalf?",
+        "Are any of the combatants on your side being paid?",
+        { "label": "Are you aware that the Concern arranges mercenary contracts for any client, including you?", "options": ["Yes", "No", "I am now"] }
+      ]
+    },
+    {
+      "id": "purchase-interest",
+      "type": "radio",
+      "options": ["Yes", "No", "Possibly", "Send a catalogue"],
+      "phrasings": [
+        "Would your faction be interested in buying matériel from the Concern?",
+        "Would you like to receive the Concern’s current price list?",
+        "Would you buy a replacement {{asset}} from the Concern at list price?",
+        "Is your faction open to a commercial arrangement?",
+        "May the Concern contact you with offers?",
+        { "label": "Would a discount change your position on this war?", "options": ["Yes", "No", "Depends on the discount", "I would like to hear the discount"] },
+        { "label": "Are you aware that the Concern sells to any party, including parties at war with it?", "options": ["Yes", "No", "I am now"] },
+        "Would you consider buying the weapons for this war from the Concern?",
+        "Do you require a quotation for anything?"
+      ]
+    },
+    {
+      "id": "negotiation",
+      "type": "radio",
+      "options": ["Yes", "No", "Possibly", "Only in writing"],
+      "phrasings": [
+        "Is your faction willing to negotiate a settlement?",
+        "Would you accept a negotiated end to hostilities?",
+        "Are you open to talks?",
+        "Would your faction consider arbitration?",
+        "Is there any offer the Concern could make that you would accept?",
+        { "label": "Do you regard this form as a negotiation?", "options": ["Yes", "No", "It is becoming one"] },
+        "Would you discuss terms, if the terms were on a form?",
+        "Is compromise possible?",
+        { "label": "Should the Concern make an offer?", "options": ["Yes", "No", "Only a generous one"] }
+      ]
+    },
+    {
+      "id": "compensation",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Settlement sum, in credits",
+        "What would it cost to make this go away?",
+        "Compensation sought, in credits",
+        "Minimum settlement figure",
+        "Settlement figure you would accept if nobody was watching",
+        "Price of peace, in credits",
+        "How much should the Concern pay you, if anything?",
+        { "label": "How much would you pay the Concern to stop sending forms?", "help": "This is not an offer." },
+        "Reparations requested"
+      ]
+    },
+    {
+      "id": "coordinates",
+      "type": "checkbox",
+      "phrasings": [
+        "I confirm that this sheet contains no coordinates.",
+        "I have not disclosed the location of any faction on this sheet.",
+        "I understand that the Concern knows where every faction is and discloses none of them.",
+        "I will not ask the Concern to disclose the location of any faction.",
+        "My answers contain no locations, grid positions, or directions.",
+        "I acknowledge that the Concern knows where I am and has chosen not to mention it.",
+        "I confirm that my answers contain no coordinates, including disguised ones.",
+        "I understand that any coordinates written here will be filed, not read, and not disclosed."
+      ]
+    },
+    {
+      "id": "neutrality",
+      "type": "radio",
+      "options": ["Yes", "No", "Partly", "Unsure"],
+      "phrasings": [
+        "Do you accept that the Concern is a neutral party?",
+        "Is it your position that the Concern has taken sides?",
+        { "label": "In your view, is the Concern a peaceful organisation?", "options": ["Yes", "No", "Commercially", "Unsure"] },
+        { "label": "Has the Concern, to your knowledge, ever fought anyone directly?", "options": ["Yes", "No", "Not personally", "Unsure"] },
+        "Do you consider the Concern’s neutrality to be genuine?",
+        "Would you describe the Concern as a combatant?",
+        { "label": "Would you describe the Concern as a shop?", "options": ["Yes", "No", "A very large shop"] },
+        "Should the Concern remain neutral in this war?"
+      ]
+    },
+    {
+      "id": "first-grievance",
+      "type": "radio",
+      "options": ["Yes", "No", "Unsure"],
+      "phrasings": [
+        "Is this your faction’s first grievance against the Concern?",
+        "Have you filed a grievance with the Concern before?",
+        "Is this matter new?",
+        { "label": "Has this grievance been raised on any previous sheet?", "options": ["Yes", "No", "On every previous sheet"] },
+        "Is this grievance related to a previous grievance?",
+        { "label": "Is this the same grievance as the one described earlier?", "options": ["Yes", "No", "It has grown"] },
+        { "label": "Is this filing a continuation?", "options": ["Yes", "No", "Aren’t they all"] },
+        "Should this grievance be treated as new?"
+      ]
+    },
+    {
+      "id": "duplicate",
+      "type": "checkbox",
+      "phrasings": [
+        "I certify that this filing is not a duplicate of any filing already on file, including this one.",
+        "I confirm that this sheet has not been submitted before.",
+        "I confirm that my answers on this sheet do not repeat answers given elsewhere.",
+        "I understand that repeated answers will be treated as new answers.",
+        "I declare that this grievance is distinct from every other grievance I have filed.",
+        "Any similarity between this sheet and a previous sheet is the Office’s doing, not mine.",
+        { "label": "I have not answered any of these questions before.", "help": "If you have, tick the box anyway." },
+        "I acknowledge that questions on this sheet may resemble earlier questions and must still be answered."
+      ]
+    },
+    {
+      "id": "truth",
+      "type": "checkbox",
+      "phrasings": [
+        "I certify that the foregoing is true to the best of my knowledge.",
+        "I confirm that my answers are accurate.",
+        "I declare that nothing on this sheet is false.",
+        "I declare that nothing on this sheet is true, unless stated.",
+        "My answers above are consistent with my answers on every previous sheet.",
+        "I accept responsibility for the accuracy of this sheet.",
+        "I certify that my knowledge is limited and that I have not attempted to extend it.",
+        "The information provided is complete, or will be on the next sheet.",
+        "I solemnly swear that I read each question before answering it."
+      ]
+    },
+    {
+      "id": "signature",
+      "type": "signature",
+      "placeholder": "Sign here",
+      "phrasings": [
+        "Signature of the declaring party’s representative",
+        "Sign here",
+        "Signature of the person completing this sheet",
+        "Signature (must match the signature on your previous sheet)",
+        "Signature (must not match the signature on your previous sheet)",
+        { "label": "Initials", "placeholder": "Initial here" },
+        "Signature of authorised officer",
+        "Countersignature",
+        "Sign again, below",
+        "Signature, as you would like it to appear in {{ledger}}"
+      ]
+    },
+    {
+      "id": "date-signed",
+      "type": "date",
+      "phrasings": [
+        "Date of signature",
+        "Today’s date",
+        "Date this sheet was completed",
+        "Date this sheet was begun",
+        "Date on which your signature takes effect",
+        { "label": "Date, written in full", "help": "If different from any date above, explain on the next sheet." },
+        "What is the date?",
+        "Date you expect this sheet to be read"
+      ]
+    },
+    {
+      "id": "witness",
+      "type": "signature",
+      "phrasings": [
+        "Signature of witness",
+        "Signature of a witness who was not present",
+        { "label": "Name of a witness to the grievance", "type": "text" },
+        { "label": "Name of a witness to this form being completed", "type": "text" },
+        "Witness countersignature",
+        { "label": "Signature of alternate notary", "disabled": true, "placeholder": "Currently on sabbatical — see Form GC-9 to request alternate notarisation" },
+        { "label": "Counter-signature of {{officer}}", "disabled": true, "placeholder": "To be completed by this office" },
+        { "label": "Did anyone see you fill this in?", "type": "radio", "options": ["Yes", "No", "I was careful"] }
+      ]
+    },
+    {
+      "id": "home-region",
+      "type": "text",
+      "help": "Describe the region only. The Office does not accept coordinates.",
+      "phrasings": [
+        "General region in which your faction operates",
+        "Where is your faction based?",
+        "Home sector, described in words",
+        "Nearest landmark to your main base, described vaguely",
+        "Planet, moon, or stretch of empty space your faction considers home",
+        "Area of operations",
+        "Where would the Concern find you, if it were looking? (It is not.)",
+        "Region affected by the dispute"
+      ]
+    },
+    {
+      "id": "fleet",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of ships operated by the declaring party",
+        "How many ships does your faction have?",
+        "Fleet strength",
+        "Number of grids your faction would describe as warships",
+        "Number of grids your faction would describe as warships, if asked by an ally",
+        "Number of ships your faction had before this dispute",
+        "Number of ships your faction expects to have after this dispute",
+        "Fleet size, excluding ships still under construction",
+        "Fleet size, including ships that exist only as plans"
+      ]
+    },
+    {
+      "id": "aggrieved-person",
+      "type": "text",
+      "phrasings": [
+        "Name of the member most affected by the grievance",
+        "Who, specifically, was wronged?",
+        "Name of the aggrieved individual",
+        "Which of your members raised this grievance first?",
+        "Person on whose behalf this complaint is chiefly made",
+        "Name of anyone who has asked to be kept out of this"
+      ]
+    },
+    {
+      "id": "responsible-person",
+      "type": "text",
+      "phrasings": [
+        "Individual whose conduct gave rise to the complaint",
+        "Who do you hold responsible?",
+        "Name of the person at fault",
+        "Name of the person at fault, if not the Concern as a whole",
+        "Individuals named in the grievance",
+        "Who started it?",
+        "Who should the Concern speak to about this? (Not in person.)",
+        "Name of the respondent"
+      ]
+    },
+    {
+      "id": "evidence",
+      "type": "checkboxes",
+      "options": ["Screenshots", "Logs", "Witness statements", "A recording", "A strong feeling", "None"],
+      "phrasings": [
+        "Evidence held in support of the grievance",
+        "What evidence do you have?",
+        "Supporting material available to the Office on request",
+        "Evidence enclosed with this sheet",
+        "Evidence you intend to enclose with a future sheet",
+        "Which of the following could you produce if asked?",
+        { "label": "Describe your strongest piece of evidence", "type": "text" },
+        { "label": "Describe your weakest piece of evidence", "type": "text" },
+        { "label": "Is your evidence notarised?", "type": "radio", "options": ["Yes", "No", "The notary is on sabbatical"] }
+      ]
+    },
+    {
+      "id": "timeline",
+      "type": "textarea",
+      "rows": 5,
+      "phrasings": [
+        "Set out the chronology of events.",
+        "Describe what happened, in order.",
+        "Set out the chronology of events in reverse order, then confirm it reads the same forwards.",
+        "List every relevant event, with a date for each.",
+        "Describe the sequence of events that led to your first sheet.",
+        "What happened first? What happened next? Continue until the present.",
+        "Account for the period between the grievance arising and this sheet being completed.",
+        "Describe the events again, from the Concern’s point of view."
+      ]
+    },
+    {
+      "id": "feelings",
+      "type": "select",
+      "options": ["Resolute", "Furious", "Weary", "Businesslike", "Confused", "Improving", "Declining to disclose"],
+      "phrasings": [
+        "Present emotional condition of the declaring party",
+        "How is your faction feeling?",
+        "Mood of the signatory at the time of signing",
+        "Mood of the signatory at the start of this sheet",
+        "Emotional state, for the record",
+        "How has completing these forms made you feel?",
+        "How do you expect to feel on the next sheet?",
+        "Morale of the declaring party"
+      ]
+    },
+    {
+      "id": "vibes",
+      "type": "number",
+      "min": 1,
+      "max": 100,
+      "phrasings": [
+        "On a scale of 1 to 100, rate the vibes at the time of the incident",
+        "Rate the vibes now, out of 100",
+        "Vibes, as a percentage",
+        "Vibes at the start of this sheet, out of 100",
+        "Vibes at the end of this sheet, out of 100",
+        "Vibes expected on the next sheet",
+        "Vibes between the parties, out of 100"
+      ]
+    },
+    {
+      "id": "understanding",
+      "type": "checkbox",
+      "phrasings": [
+        "I understand that completing this sheet does not advance my grievance.",
+        "I understand that this filing does not constitute acceptance, rejection, or acknowledgement of anything.",
+        "I understand that incomplete sheets are filed alongside complete ones.",
+        "I understand that review may take 47 – ∞ {{unit}}.",
+        "I understand that the Concern will not read this sheet.",
+        "I understand that the Concern will keep this sheet forever.",
+        "I understand that my matter is stationary.",
+        "I understand that further sheets may be required, and that they will be."
+      ]
+    },
+    {
+      "id": "patience",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of {{unit}} you are prepared to wait for a response",
+        "How long will you wait for this to be reviewed?",
+        "Maximum acceptable review period, in {{unit}}",
+        "Minimum acceptable review period, in {{unit}}",
+        "How many more sheets are you prepared to complete?",
+        "How many sheets do you expect to complete before this matter concludes?",
+        "Patience remaining, as a percentage",
+        "Number of sheets completed so far, from memory"
+      ]
+    },
+    {
+      "id": "consent",
+      "type": "checkbox",
+      "phrasings": [
+        "I consent to this filing generating further filings.",
+        "I understand that withholding consent does not prevent this.",
+        "I agree to complete any further sheets the Office requires.",
+        "I acknowledge that the next sheet is already being prepared.",
+        "I would like to receive Form {{form}}.",
+        "I consent to being asked these questions again, differently.",
+        "I waive my right to a final sheet."
+      ]
+    },
+    {
+      "id": "reply",
+      "type": "select",
+      "options": ["Formal", "Cordial", "Curt", "In triplicate", "None", "Whatever is cheapest"],
+      "phrasings": [
+        "Preferred tone of reply",
+        "How would you like the Concern to respond?",
+        "Format of any reply",
+        { "label": "Should the Concern reply at all?", "options": ["Yes", "No", "Only in writing", "Only with forms"] },
+        { "label": "Preferred length of reply", "options": ["Short", "Long", "One form", "Several forms"] },
+        { "label": "Preferred medium of reply", "options": ["Written", "Spoken", "Form", "Silence"] },
+        { "label": "When should the Concern reply?", "options": ["Immediately", "Eventually", "Never", "After review"] }
+      ]
+    },
+    {
+      "id": "read",
+      "type": "checkbox",
+      "phrasings": [
+        "I have read every previous sheet in full.",
+        "I have read the instructions at the top of this sheet.",
+        "I have read this question.",
+        "I have not skipped any questions on previous sheets.",
+        "I read the fine print.",
+        { "label": "I have read Form {{form}}.", "help": "You have not. Tick it anyway." },
+        "I have kept a copy of every sheet saved so far."
+      ]
+    },
+    {
+      "id": "form-count",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "How many sheets have you filed so far?",
+        "Number of forms completed in this matter",
+        "Sheets saved to date (count them)",
+        "Number of forms you believe remain",
+        "Number of forms you would consider reasonable",
+        "What sheet number is this?",
+        "How many copies have you sent to the Concern?"
+      ]
+    },
+    {
+      "id": "tone",
+      "type": "select",
+      "options": ["Formal", "Threatening", "Aggrieved", "Polite", "Theatrical", "Unclear"],
+      "phrasings": [
+        "Tone of your declaration of war",
+        "How would you describe your original message to the Concern?",
+        "Register of the declaration",
+        "Intended tone of the declaration",
+        "Tone of the declaration as received",
+        { "label": "How dramatic was your declaration?", "options": ["Not at all", "Somewhat", "Very", "Music was involved"] },
+        "Tone of this sheet"
+      ]
+    },
+    {
+      "id": "declaration-method",
+      "type": "select",
+      "options": ["Direct message", "Public channel", "Antenna broadcast", "Signage", "In person", "Carrier pigeon", "Other"],
+      "phrasings": [
+        "How was the declaration of war delivered?",
+        "By what means did your faction notify the Concern?",
+        "Channel used for the declaration",
+        "How did you tell the Concern?",
+        "How will you tell the Concern next time?",
+        "Medium of the original declaration",
+        { "label": "Was the declaration delivered on a form?", "type": "radio", "options": ["Yes", "No", "It is now"] }
+      ]
+    },
+    {
+      "id": "fee",
+      "type": "number",
+      "min": 0,
+      "placeholder": "{{sum}}",
+      "phrasings": [
+        "Filing fee tendered, in credits",
+        "Amount enclosed with this sheet",
+        "Fee paid for the previous sheet",
+        "Fee you intend to pay for the next sheet",
+        "How much are you paying to file this?",
+        "Credits enclosed (non-refundable)"
+      ]
+    },
+    {
+      "id": "fee-method",
+      "type": "radio",
+      "options": ["Credit transfer", "Ore", "Components", "A promise", "Under protest"],
+      "phrasings": [
+        "Method of payment",
+        "How will the filing fee be paid?",
+        "Form of payment tendered",
+        { "label": "Would you like to dispute the filing fee?", "options": ["Yes — attach Form {{form}}", "No", "I was unaware there was a fee"] },
+        { "label": "Was the fee paid willingly?", "options": ["Yes", "No", "Under protest", "Is anything, now"] }
+      ]
+    },
+    {
+      "id": "form-identity",
+      "type": "text",
+      "phrasings": [
+        "Title of the form you believe you are completing",
+        "What is the name of this form?",
+        { "label": "Is this the form you meant to complete?", "type": "radio", "options": ["Yes", "No", "It was when I began"] },
+        "Form number shown at the top of this sheet",
+        "Form number you expected to see at the top of this sheet",
+        { "label": "Have you seen this form before?", "type": "radio", "options": ["Yes", "No", "Something like it"] }
+      ]
+    },
+    {
+      "id": "schedule",
+      "type": "select",
+      "options": ["Schedule A — Active", "Schedule B — Dormant", "Schedule C — Duplicative", "Schedule D — Unreadable", "Schedule Q — Reserved"],
+      "phrasings": [
+        "Schedule under which this grievance should be indexed",
+        "Where should this sheet be filed?",
+        "Preferred filing location",
+        "Schedule the previous sheet should have been filed under",
+        { "label": "Drawer preference", "options": ["Drawer A", "Drawer B", "Drawer C (jammed)", "Any drawer"] }
+      ]
+    },
+    {
+      "id": "reference",
+      "type": "text",
+      "phrasings": [
+        { "label": "Ledger reference, if known", "placeholder": "{{ledger}}" },
+        "Reference number of your previous sheet",
+        { "label": "Reference number printed on your last saved copy", "placeholder": "e.g. 7K3-9B2" },
+        "Reference number you would like this sheet to have",
+        "Any reference number at all",
+        "File reference for this dispute"
+      ]
+    },
+    {
+      "id": "question-check",
+      "type": "radio",
+      "phrasings": [
+        { "label": "Did you understand the previous question?", "options": ["Yes", "No", "There was no previous question"] },
+        { "label": "Has this question been asked before?", "options": ["Yes", "No", "In different words"] },
+        { "label": "Is this question necessary?", "options": ["Yes", "No", "The Office has decided"] },
+        { "label": "Do you feel you have answered this question already?", "options": ["Yes", "No", "Several times"] },
+        { "label": "Are these questions getting easier?", "options": ["Yes", "No", "They are the same questions"] },
+        { "label": "Would you like to change any earlier answer?", "options": ["Yes", "No", "It is too late"], "help": "Earlier answers cannot be changed. Changes are filed separately." },
+        { "label": "Did you answer the question above truthfully?", "options": ["Yes", "No", "There is no question above"] }
+      ]
+    }
+  ],
+
+  "restatePrefixes": [
+    "Re-confirm:", "For the record:", "Supplementary:", "Once more:", "Cross-check:", "Amended:",
+    "Restated:", "Second request:", "Clarification required:", "Verification:", "For {{ledger}}:",
+    "Duplicate entry (required):", "Without reference to any earlier answer:",
+    "As at the date of this sheet:", "Final request:"
+  ],
+  "restateSuffixes": [
+    "(restated)", "(again)", "(for the avoidance of doubt)", "(second entry)", "(confirm)",
+    "(as previously requested)", "(answer independently of earlier sheets)",
+    "(this is a different question)", "(updated)", "(supersedes the earlier question)",
+    "(for audit purposes)", "(if unchanged, restate)"
+  ],
+
+  "interjections": [
+    "*The remainder of this section has been removed pending review of the review procedure.*",
+    "**Note:** some questions on this sheet may appear to repeat earlier questions. They are new questions. Answer them.",
+    "*A previous version of this section asked for the same information in a different order. Both versions remain in force.*",
+    "**Note:** answers on this sheet may contradict answers on a previous sheet. Where they do, both are kept and neither is preferred.",
+    "*If you have already answered a question below, answer it again. The earlier answer has been filed and cannot be consulted.*",
+    "**Reminder:** the Concern knows where every faction is, and says nothing.",
+    "*This section has been reviewed and found to be necessary.*",
+    "**Note:** the questions on this sheet are not numbered. This is intentional.",
+    "*Questions in this section have been reworded for clarity. The clarity has been filed separately.*",
+    "**Guidance:** if a question seems familiar, that is because it is important.",
+    "*The Office thanks you for your continued participation, which is mandatory.*",
+    "**Note:** there is no final sheet. This is not a note about the final sheet.",
+    "*Section intentionally left partly blank.*",
+    "**Please note:** the following questions are asked in a different order for your convenience.",
+    "*An earlier draft of this section was more concise. It was rejected.*"
+  ],
+
   "titles": [
-    "Grievance & Casus Belli Intake Form",
     "Supplementary Grievance Particulars",
     "Declaration of Hostile Intent — Continuation Sheet",
     "Casus Belli Substantiation Worksheet",
@@ -35,28 +928,17 @@
     "Certificate of Grievance Severity",
     "Severity Pre-Assessment Worksheet",
     "Statement of Non-Duplicative Grievance",
-    "Third-Party Conduct Attribution Claim",
-    "Notice of Retraction",
-    "Notice of Retraction of Retraction",
     "Request for Alternate Notarisation",
-    "Coordinate Disclosure Attestation",
-    "Schedule of Assets Alleged Destroyed",
-    "Photographic Evidence Cover Sheet",
-    "Transmission Authenticity Declaration",
-    "Encryption Key Custody Record",
-    "Orthographic Correction Request",
-    "Declaring Party Name Reconciliation",
+    "Coordinate Non-Disclosure Attestation",
+    "Schedule of Assets Alleged Lost",
+    "Evidence Cover Sheet",
+    "Declaring Party Name Confirmation",
     "Belligerent Entity Registration",
     "Notice of Intent to Continue Intending",
     "War Aims Itemisation Schedule",
-    "Contractor & Hired Belligerent Manifest",
-    "Waiver of Further Warnings",
+    "Contractor & Mercenary Disclosure",
     "Acknowledgement of Non-Acknowledgement",
     "Grievance Chronology Reconstruction",
-    "Tag Custody & Attribution Ledger",
-    "Membership Readmission Objection",
-    "Ideological Consistency Audit Request",
-    "Statement of Hypocrisy Particulars",
     "Neutrality Challenge Submission",
     "Application to Dispute a Filing Fee",
     "Request for Expedited Review (Denied in Advance)",
@@ -65,12 +947,20 @@
     "Amendment to a Form Not Yet Filed",
     "Notice of Correspondence Received",
     "Declaration Regarding Declarations",
-    "Sector Erasure Feasibility Questionnaire",
     "Claim for Emotional Damage to a Corporation",
     "Statement of Intent to Escalate",
     "Escalation De-Escalation Worksheet",
     "Preliminary Findings Acknowledgement Sheet",
-    "Terminal Grievance Summary (Non-Terminal)"
+    "Terminal Grievance Summary (Non-Terminal)",
+    "Restatement of Particulars Previously Stated",
+    "Consistency Verification Questionnaire",
+    "Re-Declaration of Facts Already Declared",
+    "Supplementary Supplement",
+    "Confirmation of Confirmations",
+    "Settlement Interest Survey",
+    "Commercial Opportunity Disclosure",
+    "Faction Census Return",
+    "Peace Terms Pre-Qualification Form"
   ],
 
   "subtitles": [
@@ -83,7 +973,8 @@
     "Retain your copy. The Office will retain theirs.",
     "Page 1 of an indeterminate number.",
     "Neutral by policy. Thorough by temperament.",
-    "A continuation of a matter that has not yet begun."
+    "A continuation of a matter that has not yet begun.",
+    "Some of these questions will seem familiar. They are not."
   ],
 
   "departments": [
@@ -98,7 +989,8 @@
     "Office of the Notary (Sabbatical)",
     "Sub-Office of Duplicate Filings",
     "Registry of Declared Intentions",
-    "Department of Vibes Adjudication"
+    "Department of Vibes Adjudication",
+    "Bureau of Restated Particulars"
   ],
 
   "metaLines": [
@@ -115,16 +1007,16 @@
   ],
 
   "instructions": [
-    "**Before you begin:** this sheet must be completed in full before the matter it concerns can be considered to exist. Incomplete submissions are not rejected — they are filed alongside complete ones, in the same drawer, in no particular order.",
-    "**Notice:** answers given on this sheet may contradict answers given on a previous sheet. Where they do, both are retained and neither is preferred.",
-    "**Important:** do not leave any field blank. A blank field is interpreted by {{officer}} as an admission, though of what has not been determined.",
+    "**Before you begin:** this sheet must be completed in full before the matter it concerns can be considered to exist. Incomplete sheets are not rejected — they are filed alongside complete ones, in the same drawer, in no particular order.",
+    "**Notice:** answers given on this sheet may contradict answers given on a previous sheet. Where they do, both are kept and neither is preferred.",
+    "**Important:** do not leave any field blank. A blank field is read by {{officer}} as an admission, though of what has not been determined.",
     "**Please note:** the Concern is a pacifist commercial entity and will not respond to this filing with force. It will respond with correspondence, which is worse.",
-    "**Before proceeding:** confirm that you have read {{form}}. You have not. Confirm it anyway.",
-    "**Declaring parties are reminded** that the Concern knows the location of every faction in this sector and discloses none of them, including yours, including to you.",
+    "**Before proceeding:** confirm that you have read Form {{form}}. You have not. Confirm it anyway.",
+    "**Declaring parties are reminded** that the Concern knows where every faction in this sector is and discloses none of them, including yours, including to you.",
     "**Warning:** completing this sheet does not advance your matter. Nothing advances your matter. Your matter is stationary by design.",
-    "**Procedural note:** this form was drafted in response to a filing that has not yet been made. Any resemblance to your circumstances is structural, not personal.",
-    "**Attention:** the Office does not accept verbal declarations, encrypted transmissions, or photographs of wreckage. Those are not filings. They are retained without being read.",
-    "**Prior to completion:** ensure your entity is registered under a name that is not a word meaning “not known”. See {{form}}."
+    "**Procedural note:** some information requested below has been requested before. The Office requires it again, in the form now asked.",
+    "**Attention:** the Office does not accept spoken declarations, broadcasts, or strongly worded signage. Those are not filings. They are kept without being read.",
+    "**Guidance:** where a question resembles one you have already answered, answer it as though you had not."
   ],
 
   "sectionTitles": [
@@ -138,225 +1030,47 @@
     "Chronology of Events",
     "Asset Schedule",
     "Losses Claimed",
-    "Evidentiary Attachments",
-    "Photographic Material",
-    "Transmission Particulars",
-    "Encryption & Authenticity",
-    "Orthography & Spelling",
-    "Third-Party Conduct",
-    "Attribution & Tag Custody",
-    "Membership Matters",
-    "Allegations of Hypocrisy",
+    "Evidentiary Matters",
+    "Third-Party Involvement",
+    "Allies & Contractors",
     "Neutrality Assessment",
-    "Hired Belligerents",
-    "Contractor Disclosure",
     "War Aims",
     "Intended Outcomes",
     "Escalation Particulars",
-    "Warnings Given and Withheld",
-    "Retraction Particulars",
-    "Retraction of Retraction",
-    "Coordinates (Undisclosed)",
-    "Territorial Assertions",
+    "Settlement Particulars",
+    "Commercial Matters",
+    "Location (Undisclosed)",
     "Financial Position",
     "Fees & Disbursements",
     "Certification & Notarisation",
     "Signatures",
-    "Required Attachments",
     "Cross-References",
     "Prior Filings",
     "Duplicate Filing Check",
     "Correspondence Preferences",
     "Emotional Particulars",
     "Vibes Assessment",
+    "Restated Particulars",
+    "Particulars Previously Supplied",
+    "Consistency Check",
     "Supplementary Matters",
     "Matters Not Otherwise Classified",
     "Closing Declarations"
   ],
 
   "sectionNotes": [
-    "Select all that apply. Selecting none is treated as selecting all, per Subsection 12(c)(iv)(iv).",
-    "Answers in this section are cross-checked against {{form}}, which does not exist. Discrepancies will be noted.",
-    "This section is retained by {{officer}} and is not returned.",
+    "Answers in this section are cross-checked against Form {{form}}, which does not exist. Discrepancies will be noted.",
+    "This section is kept by {{officer}} and is not returned.",
     "Responses here are advisory and will not be read before the matter is closed.",
     "Any figure entered in this section is treated as an estimate, including exact figures.",
     "This section was added in response to a previous filing and may not apply to you. Complete it regardless.",
     "Where a question cannot be answered truthfully, answer it anyway; the Office does not verify.",
-    "Entries in this section are filed in {{ledger}} and cannot subsequently be located.",
-    "Amendments to this section require {{form}}, filed before the amendment is contemplated.",
+    "Entries in this section are filed in {{ledger}} and cannot afterwards be located.",
+    "Amendments to this section require Form {{form}}, filed before the amendment is considered.",
     "The Office reminds you that this section is the shortest one.",
     "Continuation sheets are available on request. The request requires a continuation sheet.",
-    "Do not write outside the boxes. There are no boxes.",
-    "This section is identical to a section on {{form}}. Both must be completed separately."
-  ],
-
-  "questions": [
-    { "type": "text", "label": "Name of declaring party or organisation", "placeholder": "As it will appear in {{ledger}}", "required": true },
-    { "type": "text", "label": "Legal name of entity, if different from the name transmitted", "placeholder": "A word meaning “not known” is not a legal name" },
-    { "type": "text", "label": "Alternate spellings of your entity name appearing in your own correspondence", "placeholder": "e.g. a transposed consonant" },
-    { "type": "text", "label": "Entity name as it appeared in the decrypted body of your transmission", "help": "Where this differs from the header, both entities are registered separately." },
-    { "type": "radio", "label": "Are “UNKNOWN” and “UNKMOWN” the same entity for filing purposes?", "options": ["Yes — a single entity, one of the spellings being an error", "No — two entities, jointly and severally declaring", "The distinction is immaterial", "I decline to characterise my own name"] },
-    { "type": "text", "label": "Authorised signatory", "placeholder": "Rank, callsign, or alias", "required": true },
-    { "type": "text", "label": "Authority under which the signatory signs", "placeholder": "Cite the instrument, not the feeling" },
-    { "type": "text", "label": "Name of the officer who authorised the officer above" },
-    { "type": "text", "label": "Preferred correspondence channel", "placeholder": "Frequency, relay, or carrier pigeon designation" },
-    { "type": "text", "label": "Transmitting frequency", "placeholder": "{{frequency}}" },
-    { "type": "radio", "label": "Is the frequency given above a valid hexadecimal value?", "options": ["Yes", "No", "It was not intended to be", "Unaware that it was required to be"] },
-    { "type": "text", "label": "Callsign used when the transmission was sent" },
-    { "type": "text", "label": "Callsign used when the transmission was retracted" },
-    { "type": "text", "label": "Callsign used when the retraction was itself retracted" },
-    { "type": "date", "label": "Date of the declaration" },
-    { "type": "date", "label": "Date the declaration was first contemplated" },
-    { "type": "date", "label": "Date on which hostilities are expected to conclude", "help": "An estimate is acceptable. A correct estimate is not required." },
-    { "type": "number", "label": "Number of prior declarations made against the Concern by your entity", "min": 0 },
-    { "type": "number", "label": "Number of those declarations subsequently described as “just kidding”", "min": 0 },
-    { "type": "number", "label": "Number of times the phrase “…or are we?” has been appended to a retraction", "min": 0 },
-    { "type": "checkboxes", "label": "Casus belli classification — select all that apply", "options": ["Grid or cargo theft", "Territorial dispute", "Aesthetic grievance (paint scheme, silhouette, or station lighting)", "Vibes", "Ideological inconsistency on the part of the Concern", "Conduct of a third party bearing the Concern’s tag", "Readmission of a former member", "Unspecified / classified", "Other — attach {{form}}"] },
-    { "type": "checkboxes", "label": "Which of the following did you consider before declaring?", "options": ["Correspondence", "Arbitration", "A strongly worded transmission", "Purchasing the asset instead", "Hiring the Concern to attack a third party", "None of the above", "All of the above, insincerely"] },
-    { "type": "select", "label": "Severity of grievance, as assessed by the declaring party", "options": ["Trivial", "Moderate", "Grave", "Total", "Beyond the Office’s current scale", "Declining to self-assess"] },
-    { "type": "select", "label": "Severity of grievance, as it will ultimately be recorded", "options": ["Trivial"], "help": "This field is provided for completeness." },
-    { "type": "textarea", "label": "Describe the grievance in no fewer than 500 words. Testimony is preferred in the third person.", "placeholder": "Begin with: “On the date in question, the aggrieved party…”", "minWords": 500, "rows": 6 },
-    { "type": "textarea", "label": "Restate the grievance above in no more than 40 words, without omitting anything.", "rows": 3 },
-    { "type": "textarea", "label": "Describe the moment you decided the Concern was not pacifist. Include weather.", "rows": 4 },
-    { "type": "textarea", "label": "Set out the chronology of events in reverse order, then confirm it reads identically forwards.", "rows": 5 },
-    { "type": "textarea", "label": "Explain, without using the word “erase”, what you intend to do.", "rows": 4 },
-    { "type": "textarea", "label": "Explain why the matter could not be resolved by invoice.", "rows": 4 },
-    { "type": "textarea", "label": "State your war aims in itemised form, with a unit cost for each.", "rows": 5 },
-    { "type": "textarea", "label": "Describe the {{asset}} at the time it was {{verb}}, in the past tense, sympathetically.", "rows": 4 },
-    { "type": "text", "label": "Designation of the {{asset}} alleged to have been {{verb}}" },
-    { "type": "text", "label": "Registry number of that asset", "placeholder": "If unknown, state how it was identified as belonging to the Concern" },
-    { "type": "number", "label": "Declared value of the asset, in credits", "min": 0, "placeholder": "e.g. {{sum}}" },
-    { "type": "number", "label": "Value of the asset after it was {{verb}}, in credits", "min": 0 },
-    { "type": "number", "label": "Number of Concern assets located to date", "min": 0 },
-    { "type": "number", "label": "Number of Concern assets located and then mislaid again", "min": 0 },
-    { "type": "text", "label": "Method by which the {{asset}} was located", "placeholder": "Do not disclose coordinates. The Office does not accept them." },
-    { "type": "checkbox", "label": "I confirm that I possess coordinates for a Concern facility and that I will not be disclosing them on this form.", "help": "The Concern also possesses your coordinates and observes the same courtesy." },
-    { "type": "checkbox", "label": "I understand that the Concern does not disclose the location of any faction, including mine, including to me." },
-    { "type": "radio", "label": "Do you wish the Concern to confirm whether the coordinates you hold are correct?", "options": ["Yes", "No", "Yes, but I understand it will not", "I would like it noted that I asked"] },
-    { "type": "checkbox", "label": "A photograph of the remains is attached.", "help": "Photographs must be notarised. See {{form}}." },
-    { "type": "text", "label": "Name of the notary who notarised the photograph", "placeholder": "Not the notary in the certification section" },
-    { "type": "radio", "label": "Is the photograph of remains that are yours, ours, or unattributed?", "options": ["Yours", "Ours", "Unattributed", "It is a photograph of a different engagement", "Declining to specify"] },
-    { "type": "number", "label": "Resolution of the attached photograph, in pixels per side", "min": 0 },
-    { "type": "text", "label": "Encryption scheme used for the declaration", "placeholder": "State the scheme, not the key" },
-    { "type": "radio", "label": "Was the encryption intended to conceal the message?", "options": ["Yes", "No — it was intended to be decoded", "It was intended to look concealed", "The question misunderstands the gesture"] },
-    { "type": "text", "label": "Party responsible for custody of the encryption key" },
-    { "type": "checkbox", "label": "I confirm the encoded and decoded texts of my declaration are identical in meaning." },
-    { "type": "checkbox", "label": "I confirm the decoded text contains no spelling errors." },
-    { "type": "text", "label": "If the box above could not be checked, identify the error", "placeholder": "Character position is sufficient" },
-    { "type": "radio", "label": "Do you wish to file an Orthographic Correction Request?", "options": ["Yes — attach {{form}}", "No — the error stands as transmitted", "The error was deliberate and is part of the declaration", "I dispute that there is an error"] },
-    { "type": "text", "label": "Name of the individual whose conduct is attributed to the Concern" },
-    { "type": "date", "label": "Date that individual joined the Concern" },
-    { "type": "date", "label": "Date that individual departed the Concern" },
-    { "type": "date", "label": "Date that individual was readmitted to the Concern" },
-    { "type": "radio", "label": "At the time of the conduct complained of, was the individual wearing the Concern’s tag?", "options": ["Yes", "No", "Partially", "The tag was visible but the intent was personal", "Unable to determine from the wreckage"] },
-    { "type": "textarea", "label": "Explain the theory by which a tag transfers liability, citing an authority.", "rows": 4 },
-    { "type": "radio", "label": "Is it your position that readmission constitutes ratification?", "options": ["Yes", "No", "Yes, but only retroactively", "It constitutes something, and ratification is the nearest word"] },
-    { "type": "checkbox", "label": "I accept that the Concern did not order the conduct complained of." },
-    { "type": "checkbox", "label": "I nevertheless maintain that the Concern is responsible for it." },
-    { "type": "textarea", "label": "Reconcile the two statements above.", "rows": 4 },
-    { "type": "select", "label": "Which of the Concern’s stated principles do you allege was breached?", "options": ["Pacifism", "Neutrality", "Non-disclosure of coordinates", "The chasing of profit", "Willingness to sell to all parties equally", "A principle the Concern has not stated but ought to hold"] },
-    { "type": "textarea", "label": "Set out the evidence that the Concern is not neutral, excluding conduct by persons who had left it.", "rows": 5 },
-    { "type": "radio", "label": "Would the Concern’s neutrality be restored, in your view, by expelling the individual again?", "options": ["Yes", "No", "Only if done publicly", "Only if done twice", "Neutrality cannot be restored, only invoiced"] },
-    { "type": "checkboxes", "label": "Which remedies would you accept?", "options": ["Expulsion of the individual", "Public statement", "Financial compensation", "Sale of the {{asset}} at cost", "Nothing — the matter is beyond remedy", "A written apology, notarised", "An invoice marked PAID"] },
-    { "type": "text", "label": "Name of each contractor, mercenary, or allied party you intend to treat as an extension of the Concern", "placeholder": "Continuation sheet available on request" },
-    { "type": "number", "label": "Estimated number of such parties", "min": 0 },
-    { "type": "radio", "label": "Do you require that list to be exhaustive as at the date of filing, or as at the date of engagement?", "options": ["Date of filing", "Date of engagement", "Both, separately", "Neither — the list is illustrative"] },
-    { "type": "checkbox", "label": "I understand that the Concern may hire parties not yet in existence, and that I have declared war on them in advance." },
-    { "type": "textarea", "label": "Name any party you would *not* treat as an extension of the Concern, and explain the distinction.", "rows": 4 },
-    { "type": "checkbox", "label": "I attest that I am not currently at war with the Concern as of the date of this filing.", "help": "If checked in error, see {{form}}, “Retroactive Peace.”" },
-    { "type": "checkbox", "label": "I attest that no further warnings will be issued by my entity." },
-    { "type": "radio", "label": "Is this form a warning?", "options": ["No", "Yes", "It became one upon filing", "The Office will decide"] },
-    { "type": "textarea", "label": "If this form is a warning, reconcile it with the attestation that no further warnings will be issued.", "rows": 4 },
-    { "type": "checkbox", "label": "I confirm that this declaration constitutes formal notice." },
-    { "type": "checkbox", "label": "I confirm that formal notice, once given, cannot be given again." },
-    { "type": "number", "label": "Number of times formal notice has now been given", "min": 0 },
-    { "type": "radio", "label": "Does your entity negotiate?", "options": ["No", "No, emphatically", "No, but the form asks and so it is answered", "Yes, but not with the Concern", "Declining to answer on principle"] },
-    { "type": "textarea", "label": "If your entity does not negotiate, explain the purpose of transmitting terms.", "rows": 4 },
-    { "type": "select", "label": "Preferred mode of erasure", "options": ["Total", "Phased", "Selective", "Symbolic", "To be determined by circumstance", "Erasure is not sought; the word was rhetorical"] },
-    { "type": "radio", "label": "Is the erasure of a name from a sector a physical act or an administrative one?", "options": ["Physical", "Administrative", "Both", "Neither — it is aspirational"] },
-    { "type": "checkbox", "label": "I understand that administrative erasure requires a filing, and that this office performs it.", "help": "Processing time: {{unit}}." },
-    { "type": "text", "label": "Sector from which the Concern’s name is to be erased" },
-    { "type": "text", "label": "Proposed replacement name for that sector, if any" },
-    { "type": "number", "label": "Number of {{unit}} you are prepared to wait for this matter to be reviewed", "min": 0 },
-    { "type": "radio", "label": "If review takes longer than that, what action will you take?", "options": ["File again", "Escalate", "Withdraw", "Wait regardless", "Declare war on the Office separately"] },
-    { "type": "checkbox", "label": "I understand that declaring war on the Office requires this same form." },
-    { "type": "text", "label": "Reference number of your previous filing", "placeholder": "If none, state “none” and attach proof" },
-    { "type": "checkbox", "label": "I certify that this filing is not a duplicate of any filing already on file, including this one." },
-    { "type": "radio", "label": "If this filing is found to be a duplicate, which copy should be retained?", "options": ["This one", "The earlier one", "Both", "Whichever is more legible", "Neither"] },
-    { "type": "text", "label": "Title of the form you believe you are currently completing" },
-    { "type": "radio", "label": "Is that the form you are currently completing?", "options": ["Yes", "No", "It was when I began"] },
-    { "type": "checkboxes", "label": "Required attachments — confirm each is enclosed", "options": ["Proof of Standing ({{form}})", "Certificate of Grievance Severity ({{form}}, which itself requires {{form}})", "Notarised copy of this sheet, in triplicate, notarised by someone other than the notary in the certification section", "Declaration of Non-Duplicative Grievance", "Photographic evidence cover sheet", "Transmission authenticity declaration", "A second copy of this list"] },
-    { "type": "checkbox", "label": "I confirm that none of the attachments above exist." },
-    { "type": "checkbox", "label": "I confirm that I have enclosed them regardless." },
-    { "type": "text", "label": "Location where the enclosed attachments may be found" },
-    { "type": "number", "label": "Filing fee tendered, in credits", "min": 0, "placeholder": "{{sum}}" },
-    { "type": "radio", "label": "Method of payment", "options": ["Credit transfer", "Barter", "Ore", "Refusal", "Under protest", "A promise, notarised"] },
-    { "type": "checkbox", "label": "I understand the filing fee is non-refundable and that no filing has occurred." },
-    { "type": "radio", "label": "Do you wish to dispute the filing fee?", "options": ["Yes — attach {{form}}", "No", "Yes, but I will not be filing the dispute", "I was unaware there was a fee"] },
-    { "type": "number", "label": "Amount by which you consider yourself aggrieved, expressed in credits", "min": 0 },
-    { "type": "textarea", "label": "Explain how that figure was arrived at, showing your working.", "rows": 4 },
-    { "type": "select", "label": "Present emotional condition of the declaring party", "options": ["Resolute", "Incandescent", "Weary", "Businesslike", "Performing resolve", "Unwilling to disclose", "Improving"] },
-    { "type": "select", "label": "Present emotional condition of the Concern, as you assess it", "options": ["Indifferent", "Profitable", "Filing", "Unbothered", "Pretending to be unbothered", "Unknown to you"] },
-    { "type": "number", "label": "On a scale of 1 to 100, rate the vibes at the time of the incident", "min": 1, "max": 100 },
-    { "type": "number", "label": "Rate the vibes now", "min": 1, "max": 100 },
-    { "type": "textarea", "label": "Account for the difference between the two vibe ratings above.", "rows": 3 },
-    { "type": "radio", "label": "Are the vibes, in your assessment, recoverable?", "options": ["Yes", "No", "Only through commerce", "Only through paperwork", "The question is not serious and neither is the answer"] },
-    { "type": "text", "label": "Word that best describes the Concern", "placeholder": "One word. It will be counted, not read." },
-    { "type": "text", "label": "Word that best describes your entity" },
-    { "type": "radio", "label": "Is either word “cowards”?", "options": ["Yes", "No", "Both", "Declining to answer"] },
-    { "type": "textarea", "label": "Define “hypocrisy” for the purposes of this filing, in terms the Office can audit.", "rows": 4 },
-    { "type": "checkbox", "label": "I consent to this definition being applied to my own entity in a later filing." },
-    { "type": "signature", "label": "Signature of declaring party", "placeholder": "Sign here", "required": true },
-    { "type": "signature", "label": "Signature of a witness who was not present" },
-    { "type": "signature", "label": "Notary public signature", "placeholder": "Currently on sabbatical — see {{form}} to request alternate notarisation", "disabled": true },
-    { "type": "signature", "label": "Counter-signature of {{officer}}", "placeholder": "To be completed by this office", "disabled": true },
-    { "type": "date", "label": "Date of signature" },
-    { "type": "date", "label": "Date the signature is intended to take effect", "help": "Where these differ, the earlier governs, unless the later is more convenient." },
-    { "type": "checkbox", "label": "I certify that the foregoing is true to the best of my knowledge.", "required": true },
-    { "type": "checkbox", "label": "I certify that my knowledge is limited and that I have not attempted to extend it." },
-    { "type": "text", "label": "Name of the person who will receive correspondence regarding this filing" },
-    { "type": "select", "label": "Preferred tone of reply", "options": ["Formal", "Cordial", "Curt", "Actuarial", "None — do not reply", "Whatever is cheapest"] },
-    { "type": "radio", "label": "May the Concern quote this filing in promotional material?", "options": ["Yes", "No", "Yes, for a fee", "Only the flattering parts"] },
-    { "type": "checkbox", "label": "I consent to this filing generating further filings." },
-    { "type": "checkbox", "label": "I understand that withholding consent does not prevent this." },
-    { "type": "text", "label": "Designation you would like assigned to the next form in this matter", "placeholder": "The Office will disregard this" },
-    { "type": "textarea", "label": "Is there anything further the Office should know? It will not be read.", "rows": 4 },
-    { "type": "text", "label": "Name of the {{asset}} you would purchase from the Concern if you were not at war with it" },
-    { "type": "number", "label": "Price you would consider fair for it, in credits", "min": 0 },
-    { "type": "radio", "label": "Would you like the Concern to quote you for that item anyway?", "options": ["Yes", "No", "Yes, but do not tell anyone", "A quotation has already been prepared"] },
-    { "type": "checkbox", "label": "I acknowledge that the Concern will sell to anyone, including parties at war with it, including me." },
-    { "type": "select", "label": "Under which schedule should this grievance be indexed?", "options": ["Schedule A — Active", "Schedule B — Dormant", "Schedule C — Duplicative", "Schedule D — Unreadable", "Schedule Q — Reserved", "To be determined by {{officer}}"] },
-    { "type": "text", "label": "Ledger reference, if known", "placeholder": "{{ledger}}" },
-    { "type": "radio", "label": "Should this matter be cross-referenced against your previous declaration?", "options": ["Yes", "No", "Only if the previous one was retracted", "Only if the retraction was itself retracted"] },
-    { "type": "textarea", "label": "State the current status of any retraction you have issued, and of any retraction of that retraction.", "rows": 4 },
-    { "type": "radio", "label": "Is the phrase “just kidding” to be treated as a formal retraction?", "options": ["Yes", "No", "It was at the time", "The Office should not rely on it"] },
-    { "type": "radio", "label": "Is the phrase “…or are we?” to be treated as a rescission of that retraction?", "options": ["Yes", "No", "It restores the original transmission in full", "It creates a third, intermediate state"] },
-    { "type": "textarea", "label": "Describe that third, intermediate state, and propose a form for recording it.", "rows": 4 },
-    { "type": "text", "label": "Proposed designation for that form" },
-    { "type": "checkbox", "label": "I am willing to draft it myself." },
-    { "type": "checkbox", "label": "I understand that drafting it requires prior approval on {{form}}." },
-    { "type": "static", "text": "*The remainder of this section has been removed pending review of the review procedure.*" },
-    { "type": "static", "text": "**Note:** the numbering of the questions above is not sequential. This is intentional and is not an error you are required to report." },
-    { "type": "static", "text": "*A previous version of this section asked for the same information in a different order. Both versions remain in force.*" },
-    { "type": "text", "label": "If you have reached this question before, state how many times" },
-    { "type": "radio", "label": "Does the repetition of questions across sheets affect your resolve?", "options": ["No", "Not yet", "Slightly", "I would prefer not to record an answer to this"] },
-    { "type": "number", "label": "Number of sheets you expect to complete before this matter concludes", "min": 0 },
-    { "type": "number", "label": "Number of sheets you are willing to complete", "min": 0 },
-    { "type": "textarea", "label": "Account for any difference between the two figures above.", "rows": 3 },
-    { "type": "text", "label": "Time at which you began this sheet" },
-    { "type": "text", "label": "Time at which you expect to finish it" },
-    { "type": "radio", "label": "Has that expectation been revised during completion?", "options": ["Yes", "No", "Continuously"] },
-    { "type": "select", "label": "Weather at the declaring party’s principal facility", "options": ["Vacuum", "Vacuum, but colder", "Not applicable", "Declining to disclose on security grounds", "Overcast"] },
-    { "type": "text", "label": "Name of the nearest star to your principal facility", "help": "This is not a request for coordinates and will not be treated as one." },
-    { "type": "radio", "label": "Did you nearly disclose coordinates in the previous answer?", "options": ["Yes", "No", "I stopped myself", "The Office already knows and this is a formality"] },
-    { "type": "checkbox", "label": "I understand that the Concern knows where I am and has elected not to mention it." },
-    { "type": "text", "label": "Preferred designation for your entity in the Concern’s internal records", "placeholder": "The Office may substitute a number" },
-    { "type": "number", "label": "If a number is substituted, state your preferred number", "min": 0 },
-    { "type": "radio", "label": "Would you object to being recorded as “Client”?", "options": ["Yes", "No", "Strongly", "Only in writing"] },
-    { "type": "textarea", "label": "The Concern regards the chasing of profit as a religious observance. State your entity’s position on this doctrine.", "rows": 4 },
-    { "type": "select", "label": "Do you wish to receive the Concern’s quarterly catalogue?", "options": ["Yes", "No", "Yes, but addressed to someone else", "It is already being delivered"] },
-    { "type": "checkbox", "label": "I would like to be notified when a form exists that resolves this matter." },
-    { "type": "static", "text": "*No such form is currently in development. Notification will be sent regardless.*" }
+    "This section is identical to a section on Form {{form}}. Both must be completed separately.",
+    "Questions in this section may repeat questions elsewhere. Each answer is filed independently."
   ],
 
   "officeUseTitles": [
@@ -377,12 +1091,11 @@
     { "label": "PRIORITY", "value": "Standard (no other tier exists)" },
     { "label": "STATUS", "value": "Pending" },
     { "label": "STATUS", "value": "Pending, but differently" },
-    { "label": "CROSS-REF", "value": "{{form}}" },
+    { "label": "CROSS-REF", "value": "Form {{form}}" },
     { "label": "DUPLICATE OF", "value": "Itself" },
     { "label": "LEGIBILITY", "value": "Assumed" },
     { "label": "FEE STATUS", "value": "Received, unapplied" },
     { "label": "RETENTION", "value": "Permanent" },
-    { "label": "RETENTION", "value": "Permanent, then reviewed" },
     { "label": "NOTARY", "value": "On sabbatical" },
     { "label": "SUPERSEDES", "value": "Nothing" },
     { "label": "SUPERSEDED BY", "value": "Everything" },
@@ -391,82 +1104,73 @@
   ],
 
   "finePrint": [
-    "By submitting, the declaring party acknowledges that this form does not constitute acceptance, rejection, or acknowledgement of any grievance, hostility, or correspondence, and may generate further forms.",
-    "Submission creates no obligation on the part of the Concern, and no right on the part of the declaring party, other than the right to submit again.",
+    "By filing, the declaring party acknowledges that this form does not constitute acceptance, rejection, or acknowledgement of any grievance, hostility, or correspondence, and may generate further forms.",
+    "Filing creates no obligation on the part of the Concern, and no right on the part of the declaring party, other than the right to file again.",
     "The Concern is a pacifist commercial entity. Nothing in this form should be read as a threat, a promise, or an intention to act.",
-    "Filings are retained indefinitely and reviewed at the Office’s convenience, which has not yet arisen.",
+    "Filings are kept indefinitely and reviewed at the Office’s convenience, which has not yet arisen.",
     "This form was generated automatically. It is nonetheless binding to the same extent as a form that was not, which is to say not at all.",
-    "The Office reserves the right to require this information again, on a different sheet, in a different order.",
+    "The Office reserves the right to request this information again, on a different sheet, in different words.",
     "Answers may be used to generate additional questions. This is the intended operation of the system, not a defect.",
     "Neither the completion nor the abandonment of this form affects the underlying matter, which is stationary."
   ],
 
   "transmittals": [
-    "**Transmittal:** send this copy to the Consolidated Industrial Concern together with every copy saved before it. Copies transmitted out of order are re-ordered, then filed out of order.",
+    "**Transmittal:** send this copy to the Consolidated Industrial Concern together with every copy saved before it. Copies sent out of order are re-ordered, then filed out of order.",
     "**Transmittal:** this copy must accompany Form GC-1 and all continuation sheets. A missing sheet invalidates nothing, and is noted.",
-    "**Transmittal:** retain a duplicate of this copy. Retain a duplicate of the duplicate. Transmit neither until the other has been transmitted.",
-    "**Transmittal:** deliver to {{dept}} via the channel through which your declaration was made. {{officer}} will sign for it on return from leave.",
+    "**Transmittal:** keep a duplicate of this copy. Keep a duplicate of the duplicate. Send neither until the other has been sent.",
+    "**Transmittal:** deliver to {{dept}} by the channel through which your declaration was made. {{officer}} will sign for it on return from leave.",
     "**Transmittal:** this sheet is to be filed with the Concern in its entirety. Partial sheets are accepted and treated as entire.",
     "**Transmittal:** forward this copy to the Concern for entry in {{ledger}}. Receipt will not be acknowledged, which constitutes acknowledgement."
   ],
 
   "submitLabels": [
     "SAVE COPY & FILE",
-    "RETAIN COPY & LODGE",
+    "KEEP COPY & LODGE",
     "SAVE COPY & CONTINUE",
     "STAMP, SAVE & FORWARD",
     "SAVE COPY FOR {{ledger}}",
     "SAVE COPY (NON-BINDING)",
-    "SAVE COPY FOR {{dept}}",
+    "SAVE COPY & RESTATE",
     "RETAIN & PROCEED"
   ],
 
   "stamps": [
-    "RETAINED",
-    "FILED",
-    "LODGED",
-    "NOTED",
-    "PENDING",
-    "COPIED",
-    "RECORDED",
-    "ENTERED",
-    "DUPLICATED",
-    "PROCESSED"
+    "RETAINED", "FILED", "LODGED", "NOTED", "PENDING",
+    "COPIED", "RECORDED", "ENTERED", "DUPLICATED", "PROCESSED"
   ],
 
   "receiptMessages": [
-    "Your copy of **{{code}}** has been saved as **{{file}}**, reference **{{ref}}**. Transmit it to {{dept}}. Before this matter can proceed, please complete **Form {{next}}** (attached).",
-    "Sheet **{{code}}** retained as **{{file}}** and provisionally entered in {{ledger}} at position **{{queue}}**. The matter now requires **Form {{next}}**.",
-    "Thank you. **{{code}}** has been copied, stamped, and saved as **{{file}}**. Transmit it with your previous copies. Continue with **Form {{next}}**.",
-    "**{{code}}** is complete and saved as **{{file}}**. Your responses have raised **{{next}}**, which must be completed before they can be read.",
-    "Retained. Reference **{{ref}}**, queue position **{{queue}}**. {{officer}} has been notified and is not available. Proceed to **Form {{next}}**.",
+    "Your copy of **{{code}}** has been saved as **{{file}}**, reference **{{ref}}**. Send it to {{dept}}. Before this matter can proceed, please complete **Form {{next}}** (attached).",
+    "Sheet **{{code}}** saved as **{{file}}** and provisionally entered in {{ledger}} at position **{{queue}}**. The matter now requires **Form {{next}}**.",
+    "Thank you. **{{code}}** has been copied, stamped, and saved as **{{file}}**. Send it with your previous copies. Continue with **Form {{next}}**.",
+    "**{{code}}** is complete and saved as **{{file}}**. Your answers have raised further questions, which appear on **Form {{next}}**.",
+    "Kept. Reference **{{ref}}**, queue position **{{queue}}**. {{officer}} has been notified and is not available. Proceed to **Form {{next}}**.",
     "Your copy of **{{code}}** (**{{file}}**) is acknowledged without prejudice. The next sheet in this matter is **{{next}}**.",
-    "**{{code}}** has been saved as **{{file}}**. This is sheet **{{count}}** of an indeterminate number. Transmit all of them. Please continue with **Form {{next}}**."
+    "**{{code}}** has been saved as **{{file}}**. This is sheet **{{count}}** of an indeterminate number. Send all of them. Please continue with **Form {{next}}**.",
+    "**{{code}}** saved as **{{file}}**. Some of your answers require confirmation. **Form {{next}}** asks for them again."
   ],
 
   "receiptFootnotes": [
     "Note: Form {{next}} supersedes this sheet but does not invalidate it. Both remain on file, indefinitely, in the same drawer.",
-    "Note: This is not a duplicate grievance. Each subsequent filing constitutes a new and legally distinct grievance for accounting purposes.",
+    "Note: This is not a duplicate grievance. Each subsequent filing is a new and legally distinct grievance for accounting purposes.",
     "Note: {{dept}} is currently reviewing whether it has jurisdiction over itself.",
     "Note: Your patience has been logged in {{ledger}}. Logging your patience does not affect processing time.",
-    "Note: The notary remains on sabbatical. A replacement has been requested via {{form}}, which is also under review.",
-    "Note: Processing time estimates are themselves subject to review, via a form not yet drafted.",
+    "Note: The notary remains on sabbatical. A replacement has been requested on Form {{form}}, which is also under review.",
+    "Note: Processing time estimates are themselves subject to review, on a form not yet drafted.",
     "Note: This grievance has been forwarded to a department that, as of this filing, does not yet exist.",
     "Note: Per policy, forms may not be withdrawn once filed, amended once withdrawn, or referenced once amended.",
-    "Note: An earlier answer on this sheet contradicts a later one. Both have been retained and neither is preferred.",
-    "Note: {{officer}} has initialled this sheet in the wrong box. A correction has been raised on {{form}}.",
-    "Note: Your entity name has been recorded under two spellings. They will be reconciled by {{officer}} in due course.",
-    "Note: The Concern continues to decline to disclose the coordinates of any faction, including yours, which it holds.",
+    "Note: An earlier answer on this sheet contradicts a later one. Both have been kept and neither is preferred.",
+    "Note: {{officer}} has initialled this sheet in the wrong box. A correction has been raised on Form {{form}}.",
+    "Note: The Concern continues to decline to disclose the location of any faction, including yours.",
     "Note: This sheet has been marked urgent. The urgent queue is processed after the standard queue.",
-    "Note: A photograph was expected with this filing. None was attached. None was required. It has been noted as missing.",
-    "Note: The Concern wishes to record that it remains willing to sell you replacement matériel at list price.",
+    "Note: The Concern wishes to record that it remains willing to sell you replacement equipment at list price.",
     "Note: Your declaration of war has been received and filed under Correspondence. It has not been read.",
-    "Note: The Office does not negotiate either. The Office files. In this respect the parties are aligned.",
-    "Note: This matter has been escalated to a tier that does not exist, and will return automatically in {{unit}}.",
-    "Note: {{ledger}} is currently full. Entries are being written in the margin.",
-    "Note: The Concern has assessed the vibes and found them to be unchanged.",
-    "Note: A form resolving this matter has been proposed and rejected on the grounds that it would resolve the matter.",
-    "Note: Sheet retained. Contents assumed. Reading scheduled for a later {{unit}}."
+    "Note: This matter has been escalated to a tier that does not exist, and will return automatically in several {{unit}}.",
+    "Note: {{ledger}} is full. Entries are being written in the margin.",
+    "Note: The Concern has assessed the vibes and found them unchanged.",
+    "Note: A form resolving this matter was proposed and rejected on the grounds that it would resolve the matter.",
+    "Note: Sheet kept. Contents assumed. Reading scheduled for a later date.",
+    "Note: Some answers on this sheet match answers on earlier sheets. The Office will ask again until they do not."
   ],
 
   "nextLabels": [
