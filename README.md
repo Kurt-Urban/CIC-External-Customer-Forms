@@ -1,103 +1,48 @@
 # CIC External Customer Forms
 
-The Consolidated Industrial Concern's response to any complaint: more paperwork.
+*The Consolidated Industrial Concern thanks you for your feedback. Please complete the form.*
 
-**Live:** https://kurt-urban.github.io/CIC-External-Customer-Forms/
+**Site:** https://kurt-urban.github.io/CIC-External-Customer-Forms/
 
-1. The customer opens the site and is handed **Form GC-1**, a customer dissatisfaction form
-   for the Concern's goods and services — shipbuilding, trade, cargo delivery. It is always
-   the same form, and it always looks the same.
-2. They fill in **every field** and press **Save copy & file**. Nothing saves until the
-   sheet is complete. The sheet is turned into a filled-in
-   paper copy — typed answers, ticked boxes, a handwritten signature, a rubber stamp and a
-   reference number — and downloaded as a PDF.
-3. Only then can they continue, to **Form GC-1a** — which is some other kind of paperwork
-   entirely: a mining permit, a crew dietary survey, a hull registration, a war grievance
-   form (the Concern is pacifist; it is issued anyway). Each sheet has its own title,
-   questions and stationery.
-4. Saving that unlocks GC-1b, a different kind again. And so on, indefinitely.
-
-No question is ever shown to the same person twice, but the same things keep being asked
-in different words, often twice on one sheet.
-
-It works for anyone: nothing in it refers to a particular customer or dispute.
-
-It is a static site. There is no server and nothing is stored anywhere except the PDFs the
-customer saves on their own machine. They send those to you.
+A customer-complaints portal for the Consolidated Industrial Concern, a Space Engineers
+faction that is pacifist, neutral, and devoted to profit. Anyone with a grievance gets the
+link. They then disappear into paperwork that never ends, never repeats itself, and never
+reaches the right department.
 
 ---
 
-## Publishing
+## What a visitor gets
 
-The site is served by GitHub Pages from the root of `main`. **Every push to `main`
-republishes it** within a minute or so:
+1. **Form GC-1 — Customer Dissatisfaction Intake Form.** It is the same form every time. It
+   covers complaints about the Concern's shipbuilding, trade, cargo delivery, ore refining,
+   station construction, and "contracted security (arranged, but never performed, by the
+   Concern)".
+2. **Every field is required.** Save is refused until the sheet is complete. Missing fields
+   are marked in red, and a counter under the button shows how many are left.
+3. **Saving produces their copy.** The sheet becomes a filled-in paper form: typed answers,
+   ticked boxes, a handwritten signature, a *CUSTOMER'S COPY* stamp and a reference number.
+   It downloads as a PDF, e.g. `CIC-GC-1-7K3-9B2.pdf`.
+4. **The complaint is then "forwarded to the appropriate department or, failing that,
+   another one."** Form GC-1a appears, and it is some other kind of paperwork entirely.
+5. **Saving that unlocks GC-1b**, a different kind again. It does not end.
 
-```bash
-git push
-```
+The PDFs stay on the visitor's machine. The transmittal line on each one tells them to send
+it to the Concern "by the channel through which you made your purchase".
 
-To publish a copy somewhere else: create an empty **public** repository (Pages is free
-for public repositories), push this folder to it, then on GitHub choose
-**Settings → Pages → Deploy from a branch → `main`, `/ (root)`**.
+### Why it works as a trap
 
-All paths in the site are relative, so it works from that sub-path as-is. `.nojekyll`
-stops GitHub running the files through Jekyll.
-
----
-
-## Preview it locally
-
-Browsers will not load modules or JSON from a file opened straight off disk, so run the
-tiny preview server (Node 18+, no install step):
-
-```bash
-npm run serve
-```
-
-Then open <http://localhost:8787>. Add `?dry=1` to the address to click through the whole
-loop without downloading any PDFs.
-
-Before pushing a change to the forms, run:
-
-```bash
-npm run check
-```
-
-It validates both JSON files, flags wordings too alike to pass as different questions,
-and plays out six 60-sheet visitor sessions to confirm that no question ever repeats and
-that every sheet is sane — about a page long, no unfilled `{{slots}}`, no duplicate fields.
-
----
-
-## Editing Form GC-1
-
-Everything about GC-1 is in [`forms/gc-1.json`](forms/gc-1.json): the wording, the
-sections, which fields are required, the stamp and message after saving, and its look
-(pinned in the `style` block so it never changes). Edit the file, refresh the page.
-
-`"requireAll": true` means every field on GC-1 must be filled in before it will save: text
-typed, boxes ticked, an option chosen, at least one box in each tick list. Greyed-out
-fields such as the notary on sabbatical are exempt, since nobody can fill them. Set it to
-`false` to require only the fields individually marked `"required": true`.
-
-Pressing save on an incomplete sheet marks every missing field, says how many are left
-under the button, and jumps to the first one. Each mark clears as soon as the field is
-filled.
-
-The `transmittal` line is printed at the foot of the PDF — it is where you tell the
-customer what to do with their copy. `copyStamp` is the rubber stamp on that copy
-("CUSTOMER’S COPY"); the random sheets use "DECLARANT’S COPY".
-
-## Editing the random sheets
-
-Everything after GC-1 comes from [`forms/bank.json`](forms/bank.json).
-
-Every random sheet belongs to a **family** — a kind of paperwork — picked with no regard
-for what the customer actually came about:
-
-| Family | Sample titles |
+| | |
 | --- | --- |
-| Grievance & Casus Belli | Certificate of Grievance Severity, War Aims Itemisation Schedule |
+| **Always the wrong department** | Each sheet after GC-1 comes from one of seven unrelated kinds of paperwork (below). A visitor gets all seven before any repeats, and never the same kind twice in a row. About half of the sheets also carry one question "misfiled" from another department. |
+| **Never the same question** | No wording is ever shown twice to the same visitor, GC-1 included. |
+| **Always the same questions** | The same things keep coming back in new words: faction name, grievance, losses, signatures. Nearly every sheet asks one or two things twice. |
+| **Never the same form** | Every sheet gets its own stationery: paper stock, ink, typefaces, letterhead, rules, field style, section numbering, watermark. |
+| **No shortcuts** | Every field is required on every sheet, and the next sheet only unlocks after a copy is saved. |
+| **No escape** | Reloading keeps the sheet and its answers. The only way out is "Withdraw and begin again at Form GC-1", which restarts the obligations. |
+
+| Kind of paperwork | For example |
+| --- | --- |
+| Grievance & Casus Belli *(the Concern is pacifist; it is issued anyway)* | Certificate of Grievance Severity, War Aims Itemisation Schedule |
 | Customer Satisfaction & Returns | Returns Authorisation Request, Refund Voucher Application |
 | Shipyard Services & Hull Registration | Thruster Orientation Survey, Refit Request (Cosmetic) |
 | Cargo, Customs & Logistics | Lost Cargo Report, Hazardous Goods Declaration |
@@ -105,80 +50,135 @@ for what the customer actually came about:
 | Personnel & Crew Welfare | Dietary Requirements Notice, Oxygen Entitlement Claim |
 | Insurance & Damage Claims | Meteor Strike Notification, Claim Withdrawal Form (Pre-Emptive) |
 
-Families rotate: a visitor gets all seven before any comes round again, and never the same
-one twice in a row. Most of a sheet's questions come from its own family and the rest are
-general filing questions (names, signatures, reference numbers). About half of all sheets
-also carry one question "misfiled" from another family, with a note saying so.
+The bank holds 792 wordings across 101 topics, which lasts a visitor about 55 sheets before
+any wording is reused. After that, old wordings return restated ("Re-confirm: …",
+"… (for the avoidance of doubt)"), so the text is still new.
 
-Within a family, the bank is organised by **topic** — something that paperwork wants to
-know — and each topic is written many ways:
+Progress is kept per browser tab. Closing the tab and coming back starts over at GC-1.
 
-```json
-{ "id": "party-name", "type": "text", "phrasings": [
-  "What is your faction called?",
-  "Legal name of the aggrieved entity",
-  "Please print the name of your faction in capital letters"
-] }
+---
+
+## Updating the site
+
+The site is served by GitHub Pages from the root of `main`. Edit, check, push. It is live
+again within a minute or so:
+
+```bash
+npm run check
+git add -A
+git commit -m "Describe the change"
+git push
 ```
 
-That is what drives the loop:
+### Preview locally
 
-- **No question is shown twice.** The site remembers every wording a visitor has seen,
-  including GC-1's, and never shows it to them again.
-- **The same things keep being asked.** Topics come back on later sheets in new words, and
-  almost every sheet asks one or two things twice.
-- **It doesn't run dry.** The shipped bank has 7 families, 101 topics and 792 wordings,
-  which lasts about 55 sheets before any wording is reused. After that, used wordings come back with a
-  prefix or suffix from `restatePrefixes` / `restateSuffixes` ("Re-confirm: …",
-  "… (for the avoidance of doubt)"), so the text is still new.
+Browsers won't load modules or JSON from a file opened straight off disk, so use the preview
+server (Node 18+, nothing to install):
 
-To add material, add wordings to the end of an existing topic, add a new topic (give it a
-`family`), or add a whole new family with its own titles and section headings.
-Everything else — footnotes, office strips, receipts — is a plain list the sheet picks from.
+```bash
+npm run serve
+```
 
-`slots` are word lists substituted into `{{double braces}}`, so
-*"Name the {{asset}} said to have been {{verb}}"* becomes dozens of distinct questions.
+Open <http://localhost:8787>. Add `?dry=1` to the address to click through the whole loop
+without downloading any PDFs. That also works on the live site.
 
-`page` controls sheet length: 3–4 sections of 2–3 questions plus the repeated ones, at
-most one long answer box — about one printed page.
+### Check before pushing
 
-Random sheets follow GC-1's `requireAll` setting, so every field on them must be filled
-in too.
+`npm run check` needs no browser or server. It:
 
-`npm run check` flags any two wordings so alike they would read as the same question.
+- validates both form files
+- flags any two wordings so alike they would read as the same question
+- plays out six visitors filling in 60 sheets each, confirming that:
+  - no question repeats
+  - kinds of paperwork rotate properly
+  - every field is required
+  - every sheet is about a page long, with no unfilled `{{slots}}`
 
-Full reference for both files: [docs/form-schema.md](docs/form-schema.md).
+---
+
+## Editing Form GC-1
+
+Everything about GC-1 is in [`forms/gc-1.json`](forms/gc-1.json). Edit it and refresh.
+
+- **Wording and sections**: `sections`, each with `fields`.
+- **What must be filled in**: `"requireAll": true` makes every field required. Greyed-out
+  (`"disabled"`) fields, such as the notary on sabbatical, are exempt. Random sheets follow
+  this setting too.
+- **Its look**: pinned in `style`, so GC-1 never changes appearance.
+- **The PDF**: `copyStamp` is the rubber stamp; `transmittal` is the instruction printed at
+  the foot.
+- **After saving**: `receipt` sets the stamp, message and button that lead to GC-1a.
+
+## Editing the random sheets
+
+Everything after GC-1 comes from [`forms/bank.json`](forms/bank.json):
+
+- **`families`**: the kinds of paperwork. Each has its own titles, departments, section
+  headings, instructions and notes.
+- **`topics`**: the things a family wants to know. Each topic belongs to a `family`, or is
+  `general` (names, signatures, reference numbers, which fit anywhere). Each topic lists
+  many `phrasings`:
+
+  ```json
+  { "id": "g-perishable", "family": "cargo", "type": "radio",
+    "options": ["Yes", "No", "It is now"],
+    "phrasings": ["Is the cargo perishable?", "Has the cargo perished?", "Was the cargo alive when sent?"] }
+  ```
+
+- **`slots`**: word lists substituted into `{{double braces}}`, so
+  *"Name the {{asset}} said to have been {{verb}}"* becomes dozens of questions.
+- **Everything else** (receipts, footnotes, office strips, stamps, misfile notes) is a
+  plain list that sheets pick from.
+
+To add material, add phrasings **to the end** of a topic, add a topic, or add a family.
+The site remembers what a visitor has seen by position in each list, so don't insert in the
+middle.
+
+Full field and option reference: [docs/form-schema.md](docs/form-schema.md).
 
 ---
 
 ## How it works
 
+A static site: HTML, CSS, JavaScript modules and two JSON files. There is no server,
+nothing is collected, and nothing is stored beyond the visitor's own browser tab.
+
 | File | Job |
 | --- | --- |
 | `index.html` | The page. |
-| `assets/app.js` | The loop: GC-1, then a random sheet per step. Keeps the current sheet, the answers typed so far, every wording already shown, and the families already issued in `sessionStorage`, so a reload changes nothing. |
-| `assets/generator.js` | Builds a sheet from the bank: picks the next family, fills it with wordings the visitor has not seen, asks a topic or two twice, and sometimes misfiles a question from elsewhere. |
-| `assets/theme.js` | Picks the stationery — paper stock, ink, typefaces, letterhead, rules, field style, numbering, watermark — one component per axis. |
-| `assets/cic.css` | Every one of those components, as CSS classes. |
-| `assets/render.js` | Turns a form definition into the sheet on screen. |
-| `assets/pdf.js` | Makes the declarant's copy. |
+| `assets/app.js` | The loop: GC-1, then a new sheet per step. It remembers the current sheet, the answers typed, every wording already shown, and the kinds of paperwork already issued. |
+| `assets/generator.js` | Builds each sheet: picks the next kind of paperwork, fills it with wordings the visitor hasn't seen, asks a topic or two twice, and sometimes misfiles a question. |
+| `assets/theme.js` | Picks the stationery for each sheet, one component per design axis. |
+| `assets/cic.css` | Every stationery component, as CSS classes. |
+| `assets/render.js` | Turns a form definition into the sheet on screen, and checks required fields. |
+| `assets/pdf.js` | Makes the visitor's PDF copy. |
 | `assets/schema.js` | The form and bank format, shared by the page and `npm run check`. |
+| `scripts/serve.mjs`, `scripts/check.mjs` | Local preview and pre-push checks. |
 
-### The PDF
+### The PDF copy
 
-`pdf.js` loads [html2canvas](https://html2canvas.hertzen.com/) and
-[jsPDF](https://github.com/parallax/jsPDF) from cdnjs the first time someone saves. It
-copies the sheet, replaces every input in the copy with what was typed into it, adds the
-stamp and transmittal note, and renders that. The live form is never modified.
+The first time someone saves, `pdf.js` loads [html2canvas](https://html2canvas.hertzen.com/)
+and [jsPDF](https://github.com/parallax/jsPDF) from cdnjs. It then:
 
-The copy is always laid out at desktop width, so a phone produces the same document as a
-laptop. It is cut into US Letter pages at blank lines, so no page ends halfway through a
-line, a box, or between a heading and its section, and each page carries a
-*Form GC-1 · Ref · Page 1 of 4* line.
+- copies the sheet and replaces every input with what was typed into it (the form on screen
+  is never touched)
+- adds the stamp and transmittal note
+- renders the copy at desktop width, so a phone produces the same document as a laptop
+- cuts it into US Letter pages at blank lines, never through a line of text, a box, or
+  between a heading and its section
+- adds a *Form GC-1 · Ref · Page 1 of 4* line to each page
 
-The PDF is an image of the sheet, so its text is not selectable.
+The PDF is an image, so its text isn't selectable. If the libraries can't load (offline, or
+the CDN is blocked), the browser's print dialog opens instead, with *Save as PDF* as a
+destination.
 
-If the libraries cannot be loaded (offline, blocked CDN), the page offers the browser's own
-print dialog instead, where *Save as PDF* is a destination. The page cannot tell whether a
-file was actually saved in that case, so it lets the visitor continue once the
-dialog closes.
+### Third parties
+
+Fonts come from Google Fonts, and the PDF libraries from cdnjs, so those services see
+requests from visitors' browsers. Nothing else leaves the page.
+
+### Moving from the old address
+
+The site used to be at `/cic-paperwork/`. GitHub Pages does not redirect renamed
+repositories, so that address now returns 404. Links should point to
+https://kurt-urban.github.io/CIC-External-Customer-Forms/.
