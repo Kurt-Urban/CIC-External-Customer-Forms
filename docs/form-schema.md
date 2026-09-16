@@ -1,219 +1,188 @@
 # Form & bank reference
 
-Everything here is plain JSON. Drop a file on the admin page, or commit it to `forms/`.
+Two files drive the site:
+
+- `forms/gc-1.json` — Form GC-1, the fixed first form.
+- `forms/bank.json` — the pools every random sheet after it is drawn from.
+
+Run `npm run check` after editing either.
 
 ---
 
-## A form
+## Form GC-1
 
 ```json
 {
-  "id": "gc-3",
-  "code": "GC-3",
-  "title": "Certificate of Grievance Severity",
-  "subtitle": "Cannot be issued without Form GC-3a.",
-  "mode": "static",
-  "order": 30,
-  "chip": "REQUIRED",
-  "indexBlurb": "Assigns a severity band to a grievance already on file.",
-  "department": "Asset Valuation & Mourning",
-  "revision": "REV. 12",
-  "meta": ["ATTACHMENT TO GC-1"],
-  "instructions": "**Before you begin:** …",
+  "id": "gc-1",
+  "code": "GC-1",
+  "title": "Grievance & Casus Belli Intake Form",
+  "subtitle": "“Omnis Questus, Nullus Sanguis” — All Profit, No Blood",
+  "org": "CONSOLIDATED INDUSTRIAL CONCERN",
+  "department": "Office of Interdepartmental Grievance Review",
+  "revision": "REV. 47",
+  "meta": ["IN RE: FREQUENCY 0xUNKNOWN"],
   "enforceRequired": true,
+  "style": { … },
+  "instructions": "**Before you begin:** …",
   "sections": [ … ],
-  "officeUseTitle": "For Office Use Only",
-  "officeUse": [ { "label": "STATUS", "value": "Pending" } ],
+  "officeUse": [ { "label": "RECEIVED BY", "value": "—" } ],
   "finePrint": "…",
-  "submitLabel": "CERTIFY",
-  "style": { "stock": "mimeo" },
+  "submitLabel": "SAVE COPY & FILE",
+  "transmittal": "**Transmittal:** …",
   "receipt": { … }
 }
 ```
 
-| Key | Required | Notes |
-| --- | --- | --- |
-| `id` | yes | Lowercase letters, numbers, hyphens. The URL is `/form.html?f=<id>`. |
-| `code` | | Short display code in the letterhead. Defaults to the id, uppercased. |
-| `title` | yes | |
-| `subtitle` | | Italic line under the title. |
-| `mode` | | `"static"` (default) or `"generated"`. |
-| `bankId` | if generated | Which question bank to draw pages from. |
-| `order` | | Sort position on the index. Default `500`. |
-| `hidden` | | `true` keeps it off the index and returns 404 publicly. |
-| `chip` | | Small label on the index row. |
-| `indexBlurb` | | One or two lines under the title on the index. |
-| `org`, `department` | | Letterhead lines. |
-| `revision`, `meta` | | Extra letterhead detail; `meta` is an array of lines. |
-| `instructions` | | The boxed notice above the first section. Supports inline markdown. |
-| `enforceRequired` | | `false` lets any sheet through regardless of `required` flags. |
-| `sections` | if static | See below. |
-| `officeUse` | | Array of `{ label, value }` for the office-use strip. |
-| `finePrint` | | Small print beside the submit button. |
-| `submitLabel` | | Button text. |
-| `style` | | Pins any procedural choice — see *Styling*. |
-| `receipt` | | What happens after filing — see *Receipt*. |
+| Key | Notes |
+| --- | --- |
+| `code` | Shown in the letterhead. Random sheets are numbered from it: GC-1a, GC-1b, … |
+| `title`, `subtitle` | The title block. |
+| `org`, `department` | Letterhead lines. `department` is also the default for random sheets. |
+| `revision`, `meta` | Small letterhead lines on the right; `meta` is a list. |
+| `enforceRequired` | `false` lets GC-1 save with required fields empty. |
+| `style` | The pinned look — see *Styling*. |
+| `instructions` | The shaded notice above the first section. |
+| `sections` | See below. |
+| `officeUse` | The "For Office Use Only" strip. `officeUseTitle` renames it. |
+| `finePrint` | Small print beside the save button. |
+| `submitLabel` | The save button. |
+| `transmittal` | Printed at the foot of the PDF copy only. |
+| `receipt` | What appears after saving — see *Receipt*. |
 
-**Inline markdown** is available in `instructions`, `subtitle`, `finePrint`, field `label`,
-`help`, `note`, and static `text`: `**bold**`, `*italic*`, `` `code` ``, and `[link](/path)`
-to same-site paths. Everything is escaped first; raw HTML never renders.
+**Inline formatting** works in most text: `**bold**`, `*italic*`, `` `code` ``. Everything
+is escaped first; HTML never renders.
 
----
-
-## Sections
+### Sections
 
 ```json
 {
   "title": "Declaring Party Information",
   "intro": "Optional prose above the fields.",
   "fields": [ … ],
-  "note": "Optional footnote below the fields.",
+  "note": "Optional italic footnote below the fields.",
   "seal": true,
-  "sealLabel": "GC-3"
+  "sealLabel": "CIC"
 }
 ```
 
-Give the **bare** title — `"Declaring Party Information"`, not `"Section 1 — …"`. The
-numbering scheme is part of the generated template, so the same section might render as
-`Section 1 — …`, `§ 1.`, `Part I — …`, `Article 1.`, `1.` or with no number at all.
+Give the bare title. The "Section 1 —" prefix comes from the `numbering` style.
+`"seal": true` puts the section in a bordered block beside the gold notary seal.
 
-`"seal": true` wraps the section's fields in a bordered block with the gold notary seal.
-
----
-
-## Fields
+### Fields
 
 ```json
-{ "name": "entity", "type": "text", "label": "Name of the entity",
-  "placeholder": "As registered", "required": true, "width": "half" }
+{ "name": "party_name", "type": "text", "label": "Name of declaring party",
+  "placeholder": "As it will appear in Ledger 7", "required": true, "width": "half" }
 ```
 
 | Key | Applies to | Notes |
 | --- | --- | --- |
-| `type` | all | See the table below. Defaults to `text`. |
-| `name` | all | Key the answer is stored under. Derived from the label if omitted. |
-| `label` | all but `static` | |
-| `required` | all but `static` | Enforced unless `enforceRequired` is `false`. |
-| `width` | all | `"half"` pairs with the next half-width field into two columns. |
-| `placeholder` | text-like | |
+| `type` | all | See below. |
+| `name` | all | Must be unique within the form. Used to remember answers across a reload. |
+| `label` | all but `static` | A `checkboxes` field may leave it out if the section title says it all. |
+| `required` | inputs | GC-1 will not save while it is empty. |
+| `width` | inputs | `"half"` puts two consecutive half-width fields side by side. |
+| `placeholder` | text-like | Faint hint text. For a `disabled` field it is printed on the PDF. |
 | `help` | most | Italic footnote under the field. |
-| `disabled` | most | Renders greyed out and is never collected. Good for jokes. |
-| `maxLength` | text-like | Also clamped server-side. |
-| `rows` | `textarea` | |
-| `minWords` | `textarea` | Shows a live word counter. Advisory — never blocks. |
+| `disabled` | most | Greyed out, cannot be filled. Good for the notary on sabbatical. |
+| `maxLength` | text-like | |
+| `rows`, `minWords` | `textarea` | `minWords` shows a live word counter. It never blocks saving. |
 | `min`, `max` | `number` | |
-| `options` | `select`, `radio`, `checkboxes` | Strings, or `{ "value", "label" }` objects. |
-| `text` | `static` | The prose to display. |
+| `options` | `select`, `radio`, `checkboxes` | A list of strings. |
+| `text` | `static` | The prose to show. |
 
-### Types
-
-| Type | Renders as | Stored as |
+| Type | On screen | On the PDF |
 | --- | --- | --- |
-| `text` | single-line input | string |
-| `email` | email input | string |
-| `number` | number input | number, or `""` |
-| `date` | date picker | `YYYY-MM-DD` string |
-| `textarea` | multi-line box | string |
-| `select` | dropdown | one option value |
-| `radio` | radio list | one option value |
-| `checkbox` | one tick box | boolean |
-| `checkboxes` | tick list | array of option values |
-| `signature` | single-line input, sign-here styling | string |
-| `static` | prose, no input | not stored |
+| `text`, `email`, `number` | one-line box | typed text |
+| `date` | date picker | `16 SEP 2026` |
+| `textarea` | large box | typed text, line breaks kept |
+| `signature` | one-line box in handwriting | handwriting |
+| `select` | dropdown | the chosen option |
+| `radio` | pick one | every option, chosen one ticked |
+| `checkbox` | a single tick box | ticked or not |
+| `checkboxes` | tick list | every option, chosen ones ticked |
+| `static` | a paragraph | the same paragraph |
 
-Answers are coerced server-side: `select`/`radio`/`checkboxes` values not in `options` are
-discarded, strings are truncated, non-numeric `number` answers become `""`.
-
----
-
-## Receipt
+### Receipt
 
 ```json
 "receipt": {
-  "stamp": "RECEIVED",
-  "message": "Logged as **{{code}}**, reference **{{ref}}**. Now complete **Form {{next}}**.",
-  "footnotes": ["Note: …", "Note: …"],
+  "stamp": "RETAINED",
+  "message": "Your copy of **{{code}}** has been saved as **{{file}}**. Please complete **Form {{next}}**.",
+  "footnotes": ["Note: …"],
   "next": { "mode": "generate", "label": "Open Form {{next}} →" }
 }
 ```
 
-`footnotes` rotate — the *n*th filing in a session shows the *n*th footnote.
+Placeholders: `{{code}}` this form, `{{next}}` the next one, `{{file}}` the PDF's file name,
+`{{ref}}` its reference number, `{{count}}` copies saved this session, `{{queue}}` a
+meaningless queue position, `{{title}}`.
 
-Placeholders: `{{code}}` this sheet's code, `{{next}}` the next one, `{{ref}}` the
-reference number, `{{queue}}` queue position, `{{count}}` sheets filed this session,
-`{{title}}`.
-
-| `next.mode` | Behaviour |
-| --- | --- |
-| `generate` | Draw a fresh page from the bank. The endless loop. |
-| `chain` | Re-issue this same form as `GC-1a`, `GC-1b`, … |
-| `form` | Link to another form. Needs `formId`. |
-| `index` | Back to the index. |
-| `none` | No button. |
+`next.mode` is `generate` (continue to a random sheet) or `none` (stop here).
 
 ---
 
 ## Styling
 
-Each form is assigned a template deterministically from its `id`, so it always looks the
-same but differs from every other form. Override any axis in `style`:
+Every axis can be set in `style`. GC-1 sets all of them so it never varies. Random sheets
+set none, so each gets a random combination.
 
 | Axis | Options |
 | --- | --- |
 | `stock` | `cream` `buff` `goldenrod` `carbon-pink` `ledger` `mimeo` `onionskin` |
 | `ink` | `red` `violet` `navy` `green` `oxblood` `slate` |
-| `display` | `elite` `courier` `cutive` `smallcap` |
-| `body` | `plex` `garamond` `baskerv` |
+| `display` | `elite` `courier` `cutive` `smallcap` — headings |
+| `body` | `plex` `garamond` `baskerv` — text |
 | `edge` | `perforated` `punched` `tractor` `notched` `plain` |
-| `head` | `split` `stacked` `boxed` `ruled` `stamped` |
-| `rule` | `hair` `double` `dotted` `heavy` `tinted` |
+| `head` | `split` `stacked` `boxed` `ruled` `stamped` — letterhead layout |
+| `rule` | `hair` `double` `dotted` `heavy` `tinted` — section headings |
 | `fields` | `plain` `underline` `comb` `inset` `boxed` |
 | `labels` | `plain` `caps` `italic` |
 | `checks` | `plain` `boxed` `ruled` |
 | `office` | `grid` `inline` `shaded` `ticket` |
 | `numbering` | `section` `sign` `part` `article` `plain` `none` |
-| `watermark` | any short string, or `false` for none |
-| `seed` | a string — changes every unset axis at once |
-
-`"style": { "seed": "try-again" }` is the quickest way to reroll a look you dislike.
-The admin page shows the assigned template when you validate a form.
+| `watermark` | any short text, or `false` |
+| `motto` | text around the notary seal |
 
 ---
 
-## A question bank
+## The question bank
 
 ```json
 {
   "kind": "bank",
   "id": "cic-core",
-  "name": "CIC Core Grievance Bank",
   "page": {
     "minSections": 3, "maxSections": 4,
     "minQuestionsPerSection": 2, "maxQuestionsPerSection": 4,
     "maxLongAnswers": 1
   },
-  "slots": { "form": ["GC-2", "GC-9"], "asset": ["shipyard", "refinery"] },
-  "questions": [ { "type": "text", "label": "Designation of the {{asset}}" } ],
-  "sectionTitles": ["Declaring Party Information", "War Aims"],
-  "titles": ["Grievance & Casus Belli Intake Form"]
+  "slots": { "asset": ["shipyard", "refinery"], "form": ["GC-2", "GC-9"] },
+  "questions": [
+    { "type": "text", "label": "Designation of the {{asset}} alleged to have been removed" }
+  ],
+  "sectionTitles": ["Declaring Party Information", "War Aims"]
 }
 ```
 
-`questions` entries use exactly the field schema above, minus `name` (assigned per page).
+`questions` use the field format above, without `name` (assigned per sheet). Only
+`questions` is required. Each sheet picks at random from each of these lists:
 
-Every other pool is optional; a page picks one item from each:
+| Pool | Used for |
+| --- | --- |
+| `titles`, `subtitles` | title block |
+| `departments`, `metaLines` | letterhead |
+| `instructions` | the shaded notice |
+| `sectionTitles`, `sectionNotes` | section headings and footnotes |
+| `questions` | the fields |
+| `officeUse`, `officeUseTitles` | the office strip |
+| `finePrint`, `submitLabels` | beside and on the save button |
+| `transmittals` | foot of the PDF |
+| `stamps`, `receiptMessages`, `receiptFootnotes`, `nextLabels` | after saving |
 
-`titles` · `subtitles` · `departments` · `metaLines` · `instructions` · `sectionTitles` ·
-`sectionNotes` · `officeUse` · `officeUseTitles` · `finePrint` · `submitLabels` · `stamps` ·
-`receiptMessages` · `receiptFootnotes` · `nextLabels`
+**Slots.** Any `{{name}}` in a bank string is replaced with a random entry from
+`slots.name`. Slot values may contain other slots. The receipt placeholders
+(`{{code}}`, `{{next}}`, `{{file}}`, …) are not slots and are filled in after saving.
 
-`page.maxLongAnswers` keeps sheets to roughly one page by limiting `textarea` fields.
-
-### Slots
-
-Any `{{name}}` in a question label, placeholder, help text, option, section title, footnote
-or receipt line is replaced with a random entry from `slots.name`. Slots may nest up to four
-levels — a slot value can itself contain `{{another}}`.
-
-This is where the supply comes from: 166 questions with ~10 slot lists of ~10 entries each
-produces far more distinct sheets than anyone will ever fill in.
+**Order.** Questions are drawn in random order, so a question that refers to "the question
+above" may appear first on a sheet. The shipped bank leans into this.

@@ -1,243 +1,135 @@
 #!/usr/bin/env node
 /* ============================================================
-   check.mjs - end-to-end smoke test against a running dev server.
-   Usage: node scripts/dev-server.mjs   (in one terminal)
-          node scripts/check.mjs        (in another)
+   check.mjs - run before pushing.  npm run check
+
+   Validates forms/gc-1.json and forms/bank.json, then generates
+   a few hundred random sheets and checks each one is sane.
+   No server, no browser.
    ============================================================ */
 
-const BASE = process.env.BASE || 'http://localhost:8787';
-const PASSWORD = process.env.ADMIN_PASSWORD || 'local-dev-password';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { validateForm, validateBank, normalizeForm, bankReach } from '../assets/schema.js';
+import { generatePage } from '../assets/generator.js';
+import { deriveTheme, themeSummary, AXES } from '../assets/theme.js';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SHEETS = Number(process.env.SHEETS) || 300;
 
 let passed = 0;
 let failed = 0;
-
-function ok(name, detail) {
-  passed++;
-  process.stdout.write('  PASS  ' + name + (detail ? '  (' + detail + ')' : '') + '\n');
-}
-function bad(name, detail) {
-  failed++;
-  process.stdout.write('  FAIL  ' + name + (detail ? '  — ' + detail : '') + '\n');
-}
 function check(name, cond, detail) {
-  if (cond) ok(name, detail); else bad(name, detail);
+  if (cond) passed++; else failed++;
+  process.stdout.write('  ' + (cond ? 'PASS' : 'FAIL') + '  ' + name +
+    (detail ? (cond ? '  (' : '  — ') + detail + (cond ? ')' : '') : '') + '\n');
 }
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-async function jget(url) {
-  const res = await fetch(BASE + url);
-  return { status: res.status, body: await res.json().catch(() => ({})) };
-}
-async function jpost(url, body, headers = {}) {
-  const res = await fetch(BASE + url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', ...headers },
-    body: JSON.stringify(body),
-  });
-  return { status: res.status, body: await res.json().catch(() => ({})) };
+function list(items) {
+  for (const i of items) process.stdout.write('          · ' + i + '\n');
 }
 
-/** Fill every field on a page with something plausible. */
-function answerAll(form) {
-  const answers = {};
-  for (const sec of form.sections) {
-    for (const f of sec.fields) {
-      if (f.type === 'static' || f.disabled) continue;
-      switch (f.type) {
-        case 'checkbox': answers[f.name] = true; break;
-        case 'checkboxes': answers[f.name] = f.options.slice(0, 2).map((o) => o.value || o); break;
-        case 'radio':
-        case 'select': answers[f.name] = (f.options[0].value != null ? f.options[0].value : f.options[0]); break;
-        case 'number': answers[f.name] = 7; break;
-        case 'date': answers[f.name] = '2026-09-11'; break;
-        case 'textarea': answers[f.name] = 'UNKNOWN does not negotiate. UNKNOWN files.'; break;
-        default: answers[f.name] = 'Faction UNKNOWN';
-      }
-    }
+async function readJSON(rel) {
+  const text = await readFile(path.join(ROOT, rel), 'utf8');
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    check(rel + ' is valid JSON', false, err.message);
+    process.exit(1);
   }
-  return answers;
 }
 
-process.stdout.write('\nCIC paperwork — checks against ' + BASE + '\n\n');
+process.stdout.write('\nCIC paperwork — checks\n\n');
 
-/* ---------- public index ---------- */
-{
-  const { status, body } = await jget('/api/forms');
-  check('index lists forms', status === 200 && Array.isArray(body.forms) && body.forms.length >= 2,
-    (body.forms || []).length + ' forms');
-  check('generated form advertised as such',
-    (body.forms || []).some((f) => f.id === 'gc-1' && f.mode === 'generated'));
-}
+/* ---------- GC-1 ---------- */
 
-/* ---------- determinism ---------- */
-{
-  const a = await jget('/api/forms?id=gc-1&seed=fixed&page=0');
-  const b = await jget('/api/forms?id=gc-1&seed=fixed&page=0');
-  check('same seed + page gives the same page',
-    JSON.stringify(a.body.form) === JSON.stringify(b.body.form));
+const gc1 = await readJSON('forms/gc-1.json');
+const v1 = validateForm(gc1);
+check('forms/gc-1.json is a valid form', v1.ok, v1.ok ? '' : v1.errors.length + ' error(s)');
+if (!v1.ok) list(v1.errors);
+if (v1.warnings.length) list(v1.warnings.map((w) => 'warning: ' + w));
 
-  const c = await jget('/api/forms?id=gc-1&seed=fixed&page=1');
-  check('next page differs', JSON.stringify(a.body.form) !== JSON.stringify(c.body.form));
+const n1 = normalizeForm(gc1);
+const fields = n1.sections.flatMap((s) => s.fields);
+const required = fields.filter((f) => f.required).map((f) => f.name);
+check('GC-1 has fields', fields.length > 0,
+  n1.sections.length + ' sections, ' + fields.filter((f) => f.type !== 'static').length +
+  ' fields, required: ' + (required.join(', ') || 'none'));
 
-  const d = await jget('/api/forms?id=gc-1&seed=other&page=0');
-  check('different seed differs', JSON.stringify(a.body.form) !== JSON.stringify(d.body.form));
+const t1 = deriveTheme(n1);
+const pinned = Object.keys(AXES).filter((k) => k !== 'watermark')
+  .every((k) => Object.prototype.hasOwnProperty.call(n1.style, k));
+check('GC-1 look is fully pinned (same every time)', pinned,
+  themeSummary(t1).map(([k, v]) => k + '=' + v).join(' '));
+check('GC-1 ends by generating a random sheet', n1.receipt.next.mode === 'generate');
 
-  const fieldCount = a.body.form.sections.reduce((n, s) => n + s.fields.length, 0);
-  check('page is about one page long', fieldCount >= 6 && fieldCount <= 18, fieldCount + ' fields');
+/* ---------- bank ---------- */
 
-  const longs = a.body.form.sections
-    .reduce((n, s) => n + s.fields.filter((f) => f.type === 'textarea').length, 0);
-  check('at most one long-answer box per page', longs <= 1, longs + ' textareas');
+const bank = await readJSON('forms/bank.json');
+const vb = validateBank(bank);
+check('forms/bank.json is a valid bank', vb.ok, vb.ok ? '' : vb.errors.length + ' error(s)');
+if (!vb.ok) list(vb.errors);
+if (vb.warnings.length) list(vb.warnings.map((w) => 'warning: ' + w));
 
-  const names = a.body.form.sections.flatMap((s) => s.fields.map((f) => f.name)).filter(Boolean);
-  check('field names are unique', new Set(names).size === names.length);
+const reach = bankReach(bank);
+check('bank has a large pool', reach.questions >= 50,
+  reach.questions + ' questions, ~' + reach.slotCombinations.toExponential(1) + ' slot combinations');
 
-  check('page carries a registry stamp', typeof a.body.pageToken === 'string' && a.body.pageToken.length > 40);
-}
+/* ---------- generated sheets ---------- */
 
-/* ---------- procedural styling ---------- */
-{
-  const seen = new Set();
-  for (let p = 0; p < 8; p++) {
-    const { body } = await jget('/api/forms?id=gc-1&seed=styling&page=' + p);
-    seen.add(body.form.style.seed);
+const base = { id: n1.id, code: n1.code, org: n1.org, department: n1.department, title: n1.title, enforceRequired: false };
+const seed = () => Math.random().toString(16).slice(2, 18);
+
+let minF = Infinity;
+let maxF = 0;
+let tooManyLong = 0;
+let dupNames = 0;
+let leftovers = [];
+let empty = 0;
+const titles = new Set();
+const looks = new Set();
+
+for (let i = 0; i < SHEETS; i++) {
+  const step = 1 + (i % 30);
+  const page = generatePage(bank, base, seed(), step);
+  const pf = page.sections.flatMap((s) => s.fields);
+  const inputs = pf.filter((f) => f.type !== 'static');
+
+  minF = Math.min(minF, pf.length);
+  maxF = Math.max(maxF, pf.length);
+  if (pf.filter((f) => f.type === 'textarea').length > 1) tooManyLong++;
+  if (new Set(inputs.map((f) => f.name)).size !== inputs.length) dupNames++;
+  if (!inputs.length) empty++;
+
+  // Everything shown on the sheet should have had its slots filled.
+  const shown = JSON.stringify([page.title, page.subtitle, page.department, page.instructions,
+    page.finePrint, page.transmittal, page.submitLabel, page.meta, page.officeUse,
+    page.sections.map((s) => [s.title, s.note, s.fields])]);
+  const m = shown.match(/\{\{\w+\}\}/g);
+  if (m) leftovers = leftovers.concat(m);
+
+  titles.add(page.title);
+  const t = deriveTheme(page);
+  looks.add([t.stock, t.ink, t.head, t.edge, t.rule, t.fields].join('/'));
+
+  if (step === 1 && i === 0) {
+    check('first random sheet is coded ' + n1.code + 'a', page.code === n1.code + 'a', page.code);
   }
-  check('each page gets its own template seed', seen.size === 8, seen.size + ' distinct');
 }
 
-/* ---------- spam protection ---------- */
-{
-  const { body } = await jget('/api/forms?id=gc-1&seed=spam&page=0');
+check(SHEETS + ' random sheets are about one page each', minF >= 5 && maxF <= 18,
+  minF + '–' + maxF + ' fields');
+check('never more than one long-answer box per sheet', tooManyLong === 0,
+  tooManyLong ? tooManyLong + ' sheets over' : '');
+check('field names are unique on every sheet', dupNames === 0, dupNames ? dupNames + ' sheets' : '');
+check('no sheet is empty', empty === 0, empty ? empty + ' empty' : '');
+check('every {{slot}} on the sheet is filled in', leftovers.length === 0,
+  leftovers.length ? [...new Set(leftovers)].join(' ') : '');
+check('sheets vary in title', titles.size > 20, titles.size + ' distinct titles');
+check('sheets vary in appearance', looks.size > SHEETS * 0.8, looks.size + ' distinct looks in ' + SHEETS);
 
-  const noToken = await jpost('/api/submit', { formId: 'gc-1', answers: {} });
-  check('submission without a stamp is refused', noToken.status === 400, noToken.body.error);
-
-  const forged = await jpost('/api/submit', {
-    formId: 'gc-1', pageToken: 'aaaa.bbbb', answers: {},
-  });
-  check('forged stamp is refused', forged.status === 400, forged.body.error);
-
-  const tooFast = await jpost('/api/submit', {
-    formId: 'gc-1', pageToken: body.pageToken, answers: answerAll(body.form),
-  });
-  check('instant submission is refused', tooFast.status === 400, tooFast.body.error);
-
-  const hp = await jpost('/api/submit', {
-    formId: 'gc-1', pageToken: body.pageToken, answers: {}, _hp: 'bot@example.com',
-  });
-  check('honeypot returns a fake success', hp.status === 200 && hp.body.ok);
-}
-
-/* ---------- filing a real sheet ---------- */
-let firstRef = null;
-{
-  const { body } = await jget('/api/forms?id=gc-1&seed=real&page=0');
-  await sleep(2700);
-
-  const blank = await jpost('/api/submit', {
-    formId: 'gc-1', pageToken: body.pageToken, answers: {},
-  });
-  check('a wholly blank sheet is refused', blank.status === 422, blank.body.error);
-
-  const res = await jpost('/api/submit', {
-    formId: 'gc-1', pageToken: body.pageToken, answers: answerAll(body.form),
-  });
-  check('a completed sheet is filed', res.status === 200 && res.body.ok, 'ref ' + res.body.ref);
-  firstRef = res.body.ref;
-
-  const replay = await jpost('/api/submit', {
-    formId: 'gc-1', pageToken: body.pageToken, answers: answerAll(body.form),
-  });
-  check('an identical resubmission is refused', replay.status === 409, replay.body.error);
-}
-
-/* ---------- static form ---------- */
-{
-  const { body } = await jget('/api/forms?id=gc-2');
-  check('static form loads', body.mode === 'static' && body.form.sections.length === 4);
-  await sleep(2700);
-
-  const missing = await jpost('/api/submit', {
-    formId: 'gc-2', pageToken: body.pageToken, answers: {},
-  });
-  check('required fields are enforced on the static form', missing.status === 422,
-    (missing.body.error || '').slice(0, 60) + '…');
-
-  const good = await jpost('/api/submit', {
-    formId: 'gc-2', pageToken: body.pageToken, answers: answerAll(body.form),
-  });
-  check('static form files', good.status === 200 && good.body.ok, 'ref ' + good.body.ref);
-}
-
-/* ---------- admin ---------- */
-{
-  const bad1 = await jpost('/api/admin', { action: 'login', password: 'wrong' });
-  check('wrong password is rejected', bad1.status === 401);
-
-  const noAuth = await jpost('/api/admin', { action: 'list_submissions' });
-  check('admin actions need a token', noAuth.status === 401);
-
-  const login = await jpost('/api/admin', { action: 'login', password: PASSWORD });
-  check('correct password issues a token', login.status === 200 && !!login.body.token);
-
-  const auth = { authorization: 'Bearer ' + login.body.token };
-
-  const tampered = await jpost('/api/admin', { action: 'stats' },
-    { authorization: 'Bearer ' + login.body.token.slice(0, -4) + 'aaaa' });
-  check('tampered token is rejected', tampered.status === 401);
-
-  const list = await jpost('/api/admin', { action: 'list_submissions', limit: 10 }, auth);
-  check('submissions are listed', list.status === 200 && list.body.total >= 2,
-    list.body.total + ' on file');
-
-  const found = (list.body.submissions || []).find((s) => s.ref === firstRef);
-  check('the sheet we filed is there', !!found);
-  check('questions were stored with the answers',
-    !!found && found.entries.length > 0 && found.entries.every((e) => e.question && 'answer' in e),
-    found ? found.entries.length + ' q/a pairs' : '');
-
-  const filtered = await jpost('/api/admin', { action: 'list_submissions', formId: 'gc-2' }, auth);
-  check('filtering by form works',
-    filtered.status === 200 && filtered.body.submissions.every((s) => s.formId === 'gc-2'));
-
-  const reg = await jpost('/api/admin', { action: 'list_forms' }, auth);
-  check('registry lists forms and banks',
-    reg.status === 200 && reg.body.forms.length >= 2 && reg.body.banks.length >= 1,
-    reg.body.banks[0] ? reg.body.banks[0].questions + ' questions in bank' : '');
-
-  const csvRes = await fetch(BASE + '/api/admin', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', ...auth },
-    body: JSON.stringify({ action: 'export', format: 'csv' }),
-  });
-  const csv = await csvRes.text();
-  check('CSV export works', csvRes.ok && csv.split('\r\n').length > 2,
-    csv.split('\r\n').length - 1 + ' rows');
-
-  /* uploading a new form with no code change */
-  const newForm = {
-    id: 'gc-test', code: 'GC-TEST', title: 'Uploaded Test Form', order: 900,
-    sections: [{ title: 'Only Section', fields: [{ name: 'q1', type: 'text', label: 'Anything at all' }] }],
-  };
-  const save = await jpost('/api/admin', { action: 'save_document', document: newForm }, auth);
-  check('a dropped-in form is accepted', save.status === 200 && save.body.ok);
-
-  const after = await jget('/api/forms');
-  check('it appears on the public index immediately',
-    after.body.forms.some((f) => f.id === 'gc-test'));
-
-  const rubbish = await jpost('/api/admin', {
-    action: 'save_document', document: { id: 'Bad Id!', sections: [] },
-  }, auth);
-  check('an invalid form is rejected with reasons',
-    rubbish.status === 422 && Array.isArray(rubbish.body.errors) && rubbish.body.errors.length > 0,
-    (rubbish.body.errors || [])[0]);
-
-  await jpost('/api/admin', { action: 'delete_document', id: 'gc-test', kind: 'form' }, auth);
-  const cleaned = await jget('/api/forms');
-  check('deleting it removes it from the index',
-    !cleaned.body.forms.some((f) => f.id === 'gc-test'));
-}
+const sameA = JSON.stringify(generatePage(bank, base, 'fixed', 3));
+const sameB = JSON.stringify(generatePage(bank, base, 'fixed', 3));
+check('a remembered seed reproduces its sheet (reloads are stable)', sameA === sameB);
 
 process.stdout.write('\n  ' + passed + ' passed, ' + failed + ' failed\n\n');
 process.exit(failed ? 1 : 0);

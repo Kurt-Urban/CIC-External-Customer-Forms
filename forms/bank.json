@@ -401,38 +401,47 @@
     "Neither the completion nor the abandonment of this form affects the underlying matter, which is stationary."
   ],
 
+  "transmittals": [
+    "**Transmittal:** send this copy to the Consolidated Industrial Concern together with every copy saved before it. Copies transmitted out of order are re-ordered, then filed out of order.",
+    "**Transmittal:** this copy must accompany Form GC-1 and all continuation sheets. A missing sheet invalidates nothing, and is noted.",
+    "**Transmittal:** retain a duplicate of this copy. Retain a duplicate of the duplicate. Transmit neither until the other has been transmitted.",
+    "**Transmittal:** deliver to {{dept}} via the channel through which your declaration was made. {{officer}} will sign for it on return from leave.",
+    "**Transmittal:** this sheet is to be filed with the Concern in its entirety. Partial sheets are accepted and treated as entire.",
+    "**Transmittal:** forward this copy to the Concern for entry in {{ledger}}. Receipt will not be acknowledged, which constitutes acknowledgement."
+  ],
+
   "submitLabels": [
-    "SUBMIT FOR REVIEW",
-    "LODGE THIS SHEET",
-    "FILE AND CONTINUE",
-    "STAMP & FORWARD",
-    "ENTER INTO {{ledger}}",
-    "SUBMIT (NON-BINDING)",
-    "TRANSMIT TO {{dept}}",
-    "ACCEPT & PROCEED"
+    "SAVE COPY & FILE",
+    "RETAIN COPY & LODGE",
+    "SAVE COPY & CONTINUE",
+    "STAMP, SAVE & FORWARD",
+    "SAVE COPY FOR {{ledger}}",
+    "SAVE COPY (NON-BINDING)",
+    "SAVE COPY FOR {{dept}}",
+    "RETAIN & PROCEED"
   ],
 
   "stamps": [
-    "RECEIVED",
+    "RETAINED",
     "FILED",
     "LODGED",
     "NOTED",
     "PENDING",
-    "ACCEPTED",
+    "COPIED",
     "RECORDED",
     "ENTERED",
-    "RETAINED",
+    "DUPLICATED",
     "PROCESSED"
   ],
 
   "receiptMessages": [
-    "Your submission has been logged as **{{code}}**, reference **{{ref}}**, and forwarded to {{dept}}. Before this matter can proceed, please complete **Form {{next}}** (attached).",
-    "Sheet **{{code}}** received and entered in {{ledger}} at position **{{queue}}**. Reference **{{ref}}**. The matter now requires **Form {{next}}**.",
-    "Thank you. **{{code}}** has been accepted, stamped, and placed in the correct drawer. Reference **{{ref}}**. Continue with **Form {{next}}**.",
-    "**{{code}}** is complete. Reference **{{ref}}**. Your responses have raised **{{next}}**, which must be completed before they can be read.",
-    "Filed. Reference **{{ref}}**, queue position **{{queue}}**. {{officer}} has been notified and is not available. Proceed to **Form {{next}}**.",
-    "Receipt of **{{code}}** is acknowledged without prejudice. Reference **{{ref}}**. The next sheet in this matter is **{{next}}**.",
-    "**{{code}}** has been recorded. Reference **{{ref}}**. This is sheet **{{count}}** of an indeterminate number. Please continue with **Form {{next}}**."
+    "Your copy of **{{code}}** has been saved as **{{file}}**, reference **{{ref}}**. Transmit it to {{dept}}. Before this matter can proceed, please complete **Form {{next}}** (attached).",
+    "Sheet **{{code}}** retained as **{{file}}** and provisionally entered in {{ledger}} at position **{{queue}}**. The matter now requires **Form {{next}}**.",
+    "Thank you. **{{code}}** has been copied, stamped, and saved as **{{file}}**. Transmit it with your previous copies. Continue with **Form {{next}}**.",
+    "**{{code}}** is complete and saved as **{{file}}**. Your responses have raised **{{next}}**, which must be completed before they can be read.",
+    "Retained. Reference **{{ref}}**, queue position **{{queue}}**. {{officer}} has been notified and is not available. Proceed to **Form {{next}}**.",
+    "Your copy of **{{code}}** (**{{file}}**) is acknowledged without prejudice. The next sheet in this matter is **{{next}}**.",
+    "**{{code}}** has been saved as **{{file}}**. This is sheet **{{count}}** of an indeterminate number. Transmit all of them. Please continue with **Form {{next}}**."
   ],
 
   "receiptFootnotes": [

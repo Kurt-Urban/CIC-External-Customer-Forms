@@ -18,7 +18,7 @@ export function escapeHTML(s) {
 
 /**
  * Escapes first, then re-introduces a very small markdown subset.
- * Form definitions are admin-supplied, but they still never get raw HTML.
+ * Form definitions are hand-written JSON, but they still never get raw HTML.
  */
 export function mdInline(text) {
   let s = escapeHTML(text);
@@ -146,6 +146,7 @@ function buildField(field, form) {
   } else if (field.type === 'signature') {
     control = textLike(field, 'text');
     control.autocomplete = 'off';
+    control.classList.add('sig');
   } else if (field.type === 'email') {
     control = textLike(field, 'email');
   } else if (field.type === 'number') {
@@ -291,11 +292,14 @@ export function renderForm(rawForm, mount, opts) {
   /* submit row */
   const row = el('div', 'submit-row');
   if (form.finePrint) row.appendChild(el('p', 'fine-print', mdInline(form.finePrint)));
+  const btnWrap = el('div', 'stamp-wrap');
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'stamp-btn';
   btn.textContent = form.submitLabel;
-  row.appendChild(btn);
+  btnWrap.appendChild(btn);
+  btnWrap.appendChild(el('div', 'btn-caption', 'Saves a PDF copy of this sheet.<br>Required before the next form.'));
+  row.appendChild(btnWrap);
   sheet.appendChild(row);
 
   /* counter + result panel */
@@ -342,6 +346,33 @@ export function collectAnswers(form, sheet) {
     });
   });
   return answers;
+}
+
+/** Put previously collected answers back (used to survive a reload). */
+export function restoreAnswers(form, sheet, answers) {
+  if (!answers) return;
+  (form.sections || []).forEach((sec) => {
+    (sec.fields || []).forEach((f) => {
+      if (f.type === 'static' || f.disabled || !(f.name in answers)) return;
+      const v = answers[f.name];
+      const sel = '[name="' + CSS.escape(f.name) + '"]';
+      if (f.type === 'checkbox') {
+        const box = sheet.querySelector(sel);
+        if (box) box.checked = v === true;
+      } else if (f.type === 'checkboxes') {
+        const want = new Set(Array.isArray(v) ? v : []);
+        sheet.querySelectorAll(sel).forEach((b) => { b.checked = want.has(b.value); });
+      } else if (f.type === 'radio') {
+        sheet.querySelectorAll(sel).forEach((b) => { b.checked = b.value === v; });
+      } else {
+        const c = sheet.querySelector(sel);
+        if (c) {
+          c.value = v == null ? '' : String(v);
+          c.dispatchEvent(new Event('input')); // refresh word counters
+        }
+      }
+    });
+  });
 }
 
 /** Bureaucratic phrasing for a missing required field. */

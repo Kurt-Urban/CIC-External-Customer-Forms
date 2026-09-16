@@ -2,10 +2,9 @@
    generator.js - builds one page of paperwork from a question bank.
 
    Deterministic: the same (bank, seed, pageIndex) always produces
-   exactly the same page. That matters because the browser renders
-   the page and the server re-generates it to work out what was
-   actually asked - so answers are matched to questions server-side
-   and nothing is taken on trust from the client.
+   exactly the same page. The app draws a fresh random seed for every
+   new sheet, and remembers it, so a reload shows the same sheet
+   rather than a different one.
    ============================================================ */
 
 import { letterSuffix } from './schema.js';
@@ -197,7 +196,7 @@ export function generatePage(bank, base, seed, pageIndex) {
     officeUse,
     officeUseTitle: pickOne(rnd, bank.officeUseTitles || ['For Office Use Only']),
     finePrint: expand(rnd, pickOne(rnd, bank.finePrint) || '', slots),
-    submitLabel: pickOne(rnd, bank.submitLabels || ['SUBMIT FOR REVIEW']),
+    submitLabel: expand(rnd, pickOne(rnd, bank.submitLabels) || 'SAVE COPY & FILE', slots),
     enforceRequired: base.enforceRequired !== false,
     // Each page is a different document, so it gets a different template.
     style: { seed: String(seed) + '::' + pageIndex },
@@ -209,20 +208,6 @@ export function generatePage(bank, base, seed, pageIndex) {
         .map((f) => expand(rnd, f, slots)),
       next: { mode: 'generate', label: pickOne(rnd, bank.nextLabels || ['Continue to Form {{next}} →']) },
     },
+    transmittal: expand(rnd, pickOne(rnd, bank.transmittals) || '', slots),
   };
-}
-
-/**
- * The questions on a page, flattened - used server-side to pair
- * answers with the question text that produced them.
- */
-export function pageQuestions(page) {
-  const out = [];
-  (page.sections || []).forEach((sec) => {
-    (sec.fields || []).forEach((f) => {
-      if (f.type === 'static') return;
-      out.push({ name: f.name, label: f.label || f.name, type: f.type, section: sec.title, field: f });
-    });
-  });
-  return out;
 }

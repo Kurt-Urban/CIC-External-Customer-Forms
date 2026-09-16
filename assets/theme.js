@@ -136,8 +136,16 @@ export function applyTheme(theme, sheetEl) {
   if (theme.fields !== 'plain') classes.push('fields-' + theme.fields);
   sheetEl.className = classes.join(' ');
 
-  if (theme.watermark) sheetEl.setAttribute('data-watermark', theme.watermark);
-  else sheetEl.removeAttribute('data-watermark');
+  // A real element rather than ::after + attr(), so the PDF capture sees it.
+  const old = sheetEl.querySelector(':scope > .watermark');
+  if (old) old.remove();
+  if (theme.watermark) {
+    const wm = document.createElement('div');
+    wm.className = 'watermark';
+    wm.setAttribute('aria-hidden', 'true');
+    wm.textContent = theme.watermark;
+    sheetEl.prepend(wm);
+  }
 
   const head = sheetEl.querySelector('header.letterhead');
   if (head) head.className = 'letterhead head-' + theme.head;
@@ -179,6 +187,14 @@ export function sectionHeading(scheme, i, title) {
 
 /* ---------- marks ---------- */
 
+/* Colours and fonts go in style="" rather than presentation attributes:
+   var() is reliably resolved there, and pdf.js reads the computed values
+   back out to bake them in before the SVG is rasterised. */
+const INK_STROKE = 'fill:none;stroke:var(--ink)';
+const INK_TEXT = 'fill:var(--ink);font-family:var(--font-display)';
+const GOLD_STROKE = 'fill:none;stroke:var(--gold)';
+const GOLD_TEXT = 'fill:var(--gold);font-family:var(--font-display)';
+
 /**
  * The small CIC roundel used in the letterhead.
  * Varies with the theme so each form's letterhead reads differently.
@@ -187,31 +203,33 @@ export function orgMarkSVG(theme) {
   const solid = theme.head === 'stacked' || theme.head === 'boxed';
   return `
 <svg class="org-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-  <circle cx="50" cy="50" r="46" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
-  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--ink)" stroke-width="${solid ? 2 : 1}"/>
-  <text x="50" y="40" text-anchor="middle" font-family="var(--font-display)" font-size="20" fill="var(--ink)">C</text>
-  <text x="50" y="58" text-anchor="middle" font-family="var(--font-display)" font-size="20" fill="var(--ink)">I</text>
-  <text x="50" y="76" text-anchor="middle" font-family="var(--font-display)" font-size="20" fill="var(--ink)">C</text>
+  <circle cx="50" cy="50" r="46" style="${INK_STROKE}" stroke-width="2.5"/>
+  <circle cx="50" cy="50" r="38" style="${INK_STROKE}" stroke-width="${solid ? 2 : 1}"/>
+  <text x="50" y="40" text-anchor="middle" font-size="20" style="${INK_TEXT}">C</text>
+  <text x="50" y="58" text-anchor="middle" font-size="20" style="${INK_TEXT}">I</text>
+  <text x="50" y="76" text-anchor="middle" font-size="20" style="${INK_TEXT}">C</text>
 </svg>`;
 }
+
+let sealCount = 0;
 
 /**
  * The gold notary seal. The motto ring and centre glyph come from the theme,
  * so each form is sealed by a subtly different office.
  */
 export function sealSVG(theme, centre) {
-  const id = 'sealpath-' + Math.random().toString(36).slice(2, 8);
+  const id = 'sealpath-' + (++sealCount);
   const label = (centre || 'CIC').slice(0, 6);
   const size = label.length > 3 ? 8 : 11;
   return `
 <svg class="seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-  <circle cx="50" cy="50" r="44" fill="none" stroke="var(--gold)" stroke-width="2"/>
-  <circle cx="50" cy="50" r="36" fill="none" stroke="var(--gold)" stroke-width="1"/>
+  <circle cx="50" cy="50" r="44" style="${GOLD_STROKE}" stroke-width="2"/>
+  <circle cx="50" cy="50" r="36" style="${GOLD_STROKE}" stroke-width="1"/>
   <path id="${id}" d="M 50,50 m -30,0 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0" fill="none"/>
-  <text font-family="var(--font-display)" font-size="7.2" fill="var(--gold)" letter-spacing="1">
+  <text font-size="7.2" letter-spacing="1" style="${GOLD_TEXT}">
     <textPath href="#${id}" startOffset="2%">${escapeXML(theme.motto)}</textPath>
   </text>
-  <text x="50" y="54" text-anchor="middle" font-family="var(--font-display)" font-size="${size}" fill="var(--gold)">${escapeXML(label)}</text>
+  <text x="50" y="54" text-anchor="middle" font-size="${size}" style="${GOLD_TEXT}">${escapeXML(label)}</text>
 </svg>`;
 }
 
@@ -221,7 +239,7 @@ function escapeXML(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
-/* ---------- admin preview helper ---------- */
+/* ---------- summary (used by scripts/check.mjs) ---------- */
 
 export function themeSummary(theme) {
   return [

@@ -1,18 +1,14 @@
 {
   "name": "cic-paperwork",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "description": "CIC bureaucratic intake forms — JSON-defined, procedurally styled, Netlify-hosted.",
+  "description": "CIC bureaucratic intake forms — a static GitHub Pages site. Fill in, save as PDF, receive another form.",
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "dev": "node scripts/dev-server.mjs",
+    "serve": "node scripts/serve.mjs",
     "check": "node scripts/check.mjs"
   },
-  "dependencies": {
-    "@netlify/blobs": "^8.1.0"
-  },
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   }
 }
