@@ -4,6 +4,12 @@
    The bank is a list of *topics* - things the Office wants to know -
    each written many ways. Two rules shape every sheet:
 
+   0. Misdirection. Each sheet belongs to a family - a kind of
+      paperwork (cargo, mining, crew welfare, war...) - chosen with no
+      regard to what the visitor came about. Families rotate so the
+      same kind does not come back straight away, and a sheet now and
+      then carries a question misfiled from another family.
+
    1. No repeats. A wording already shown to this visitor (on GC-1 or
       any earlier sheet) is never shown again. Unused wordings are used
       first; once a visitor has seen them all, old wordings come back
@@ -144,6 +150,19 @@ function lowerFirst(s) {
   return s.charAt(0).toLowerCase() + s.slice(1);
 }
 
+/* ---------- families ---------- */
+
+/** Rotate through families: never the same as last time, least-used first. */
+function chooseFamily(rnd, families, past) {
+  if (!families.length) return null;
+  const last = past[past.length - 1];
+  let pool = families.filter((f) => f.id !== last);
+  if (!pool.length) pool = families;
+  const count = (id) => past.filter((p) => p === id).length;
+  const least = Math.min(...pool.map((f) => count(f.id)));
+  return pickOne(rnd, pool.filter((f) => count(f.id) === least));
+}
+
 /* ---------- sheet generation ---------- */
 
 /**
@@ -151,7 +170,7 @@ function lowerFirst(s) {
  * @param {object} base      the parent form ({ id, code, org, department, ... })
  * @param {string} seed      random seed for this sheet
  * @param {number} pageIndex 1 for GC-1a, 2 for GC-1b ...
- * @param {{ phrasings?: string[], texts?: string[], interjections?: string[] }} used
+ * @param {{ phrasings?: string[], texts?: string[], interjections?: string[], families?: string[] }} used
  *        what this visitor has already been shown
  * @returns {object} a form definition, with `usage` listing what it consumed
  */
@@ -173,7 +192,19 @@ export function generatePage(bank, base, seed, pageIndex, used) {
   const seenPhrasing = new Set((used && used.phrasings) || []);
   const seenText = new Set((used && used.texts) || []);
   const seenInterjection = new Set((used && used.interjections) || []);
-  const usage = { phrasings: [], texts: [], interjections: [] };
+  const usage = { phrasings: [], texts: [], interjections: [], family: null };
+
+  const families = Array.isArray(bank.families) ? bank.families : [];
+  const family = chooseFamily(rnd, families, (used && used.families) || []);
+  if (family) usage.family = family.id;
+  const familyShare = cfg.familyShare == null ? 0.7 : cfg.familyShare;
+  const misfileChance = cfg.misfileChance == null ? 0.45 : cfg.misfileChance;
+  const familyOf = (c) => topics[c.ti].family || 'general';
+
+  /** Pick from the family's own list most of the time, else the shared one. */
+  const famPick = (key, share) => (family && Array.isArray(family[key]) && family[key].length && rnd() < share
+    ? pickOne(rnd, family[key])
+    : pickOne(rnd, bank[key]));
 
   // Every wording in the bank, as a candidate.
   const all = [];
@@ -247,7 +278,13 @@ export function generatePage(bank, base, seed, pageIndex, used) {
   /* --- sections, each topic once --- */
 
   const sectionCount = intBetween(rnd, minSections, maxSections);
-  const titles = pickMany(rnd, bank.sectionTitles || ['Particulars'], sectionCount);
+  const famTitles = shuffled(rnd, (family && family.sectionTitles) || []);
+  const genTitles = shuffled(rnd, bank.sectionTitles || []);
+  const nextTitle = () => ((famTitles.length && (rnd() < 0.75 || !genTitles.length))
+    ? famTitles.shift()
+    : genTitles.shift() || famTitles.shift() || 'Particulars');
+  const own = (c) => !!family && familyOf(c) === family.id;
+  const shared = (c) => familyOf(c) === 'general';
   const onPage = new Set();
   const sections = [];
   let total = 0;
@@ -256,7 +293,12 @@ export function generatePage(bank, base, seed, pageIndex, used) {
     const want = Math.min(intBetween(rnd, minPer, maxPer), maxFields - total);
     const fields = [];
     while (fields.length < want) {
-      const pick = take((c) => !onPage.has(topics[c.ti].id));
+      const unasked = (c) => !onPage.has(topics[c.ti].id);
+      const first = family && rnd() < familyShare ? own : shared;
+      const second = first === own ? shared : own;
+      const pick = take((c) => unasked(c) && first(c), true)
+        || take((c) => unasked(c) && second(c), true)
+        || take((c) => unasked(c) && (own(c) || shared(c)));
       if (!pick) break;
       onPage.add(topics[pick.c.ti].id);
       fields.push(build(pick));
@@ -264,9 +306,10 @@ export function generatePage(bank, base, seed, pageIndex, used) {
     if (!fields.length) continue;
     total += fields.length;
 
-    const sec = { title: expand(rnd, titles[si] || 'Particulars', slots), fields };
-    if (rnd() < 0.4 && (bank.sectionNotes || []).length) {
-      sec.note = expand(rnd, pickOne(rnd, bank.sectionNotes), slots);
+    const sec = { title: expand(rnd, nextTitle(), slots), fields };
+    if (rnd() < 0.4) {
+      const note = famPick('sectionNotes', 0.5);
+      if (note) sec.note = expand(rnd, note, slots);
     }
     sections.push(sec);
   }
@@ -311,6 +354,26 @@ export function generatePage(bank, base, seed, pageIndex, used) {
     if (!seenInterjection.has(String(idx))) usage.interjections.push(String(idx));
   }
 
+  /* --- a question from somebody else's paperwork --- */
+
+  if (family && sections.length && total <= maxFields && rnd() < misfileChance) {
+    for (const other of shuffled(rnd, families.filter((f) => f.id !== family.id))) {
+      const pick = take((c) => familyOf(c) === other.id && !onPage.has(topics[c.ti].id), true);
+      if (!pick) continue;
+      onPage.add(topics[pick.c.ti].id);
+      const items = [build(pick)];
+      const notes = bank.misfileNotes || [];
+      if (notes.length) {
+        const note = pickOne(rnd, notes).replace(/\{\{family\}\}/g, other.name);
+        items.unshift({ type: 'static', text: expand(rnd, note, slots) });
+      }
+      const sec = sections.length > 1 ? pickOne(rnd, sections.slice(1)) : sections[0];
+      sec.fields.splice(intBetween(rnd, 0, sec.fields.length), 0, ...items);
+      total++;
+      break;
+    }
+  }
+
   /* --- names and layout, now the order is final --- */
 
   const compact = (f) => ['text', 'date', 'number', 'signature'].includes(f && f.type);
@@ -335,13 +398,17 @@ export function generatePage(bank, base, seed, pageIndex, used) {
   return {
     id: base.id,
     code,
-    title: expand(rnd, pickOne(rnd, bank.titles) || base.title, slots),
+    family: family ? family.id : null,
+    title: expand(rnd, famPick('titles', 0.8) || base.title, slots),
     subtitle: expand(rnd, pickOne(rnd, bank.subtitles) || '', slots),
     org: base.org,
-    department: expand(rnd, pickOne(rnd, bank.departments) || base.department, slots),
+    department: expand(rnd, famPick('departments', 0.8) || base.department, slots),
     revision: 'REV. ' + intBetween(rnd, 2, 141) + ' · PAGE ' + (pageIndex + 1),
-    meta: [expand(rnd, pickOne(rnd, bank.metaLines) || '', slots)].filter(Boolean),
-    instructions: expand(rnd, pickOne(rnd, bank.instructions) || '', slots),
+    meta: [
+      family ? 'SERIES: ' + family.name.toUpperCase() : '',
+      expand(rnd, pickOne(rnd, bank.metaLines) || '', slots),
+    ].filter(Boolean),
+    instructions: expand(rnd, famPick('instructions', 0.5) || '', slots),
     sections,
     officeUse,
     officeUseTitle: pickOne(rnd, bank.officeUseTitles || ['For Office Use Only']),

@@ -2,8 +2,8 @@
 
 Two files drive the site:
 
-- `forms/gc-1.json` — Form GC-1, the fixed first form.
-- `forms/bank.json` — the topics and lists every random sheet after it is drawn from.
+- `forms/gc-1.json` — Form GC-1, the fixed first form: a customer complaint.
+- `forms/bank.json` — the families, topics and lists every random sheet after it is drawn from.
 
 Run `npm run check` after editing either.
 
@@ -15,14 +15,15 @@ Run `npm run check` after editing either.
 {
   "id": "gc-1",
   "code": "GC-1",
-  "title": "Grievance & Casus Belli Intake Form",
+  "title": "Customer Dissatisfaction Intake Form",
   "subtitle": "“Omnis Questus, Nullus Sanguis” — All Profit, No Blood",
   "org": "CONSOLIDATED INDUSTRIAL CONCERN",
-  "department": "Office of Interdepartmental Grievance Review",
+  "department": "Department of Customer Satisfaction (Provisional)",
   "revision": "REV. 47",
-  "meta": ["FILED THIS SESSION"],
+  "meta": ["GENERAL COMPLAINT — GOODS & SERVICES"],
   "enforceRequired": true,
   "requireAll": true,
+  "copyStamp": "CUSTOMER’S COPY",
   "style": { … },
   "instructions": "**Before you begin:** …",
   "sections": [ … ],
@@ -49,6 +50,7 @@ Run `npm run check` after editing either.
 | `finePrint` | Small print beside the save button. |
 | `submitLabel` | The save button. |
 | `transmittal` | Printed at the foot of the PDF copy only. |
+| `copyStamp` | Text of the rubber stamp on the PDF copy. Random sheets use "DECLARANT’S COPY". |
 | `receipt` | What appears after saving — see *Receipt*. |
 
 **Inline formatting** works in most text: `**bold**`, `*italic*`, `` `code` ``. Everything
@@ -73,8 +75,8 @@ Give the bare title. The "Section 1 —" prefix comes from the `numbering` style
 ### Fields
 
 ```json
-{ "name": "party_name", "type": "text", "label": "Name of declaring party",
-  "placeholder": "As it will appear in Ledger 7", "required": true, "width": "half" }
+{ "name": "customer_name", "type": "text", "label": "Customer name or faction",
+  "placeholder": "As it appears on your invoice", "required": true, "width": "half" }
 ```
 
 | Key | Applies to | Notes |
@@ -161,9 +163,28 @@ set none, so each gets a random combination.
     "echoChance": 0.95, "interjectionChance": 0.35
   },
   "slots": { "asset": ["ship", "refinery"], "verb": ["destroyed", "taken"] },
+  "families": [
+    {
+      "id": "cargo",
+      "name": "Cargo, Customs & Logistics",
+      "titles": ["Lost Cargo Report"],
+      "departments": ["Lost Cargo Office"],
+      "sectionTitles": ["Consignment Details"],
+      "instructions": ["**Before you begin:** all cargo must be declared, including cargo that has not yet been lost."],
+      "sectionNotes": ["Containers declared empty will be inspected for emptiness."]
+    }
+  ],
   "topics": [
     {
+      "id": "g-perishable",
+      "family": "cargo",
+      "type": "radio",
+      "options": ["Yes", "No", "It is now"],
+      "phrasings": ["Is the cargo perishable?", "Has the cargo perished?"]
+    },
+    {
       "id": "losses-asset",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "What did your faction lose?",
@@ -173,6 +194,7 @@ set none, so each gets a random combination.
     },
     {
       "id": "at-war",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Unsure"],
       "phrasings": [
@@ -182,6 +204,7 @@ set none, so each gets a random combination.
       ]
     }
   ],
+  "misfileNotes": ["*The following question was misfiled from {{family}}. It must be answered here.*"],
   "restatePrefixes": ["Re-confirm:"],
   "restateSuffixes": ["(for the avoidance of doubt)"],
   "interjections": ["*Section intentionally left partly blank.*"],
@@ -189,9 +212,21 @@ set none, so each gets a random combination.
 }
 ```
 
+### Families
+
+A family is a kind of paperwork. Each random sheet belongs to exactly one, and takes its
+title, department, most section headings, and often its instructions and section notes
+from the family's own lists (falling back to the shared lists at the bottom of the bank).
+
+Families rotate: the least-issued family goes next, never the same one twice in a row.
+`id` must be unique and may not be `general`; `name` appears on the sheet as
+"SERIES: …" and in misfile notes.
+
 ### Topics
 
-A topic is one thing the Office wants to know. Its properties (`type`, `options`,
+A topic is one thing a family wants to know. `family` says which family it belongs to;
+`general` (or no `family`) means it can appear on any sheet — names, signatures,
+reference numbers. Its properties (`type`, `options`,
 `placeholder`, `help`, `min`, `max`, `rows`, `minWords`, `maxLength`, `disabled`) use the
 field format above and apply to every wording. A wording is either a plain string (the
 label) or an object that overrides any of those properties for itself.
@@ -202,12 +237,15 @@ of a list** rather than in the middle.
 
 ### How a sheet is drawn
 
-1. Pick 3–4 section headings.
-2. Fill each section with 2–3 wordings the visitor has never seen, from different topics.
+1. Pick the family, and 3–4 section headings.
+2. Fill each section with 2–3 wordings the visitor has never seen, from different topics —
+   a share (`familyShare`) from the sheet's family, the rest general.
 3. With probability `echoChance`, pick one or two topics already on the sheet and ask them
    again, in another wording, in a later section.
 4. With probability `interjectionChance`, drop in one of the `interjections`.
-5. Nothing already shown to the visitor — on GC-1 or any earlier sheet — is shown again.
+5. With probability `misfileChance`, add one question from a different family, preceded by
+   one of the `misfileNotes` (`{{family}}` becomes that family's name).
+6. Nothing already shown to the visitor — on GC-1 or any earlier sheet — is shown again.
    Once every wording has been used, old ones come back with a restate prefix or suffix.
 
 | `page` setting | Meaning |
@@ -218,10 +256,14 @@ of a list** rather than in the middle.
 | `maxLongAnswers` | cap on `textarea` questions per sheet |
 | `echoChance` | chance a sheet asks something twice |
 | `interjectionChance` | chance of a note from the Office |
+| `familyShare` | share of questions drawn from the sheet's own family |
+| `misfileChance` | chance of one question from another family |
 
 ### Other pools
 
-Each sheet picks at random from each of these lists:
+Each sheet picks at random from each of these lists. `titles`, `departments`,
+`sectionTitles`, `instructions` and `sectionNotes` are used when the sheet's family has
+none of its own, or occasionally for variety.
 
 | Pool | Used for |
 | --- | --- |
@@ -230,6 +272,7 @@ Each sheet picks at random from each of these lists:
 | `instructions` | the shaded notice |
 | `sectionTitles`, `sectionNotes` | section headings and footnotes |
 | `interjections` | notes dropped between questions |
+| `misfileNotes` | the note above a misfiled question |
 | `restatePrefixes`, `restateSuffixes` | re-wording a used question |
 | `officeUse`, `officeUseTitles` | the office strip |
 | `finePrint`, `submitLabels` | beside and on the save button |

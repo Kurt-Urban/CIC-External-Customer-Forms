@@ -68,7 +68,7 @@ function saveState() {
 
 /** A fresh visitor has "seen" only GC-1's own questions. */
 function freshUsage() {
-  return { phrasings: [], texts: formTexts(docs.gc1), interjections: [] };
+  return { phrasings: [], texts: formTexts(docs.gc1), interjections: [], families: [] };
 }
 
 function drawSheet() {
@@ -88,6 +88,7 @@ function drawSheet() {
     phrasings: state.used.phrasings.concat(u.phrasings),
     texts: state.used.texts.concat(u.texts),
     interjections: state.used.interjections.concat(u.interjections),
+    families: (state.used.families || []).concat(u.family ? [u.family] : []),
   };
   delete page.usage;
   state.page = page;
@@ -234,7 +235,7 @@ async function onSave() {
       filename,
       title: 'CIC Form ' + form.code + ' — ' + form.title,
       when: nowStamp(),
-      stampText: 'DECLARANT’S COPY',
+      stampText: form.copyStamp || 'DECLARANT’S COPY',
       transmittal: form.transmittal,
     }, { dry: DRY });
   } catch (err) {
@@ -345,7 +346,7 @@ async function start() {
     state.filed = Number(saved.filed) || 0;
     const u = saved.used;
     if (u && Array.isArray(u.phrasings) && Array.isArray(u.texts) && Array.isArray(u.interjections)) {
-      state.used = u;
+      state.used = { ...u, families: Array.isArray(u.families) ? u.families : [] };
     }
     if (state.step > 0) {
       if (!state.seed) state.seed = randomHex(8);

@@ -1,9 +1,8 @@
 {
   "kind": "bank",
   "id": "cic-core",
-  "name": "CIC Core Grievance Bank",
-  "description": "Topics are the things the Office wants to know. Each topic is asked many different ways. A wording is never shown twice to the same visitor; the topic keeps coming back.",
-
+  "name": "CIC Core Paperwork Bank",
+  "description": "Sheets come in families - kinds of paperwork, each more or less unrelated to whatever the visitor came about. Topics are the things each family wants to know, each asked many ways. A wording is never shown twice to the same visitor; topics keep coming back.",
   "page": {
     "minSections": 3,
     "maxSections": 4,
@@ -12,23 +11,374 @@
     "maxFields": 15,
     "maxLongAnswers": 1,
     "echoChance": 0.95,
-    "interjectionChance": 0.35
+    "interjectionChance": 0.35,
+    "familyShare": 0.7,
+    "misfileChance": 0.45
   },
-
   "slots": {
-    "form": ["GC-2", "GC-3", "GC-3a", "GC-4", "GC-5", "GC-7", "GC-9", "GC-11", "GC-12", "GC-14(b)", "GC-22", "GC-31(c)", "GC-40", "GC-44(b)(ii)", "Schedule Q", "Annex 6", "Form P-0"],
-    "ledger": ["Ledger 7", "Ledger 7, Column C", "the Grey Ledger", "the Unreconciled Ledger", "Appendix N", "the Pending Drawer", "Cabinet 7, Drawer C", "the Overflow Cabinet"],
-    "officer": ["the Deputy Adjunct Registrar", "the Under-Clerk of Grievances", "the Second Assistant Notary", "the Acting Interim Archivist", "the Clerk of Unreconciled Matters", "the Custodian of Cabinet 7", "the Deputy Comptroller of Feelings", "the Adjudicator of Vibes", "the Officer of the Day (unfilled)"],
-    "dept": ["Interdepartmental Grievance Review", "Hostile Correspondence Intake", "the Office of Retroactive Peace", "Asset Valuation & Mourning", "the Bureau of Declared Intentions", "Non-Combat Operations", "the Directorate of Polite Refusal", "Accounts Receivable (Grievances)", "the Standing Committee on Standing"],
-    "unit": ["business days", "fiscal quarters", "billing cycles", "standard weeks", "notarised fortnights", "audit periods", "working months"],
-    "asset": ["ship", "station", "refinery", "ore hauler", "forward base", "assembler bay", "survey drone", "cargo container", "mining outpost", "hangar", "fuel depot", "antenna mast"],
-    "verb": ["destroyed", "damaged", "taken", "disassembled", "rendered inoperable", "moved without permission", "painted an unapproved colour"],
-    "sum": ["4,000 credits", "17,500 credits", "1 credit", "an undisclosed sum", "a sum to be determined by {{officer}}", "220,000 credits", "no less than 6,000 credits"]
+    "form": [
+      "GC-2",
+      "GC-3",
+      "GC-3a",
+      "GC-4",
+      "GC-5",
+      "GC-7",
+      "GC-9",
+      "GC-11",
+      "GC-12",
+      "GC-14(b)",
+      "GC-22",
+      "GC-31(c)",
+      "GC-40",
+      "GC-44(b)(ii)",
+      "Schedule Q",
+      "Annex 6",
+      "Form P-0"
+    ],
+    "ledger": [
+      "Ledger 7",
+      "Ledger 7, Column C",
+      "the Grey Ledger",
+      "the Unreconciled Ledger",
+      "Appendix N",
+      "the Pending Drawer",
+      "Cabinet 7, Drawer C",
+      "the Overflow Cabinet"
+    ],
+    "officer": [
+      "the Deputy Adjunct Registrar",
+      "the Under-Clerk of Grievances",
+      "the Second Assistant Notary",
+      "the Acting Interim Archivist",
+      "the Clerk of Unreconciled Matters",
+      "the Custodian of Cabinet 7",
+      "the Deputy Comptroller of Feelings",
+      "the Adjudicator of Vibes",
+      "the Officer of the Day (unfilled)"
+    ],
+    "dept": [
+      "Interdepartmental Grievance Review",
+      "Hostile Correspondence Intake",
+      "the Office of Retroactive Peace",
+      "Asset Valuation & Mourning",
+      "the Bureau of Declared Intentions",
+      "Non-Combat Operations",
+      "the Directorate of Polite Refusal",
+      "Accounts Receivable (Grievances)",
+      "the Standing Committee on Standing"
+    ],
+    "unit": [
+      "business days",
+      "fiscal quarters",
+      "billing cycles",
+      "standard weeks",
+      "notarised fortnights",
+      "audit periods",
+      "working months"
+    ],
+    "asset": [
+      "ship",
+      "station",
+      "refinery",
+      "ore hauler",
+      "forward base",
+      "assembler bay",
+      "survey drone",
+      "cargo container",
+      "mining outpost",
+      "hangar",
+      "fuel depot",
+      "antenna mast"
+    ],
+    "verb": [
+      "destroyed",
+      "damaged",
+      "taken",
+      "disassembled",
+      "rendered inoperable",
+      "moved without permission",
+      "painted an unapproved colour"
+    ],
+    "sum": [
+      "4,000 credits",
+      "17,500 credits",
+      "1 credit",
+      "an undisclosed sum",
+      "a sum to be determined by {{officer}}",
+      "220,000 credits",
+      "no less than 6,000 credits"
+    ]
   },
-
+  "families": [
+    {
+      "id": "grievance",
+      "name": "Grievance & Casus Belli",
+      "titles": [
+        "Supplementary Grievance Particulars",
+        "Declaration of Hostile Intent — Continuation Sheet",
+        "Casus Belli Substantiation Worksheet",
+        "Proof of Standing to Declare",
+        "Certificate of Grievance Severity",
+        "Severity Pre-Assessment Worksheet",
+        "Statement of Non-Duplicative Grievance",
+        "Schedule of Assets Alleged Lost",
+        "Belligerent Entity Registration",
+        "Notice of Intent to Continue Intending",
+        "War Aims Itemisation Schedule",
+        "Contractor & Mercenary Disclosure",
+        "Grievance Chronology Reconstruction",
+        "Neutrality Challenge Submission",
+        "Standing Grievance Renewal Notice",
+        "Quarterly Hostility Reconciliation",
+        "Declaration Regarding Declarations",
+        "Claim for Emotional Damage to a Corporation",
+        "Statement of Intent to Escalate",
+        "Escalation De-Escalation Worksheet",
+        "Terminal Grievance Summary (Non-Terminal)",
+        "Settlement Interest Survey",
+        "Peace Terms Pre-Qualification Form"
+      ],
+      "departments": [
+        "Office of Interdepartmental Grievance Review",
+        "Bureau of Hostile Correspondence Intake",
+        "Directorate of Polite Refusal",
+        "Office of Retroactive Peace",
+        "Standing Committee on Standing",
+        "Non-Combat Operations — Paperwork Division",
+        "Registry of Declared Intentions"
+      ],
+      "sectionTitles": [
+        "Casus Belli Classification",
+        "Grounds Asserted",
+        "Statement of Grievance",
+        "Chronology of Events",
+        "Losses Claimed",
+        "Evidentiary Matters",
+        "Allies & Contractors",
+        "Neutrality Assessment",
+        "War Aims",
+        "Intended Outcomes",
+        "Escalation Particulars",
+        "Settlement Particulars"
+      ],
+      "instructions": [
+        "**Please note:** the Concern is a pacifist commercial entity and does not make war. This form concerns war. It has been issued anyway.",
+        "**Procedural note:** your matter has been classified as a potential declaration of hostilities. The classification is routine and is applied to all matters, including compliments.",
+        "**Attention:** the Office does not accept spoken declarations, broadcasts, or strongly worded signage. Those are not filings. They are kept without being read."
+      ],
+      "sectionNotes": [
+        "The Concern does not make war. This section is completed regardless.",
+        "This section was added in response to a previous filing and may not apply to you. Complete it regardless."
+      ]
+    },
+    {
+      "id": "customer",
+      "name": "Customer Satisfaction & Returns",
+      "titles": [
+        "Customer Satisfaction Survey (Mandatory)",
+        "Returns Authorisation Request",
+        "Warranty Claim Pre-Qualification",
+        "Complaint Escalation Worksheet",
+        "Refund Voucher Application",
+        "Delivery Experience Questionnaire",
+        "Customer Loyalty Enrolment",
+        "Notice of Continued Dissatisfaction"
+      ],
+      "departments": [
+        "Department of Customer Satisfaction (Provisional)",
+        "Returns & Regret",
+        "Warranty Refusals Office",
+        "Customer Loyalty Bureau"
+      ],
+      "sectionTitles": [
+        "Order Particulars",
+        "Product Experience",
+        "Delivery Experience",
+        "Returns",
+        "Warranty",
+        "Satisfaction Measurement",
+        "Loyalty"
+      ],
+      "instructions": [
+        "**Your feedback matters.** It is weighed, catalogued, and stored at a constant temperature.",
+        "**Please note:** this survey is voluntary. Completion of this survey is mandatory."
+      ],
+      "sectionNotes": [
+        "Answers in this section will be used to improve our service, which is already optimal.",
+        "Vouchers issued under this section are redeemable against future forms."
+      ]
+    },
+    {
+      "id": "shipyard",
+      "name": "Shipyard Services & Hull Registration",
+      "titles": [
+        "Hull Registration Application",
+        "Refit Request (Cosmetic)",
+        "Shipbuilding Order Amendment",
+        "Declaration of Intended Vessel Use",
+        "Thruster Orientation Survey",
+        "Vessel Naming Approval Request",
+        "Paint Scheme Variance Application",
+        "Flight Trials Waiver"
+      ],
+      "departments": ["Shipyard Services", "Hull Registry", "Office of Paint & Finish", "Thruster Compliance Unit"],
+      "sectionTitles": [
+        "Vessel Particulars",
+        "Hull Specification",
+        "Propulsion",
+        "Finish & Livery",
+        "Intended Use",
+        "Refit Requirements",
+        "Registration"
+      ],
+      "instructions": [
+        "**Before you begin:** vessels must be registered before they are built, and built before they are registered.",
+        "**Please note:** the Concern builds ships for any purpose except war, and does not ask what the purpose is."
+      ],
+      "sectionNotes": [
+        "Measurements in this section should be given in blocks. Blocks should be given in measurements.",
+        "Vessels registered under this section are not guaranteed to fly."
+      ]
+    },
+    {
+      "id": "cargo",
+      "name": "Cargo, Customs & Logistics",
+      "titles": [
+        "Cargo Manifest Declaration",
+        "Customs Pre-Clearance Form",
+        "Lost Cargo Report",
+        "Hazardous Goods Declaration",
+        "Container Return Request",
+        "Consignment Tracking Enquiry",
+        "Delivery Instruction Amendment",
+        "Undeliverable Goods Notice"
+      ],
+      "departments": ["Logistics & Mild Disappointment", "Customs & Excise", "Lost Cargo Office", "Container Recovery Unit"],
+      "sectionTitles": [
+        "Consignment Details",
+        "Contents",
+        "Origin & Destination (Undisclosed)",
+        "Hazardous Materials",
+        "Customs Declaration",
+        "Delivery Instructions",
+        "Loss or Damage"
+      ],
+      "instructions": [
+        "**Before you begin:** all cargo must be declared, including cargo that has not yet been lost.",
+        "**Please note:** the Concern delivers anywhere and discloses nothing, including, on occasion, the delivery."
+      ],
+      "sectionNotes": [
+        "Places in this section must be described in words. The Office does not accept coordinates.",
+        "Containers declared empty will be inspected for emptiness."
+      ]
+    },
+    {
+      "id": "mining",
+      "name": "Mining Permits & Resource Claims",
+      "titles": [
+        "Mining Permit Application",
+        "Asteroid Claim Registration",
+        "Ore Purchase Agreement Variation",
+        "Drilling Noise Assessment",
+        "Resource Extraction Return (Quarterly)",
+        "Voxel Removal Consent Form",
+        "Refinery Queue Priority Request"
+      ],
+      "departments": [
+        "Ore Purchasing & Refinement",
+        "Asteroid Claims Registry",
+        "Office of Holes",
+        "Refinery Queue Management"
+      ],
+      "sectionTitles": [
+        "Claim Particulars",
+        "Ore Extracted",
+        "Extraction Method",
+        "Refinement",
+        "Environmental Assessment",
+        "Holes"
+      ],
+      "instructions": [
+        "**Before you begin:** a permit is required to mine. A permit is also required to apply for a permit.",
+        "**Please note:** the Concern purchases all ore at a fair price, which it sets."
+      ],
+      "sectionNotes": [
+        "Quantities in this section are recorded as reported and paid as measured.",
+        "Holes declared in this section remain the declarant’s responsibility."
+      ]
+    },
+    {
+      "id": "personnel",
+      "name": "Personnel & Crew Welfare",
+      "titles": [
+        "Crew Welfare Survey",
+        "Oxygen Entitlement Claim",
+        "Shift Pattern Preference Form",
+        "Dietary Requirements Notice",
+        "Emergency Contact Registration",
+        "Engineer Wellbeing Questionnaire",
+        "Timesheet (Retrospective)",
+        "Medical Bay Usage Declaration"
+      ],
+      "departments": ["Personnel & Oxygen", "Crew Welfare Office", "Timekeeping", "Medical Bay Administration"],
+      "sectionTitles": [
+        "Crew Member Details",
+        "Working Hours",
+        "Welfare",
+        "Oxygen & Hydrogen",
+        "Diet",
+        "Training",
+        "Emergency Contacts"
+      ],
+      "instructions": [
+        "**Your wellbeing is important to the Concern.** It appears as a line item in the quarterly accounts.",
+        "**Please note:** this form concerns your crew. You are not the Concern’s crew. Complete it regardless."
+      ],
+      "sectionNotes": [
+        "Welfare concerns raised in this section will be addressed in the order they are filed, which is last.",
+        "Oxygen is provided at cost."
+      ]
+    },
+    {
+      "id": "insurance",
+      "name": "Insurance & Damage Claims",
+      "titles": [
+        "Insurance Claim Form",
+        "Damage Assessment Report",
+        "Collision Incident Statement",
+        "Meteor Strike Notification",
+        "Act of Engineering Declaration",
+        "Premium Adjustment Request",
+        "Claim Withdrawal Form (Pre-Emptive)"
+      ],
+      "departments": [
+        "Insurance & Underwriting",
+        "Damage Assessment Office",
+        "Claims Rejection Services",
+        "Actuarial Pessimism Unit"
+      ],
+      "sectionTitles": [
+        "Policy Details",
+        "Incident Details",
+        "Cause of Damage",
+        "Damaged Components",
+        "Repair Estimate",
+        "Third Parties"
+      ],
+      "instructions": [
+        "**Before you begin:** claims must be filed before the damage occurs, or within a reasonable time afterwards, as determined before the damage occurs.",
+        "**Please note:** you do not hold a policy with the Concern. This claim will be processed regardless."
+      ],
+      "sectionNotes": [
+        "Damage caused by the laws of physics is excluded.",
+        "Estimates in this section will be reduced by a fixed percentage, and then by another."
+      ]
+    }
+  ],
   "topics": [
     {
       "id": "party-name",
+      "family": "general",
       "type": "text",
       "placeholder": "As it will appear in {{ledger}}",
       "phrasings": [
@@ -48,6 +398,7 @@
     },
     {
       "id": "party-tag",
+      "family": "general",
       "type": "text",
       "placeholder": "Three or four characters",
       "phrasings": [
@@ -63,6 +414,7 @@
     },
     {
       "id": "signatory",
+      "family": "general",
       "type": "text",
       "placeholder": "Rank, callsign, or alias",
       "phrasings": [
@@ -81,6 +433,7 @@
     },
     {
       "id": "signatory-role",
+      "family": "general",
       "type": "text",
       "phrasings": [
         "Position held by the signatory within the declaring party",
@@ -90,15 +443,22 @@
         "Is the signatory the leader of the faction? If not, who is?",
         { "label": "Role of the signatory", "placeholder": "Leader, officer, member, bystander" },
         "Job title of the person answering",
-        { "label": "Authority under which this sheet is completed", "placeholder": "Cite the instrument, not the feeling" },
+        {
+          "label": "Authority under which this sheet is completed",
+          "placeholder": "Cite the instrument, not the feeling"
+        },
         "Rank of whoever authorised the signatory to sign"
       ]
     },
     {
       "id": "contact",
+      "family": "general",
       "type": "text",
       "phrasings": [
-        { "label": "Relay or channel to which correspondence should be addressed", "placeholder": "Frequency, relay, or carrier pigeon designation" },
+        {
+          "label": "Relay or channel to which correspondence should be addressed",
+          "placeholder": "Frequency, relay, or carrier pigeon designation"
+        },
         "How may the Concern contact you?",
         "Where should replies to this filing be sent?",
         "Contact details for the declaring party",
@@ -112,6 +472,7 @@
     },
     {
       "id": "member-count",
+      "family": "general",
       "type": "number",
       "min": 0,
       "phrasings": [
@@ -129,6 +490,7 @@
     },
     {
       "id": "founded",
+      "family": "general",
       "type": "date",
       "phrasings": [
         "Date the declaring party was founded",
@@ -143,24 +505,41 @@
     },
     {
       "id": "at-war",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Unsure", "Declining to say"],
       "phrasings": [
         "Are you currently at war with the Concern?",
         "Is your faction presently engaged in hostilities against the Concern?",
-        { "label": "State of relations between your faction and the Concern", "options": ["War", "Peace", "Neither", "Both"] },
+        {
+          "label": "State of relations between your faction and the Concern",
+          "options": ["War", "Peace", "Neither", "Both"]
+        },
         "Does a state of war exist between the parties?",
         "Is your faction at peace with the Concern?",
         "Would you describe the present situation as a war?",
-        { "label": "Confirm whether hostilities are ongoing", "options": ["Ongoing", "Concluded", "Not yet begun", "Paused for paperwork"] },
+        {
+          "label": "Confirm whether hostilities are ongoing",
+          "options": ["Ongoing", "Concluded", "Not yet begun", "Paused for paperwork"]
+        },
         "Have you declared war on the Concern?",
-        { "label": "Is the Concern, as far as you are aware, at war with you?", "options": ["Yes", "No", "The Concern does not go to war", "Unsure"] },
-        { "label": "Are you at war with anyone? If so, is it the Concern?", "options": ["Yes, the Concern", "Yes, someone else", "No", "All of the above"] },
-        { "label": "Is your faction not at war with the Concern?", "options": ["Yes (not at war)", "No (at war)", "Yes (at war)", "No (not at war)"] }
+        {
+          "label": "Is the Concern, as far as you are aware, at war with you?",
+          "options": ["Yes", "No", "The Concern does not go to war", "Unsure"]
+        },
+        {
+          "label": "Are you at war with anyone? If so, is it the Concern?",
+          "options": ["Yes, the Concern", "Yes, someone else", "No", "All of the above"]
+        },
+        {
+          "label": "Is your faction not at war with the Concern?",
+          "options": ["Yes (not at war)", "No (at war)", "Yes (at war)", "No (not at war)"]
+        }
       ]
     },
     {
       "id": "war-start",
+      "family": "grievance",
       "type": "date",
       "phrasings": [
         "Date on which hostilities were declared",
@@ -177,10 +556,15 @@
     },
     {
       "id": "war-reason",
+      "family": "grievance",
       "type": "textarea",
       "rows": 5,
       "phrasings": [
-        { "label": "Restate the grievance in no fewer than 500 words, in the first person this time.", "minWords": 500, "placeholder": "Begin with: “On the date in question, the aggrieved party…”" },
+        {
+          "label": "Restate the grievance in no fewer than 500 words, in the first person this time.",
+          "minWords": 500,
+          "placeholder": "Begin with: “On the date in question, the aggrieved party…”"
+        },
         "Explain why your faction has declared war on the Concern.",
         "Set out the reasons for hostilities, in order of importance.",
         "Set out the reasons for hostilities, in reverse order of importance.",
@@ -197,6 +581,7 @@
     },
     {
       "id": "war-reason-short",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "Reason for declaring war, in ten words or fewer",
@@ -213,6 +598,7 @@
     },
     {
       "id": "casus-class",
+      "family": "grievance",
       "type": "checkboxes",
       "options": [
         "Grid or cargo theft",
@@ -241,6 +627,7 @@
     },
     {
       "id": "severity",
+      "family": "grievance",
       "type": "select",
       "options": ["Trivial", "Minor", "Moderate", "Serious", "Grave", "Total"],
       "phrasings": [
@@ -253,11 +640,15 @@
         "Classify the seriousness of the dispute",
         "Severity of the grievance at the time it arose",
         "Severity of the grievance now",
-        { "label": "If this grievance were a ship, how much damage would it have taken?", "options": ["None", "Cosmetic", "Structural", "Critical", "Total"] }
+        {
+          "label": "If this grievance were a ship, how much damage would it have taken?",
+          "options": ["None", "Cosmetic", "Structural", "Critical", "Total"]
+        }
       ]
     },
     {
       "id": "severity-number",
+      "family": "grievance",
       "type": "number",
       "min": 1,
       "max": 10,
@@ -275,6 +666,7 @@
     },
     {
       "id": "desired-outcome",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "What outcome does your faction seek?",
@@ -283,7 +675,11 @@
         "What do you want?",
         "What would the Concern have to do for this war to end?",
         "State your war aims",
-        { "label": "State your war aims, itemised, with a unit cost for each.", "type": "textarea", "rows": 4 },
+        {
+          "label": "State your war aims, itemised, with a unit cost for each.",
+          "type": "textarea",
+          "rows": 4
+        },
         "Objective of hostilities",
         "What does victory look like, in practical terms?",
         "If the Concern agreed to everything, what would it have agreed to?",
@@ -293,6 +689,7 @@
     },
     {
       "id": "end-condition",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "Conditions under which your faction would end hostilities",
@@ -302,12 +699,16 @@
         "Maximum acceptable terms",
         "Under what circumstances would you withdraw your declaration?",
         "Circumstances in which this filing would become unnecessary",
-        { "label": "What would make you stop filling in these forms?", "help": "There are no such circumstances. Answer anyway." },
+        {
+          "label": "What would make you stop filling in these forms?",
+          "help": "There are no such circumstances. Answer anyway."
+        },
         "Describe peace, briefly"
       ]
     },
     {
       "id": "end-date",
+      "family": "grievance",
       "type": "date",
       "phrasings": [
         "Date on which hostilities are expected to end",
@@ -315,13 +716,17 @@
         "Anticipated conclusion date",
         "Date by which your faction expects satisfaction",
         "Date on which you intend to stop filing forms",
-        { "label": "Expected end of dispute", "help": "An estimate is acceptable. A correct estimate is not required." },
+        {
+          "label": "Expected end of dispute",
+          "help": "An estimate is acceptable. A correct estimate is not required."
+        },
         "Latest date on which this war would still seem worthwhile",
         "Date on which the matter will, in your view, be resolved"
       ]
     },
     {
       "id": "losses-value",
+      "family": "grievance",
       "type": "number",
       "min": 0,
       "placeholder": "e.g. {{sum}}",
@@ -340,6 +745,7 @@
     },
     {
       "id": "losses-asset",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "Description of any asset lost or damaged",
@@ -357,6 +763,7 @@
     },
     {
       "id": "prior-contact",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Attempted", "Not applicable"],
       "phrasings": [
@@ -367,12 +774,16 @@
         "Was a complaint lodged with the Concern before hostilities began?",
         "Did you consider writing to the Concern first?",
         "Is this the first the Concern is hearing of this?",
-        { "label": "Has this dispute been the subject of earlier correspondence?", "options": ["Yes", "No", "Only this correspondence"] },
+        {
+          "label": "Has this dispute been the subject of earlier correspondence?",
+          "options": ["Yes", "No", "Only this correspondence"]
+        },
         { "label": "Have you tried asking nicely?", "options": ["Yes", "No", "Nicely is subjective"] }
       ]
     },
     {
       "id": "prior-declarations",
+      "family": "grievance",
       "type": "number",
       "min": 0,
       "phrasings": [
@@ -389,6 +800,7 @@
     },
     {
       "id": "allies",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "Names of any factions allied with the declaring party",
@@ -404,21 +816,29 @@
     },
     {
       "id": "mercenaries",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Undecided", "Already have"],
       "phrasings": [
         "Does your faction intend to hire mercenaries?",
         "Will any part of this war be carried out by contractors?",
         "Is your faction employing hired fighters in this dispute?",
-        { "label": "Would your faction like to hire mercenaries through the Concern?", "options": ["Yes", "No", "Request a quote", "Only at a discount"] },
+        {
+          "label": "Would your faction like to hire mercenaries through the Concern?",
+          "options": ["Yes", "No", "Request a quote", "Only at a discount"]
+        },
         "Have you considered outsourcing this war?",
         "Will you be engaging third parties to act on your behalf?",
         "Are any of the combatants on your side being paid?",
-        { "label": "Are you aware that the Concern arranges mercenary contracts for any client, including you?", "options": ["Yes", "No", "I am now"] }
+        {
+          "label": "Are you aware that the Concern arranges mercenary contracts for any client, including you?",
+          "options": ["Yes", "No", "I am now"]
+        }
       ]
     },
     {
       "id": "purchase-interest",
+      "family": "general",
       "type": "radio",
       "options": ["Yes", "No", "Possibly", "Send a catalogue"],
       "phrasings": [
@@ -427,14 +847,21 @@
         "Would you buy a replacement {{asset}} from the Concern at list price?",
         "Is your faction open to a commercial arrangement?",
         "May the Concern contact you with offers?",
-        { "label": "Would a discount change your position on this war?", "options": ["Yes", "No", "Depends on the discount", "I would like to hear the discount"] },
-        { "label": "Are you aware that the Concern sells to any party, including parties at war with it?", "options": ["Yes", "No", "I am now"] },
+        {
+          "label": "Would a discount change your position on this war?",
+          "options": ["Yes", "No", "Depends on the discount", "I would like to hear the discount"]
+        },
+        {
+          "label": "Are you aware that the Concern sells to any party, including parties at war with it?",
+          "options": ["Yes", "No", "I am now"]
+        },
         "Would you consider buying the weapons for this war from the Concern?",
         "Do you require a quotation for anything?"
       ]
     },
     {
       "id": "negotiation",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Possibly", "Only in writing"],
       "phrasings": [
@@ -443,7 +870,10 @@
         "Are you open to talks?",
         "Would your faction consider arbitration?",
         "Is there any offer the Concern could make that you would accept?",
-        { "label": "Do you regard this form as a negotiation?", "options": ["Yes", "No", "It is becoming one"] },
+        {
+          "label": "Do you regard this form as a negotiation?",
+          "options": ["Yes", "No", "It is becoming one"]
+        },
         "Would you discuss terms, if the terms were on a form?",
         "Is compromise possible?",
         { "label": "Should the Concern make an offer?", "options": ["Yes", "No", "Only a generous one"] }
@@ -451,6 +881,7 @@
     },
     {
       "id": "compensation",
+      "family": "grievance",
       "type": "number",
       "min": 0,
       "phrasings": [
@@ -461,12 +892,16 @@
         "Settlement figure you would accept if nobody was watching",
         "Price of peace, in credits",
         "How much should the Concern pay you, if anything?",
-        { "label": "How much would you pay the Concern to stop sending forms?", "help": "This is not an offer." },
+        {
+          "label": "How much would you pay the Concern to stop sending forms?",
+          "help": "This is not an offer."
+        },
         "Reparations requested"
       ]
     },
     {
       "id": "coordinates",
+      "family": "general",
       "type": "checkbox",
       "phrasings": [
         "I confirm that this sheet contains no coordinates.",
@@ -481,36 +916,54 @@
     },
     {
       "id": "neutrality",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Partly", "Unsure"],
       "phrasings": [
         "Do you accept that the Concern is a neutral party?",
         "Is it your position that the Concern has taken sides?",
-        { "label": "In your view, is the Concern a peaceful organisation?", "options": ["Yes", "No", "Commercially", "Unsure"] },
-        { "label": "Has the Concern, to your knowledge, ever fought anyone directly?", "options": ["Yes", "No", "Not personally", "Unsure"] },
+        {
+          "label": "In your view, is the Concern a peaceful organisation?",
+          "options": ["Yes", "No", "Commercially", "Unsure"]
+        },
+        {
+          "label": "Has the Concern, to your knowledge, ever fought anyone directly?",
+          "options": ["Yes", "No", "Not personally", "Unsure"]
+        },
         "Do you consider the Concern’s neutrality to be genuine?",
         "Would you describe the Concern as a combatant?",
-        { "label": "Would you describe the Concern as a shop?", "options": ["Yes", "No", "A very large shop"] },
+        {
+          "label": "Would you describe the Concern as a shop?",
+          "options": ["Yes", "No", "A very large shop"]
+        },
         "Should the Concern remain neutral in this war?"
       ]
     },
     {
       "id": "first-grievance",
+      "family": "grievance",
       "type": "radio",
       "options": ["Yes", "No", "Unsure"],
       "phrasings": [
         "Is this your faction’s first grievance against the Concern?",
         "Have you filed a grievance with the Concern before?",
         "Is this matter new?",
-        { "label": "Has this grievance been raised on any previous sheet?", "options": ["Yes", "No", "On every previous sheet"] },
+        {
+          "label": "Has this grievance been raised on any previous sheet?",
+          "options": ["Yes", "No", "On every previous sheet"]
+        },
         "Is this grievance related to a previous grievance?",
-        { "label": "Is this the same grievance as the one described earlier?", "options": ["Yes", "No", "It has grown"] },
+        {
+          "label": "Is this the same grievance as the one described earlier?",
+          "options": ["Yes", "No", "It has grown"]
+        },
         { "label": "Is this filing a continuation?", "options": ["Yes", "No", "Aren’t they all"] },
         "Should this grievance be treated as new?"
       ]
     },
     {
       "id": "duplicate",
+      "family": "general",
       "type": "checkbox",
       "phrasings": [
         "I certify that this filing is not a duplicate of any filing already on file, including this one.",
@@ -519,12 +972,16 @@
         "I understand that repeated answers will be treated as new answers.",
         "I declare that this grievance is distinct from every other grievance I have filed.",
         "Any similarity between this sheet and a previous sheet is the Office’s doing, not mine.",
-        { "label": "I have not answered any of these questions before.", "help": "If you have, tick the box anyway." },
+        {
+          "label": "I have not answered any of these questions before.",
+          "help": "If you have, tick the box anyway."
+        },
         "I acknowledge that questions on this sheet may resemble earlier questions and must still be answered."
       ]
     },
     {
       "id": "truth",
+      "family": "general",
       "type": "checkbox",
       "phrasings": [
         "I certify that the foregoing is true to the best of my knowledge.",
@@ -540,6 +997,7 @@
     },
     {
       "id": "signature",
+      "family": "general",
       "type": "signature",
       "placeholder": "Sign here",
       "phrasings": [
@@ -557,6 +1015,7 @@
     },
     {
       "id": "date-signed",
+      "family": "general",
       "type": "date",
       "phrasings": [
         "Date of signature",
@@ -564,13 +1023,17 @@
         "Date this sheet was completed",
         "Date this sheet was begun",
         "Date on which your signature takes effect",
-        { "label": "Date, written in full", "help": "If different from any date above, explain on the next sheet." },
+        {
+          "label": "Date, written in full",
+          "help": "If different from any date above, explain on the next sheet."
+        },
         "What is the date?",
         "Date you expect this sheet to be read"
       ]
     },
     {
       "id": "witness",
+      "family": "general",
       "type": "signature",
       "phrasings": [
         "Signature of witness",
@@ -578,13 +1041,26 @@
         { "label": "Name of a witness to the grievance", "type": "text" },
         { "label": "Name of a witness to this form being completed", "type": "text" },
         "Witness countersignature",
-        { "label": "Signature of alternate notary", "disabled": true, "placeholder": "Currently on sabbatical — see Form GC-9 to request alternate notarisation" },
-        { "label": "Counter-signature of {{officer}}", "disabled": true, "placeholder": "To be completed by this office" },
-        { "label": "Did anyone see you fill this in?", "type": "radio", "options": ["Yes", "No", "I was careful"] }
+        {
+          "label": "Signature of alternate notary",
+          "disabled": true,
+          "placeholder": "Currently on sabbatical — see Form GC-9 to request alternate notarisation"
+        },
+        {
+          "label": "Counter-signature of {{officer}}",
+          "disabled": true,
+          "placeholder": "To be completed by this office"
+        },
+        {
+          "label": "Did anyone see you fill this in?",
+          "type": "radio",
+          "options": ["Yes", "No", "I was careful"]
+        }
       ]
     },
     {
       "id": "home-region",
+      "family": "general",
       "type": "text",
       "help": "Describe the region only. The Office does not accept coordinates.",
       "phrasings": [
@@ -600,6 +1076,7 @@
     },
     {
       "id": "fleet",
+      "family": "general",
       "type": "number",
       "min": 0,
       "phrasings": [
@@ -616,6 +1093,7 @@
     },
     {
       "id": "aggrieved-person",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "Name of the member most affected by the grievance",
@@ -628,6 +1106,7 @@
     },
     {
       "id": "responsible-person",
+      "family": "grievance",
       "type": "text",
       "phrasings": [
         "Individual whose conduct gave rise to the complaint",
@@ -642,6 +1121,7 @@
     },
     {
       "id": "evidence",
+      "family": "grievance",
       "type": "checkboxes",
       "options": ["Screenshots", "Logs", "Witness statements", "A recording", "A strong feeling", "None"],
       "phrasings": [
@@ -653,11 +1133,16 @@
         "Which of the following could you produce if asked?",
         { "label": "Describe your strongest piece of evidence", "type": "text" },
         { "label": "Describe your weakest piece of evidence", "type": "text" },
-        { "label": "Is your evidence notarised?", "type": "radio", "options": ["Yes", "No", "The notary is on sabbatical"] }
+        {
+          "label": "Is your evidence notarised?",
+          "type": "radio",
+          "options": ["Yes", "No", "The notary is on sabbatical"]
+        }
       ]
     },
     {
       "id": "timeline",
+      "family": "grievance",
       "type": "textarea",
       "rows": 5,
       "phrasings": [
@@ -673,6 +1158,7 @@
     },
     {
       "id": "feelings",
+      "family": "general",
       "type": "select",
       "options": ["Resolute", "Furious", "Weary", "Businesslike", "Confused", "Improving", "Declining to disclose"],
       "phrasings": [
@@ -688,6 +1174,7 @@
     },
     {
       "id": "vibes",
+      "family": "general",
       "type": "number",
       "min": 1,
       "max": 100,
@@ -703,6 +1190,7 @@
     },
     {
       "id": "understanding",
+      "family": "general",
       "type": "checkbox",
       "phrasings": [
         "I understand that completing this sheet does not advance my grievance.",
@@ -717,6 +1205,7 @@
     },
     {
       "id": "patience",
+      "family": "general",
       "type": "number",
       "min": 0,
       "phrasings": [
@@ -732,6 +1221,7 @@
     },
     {
       "id": "consent",
+      "family": "general",
       "type": "checkbox",
       "phrasings": [
         "I consent to this filing generating further filings.",
@@ -745,20 +1235,28 @@
     },
     {
       "id": "reply",
+      "family": "general",
       "type": "select",
       "options": ["Formal", "Cordial", "Curt", "In triplicate", "None", "Whatever is cheapest"],
       "phrasings": [
         "Preferred tone of reply",
         "How would you like the Concern to respond?",
         "Format of any reply",
-        { "label": "Should the Concern reply at all?", "options": ["Yes", "No", "Only in writing", "Only with forms"] },
+        {
+          "label": "Should the Concern reply at all?",
+          "options": ["Yes", "No", "Only in writing", "Only with forms"]
+        },
         { "label": "Preferred length of reply", "options": ["Short", "Long", "One form", "Several forms"] },
         { "label": "Preferred medium of reply", "options": ["Written", "Spoken", "Form", "Silence"] },
-        { "label": "When should the Concern reply?", "options": ["Immediately", "Eventually", "Never", "After review"] }
+        {
+          "label": "When should the Concern reply?",
+          "options": ["Immediately", "Eventually", "Never", "After review"]
+        }
       ]
     },
     {
       "id": "read",
+      "family": "general",
       "type": "checkbox",
       "phrasings": [
         "I have read every previous sheet in full.",
@@ -772,6 +1270,7 @@
     },
     {
       "id": "form-count",
+      "family": "general",
       "type": "number",
       "min": 0,
       "phrasings": [
@@ -786,6 +1285,7 @@
     },
     {
       "id": "tone",
+      "family": "grievance",
       "type": "select",
       "options": ["Formal", "Threatening", "Aggrieved", "Polite", "Theatrical", "Unclear"],
       "phrasings": [
@@ -794,14 +1294,26 @@
         "Register of the declaration",
         "Intended tone of the declaration",
         "Tone of the declaration as received",
-        { "label": "How dramatic was your declaration?", "options": ["Not at all", "Somewhat", "Very", "Music was involved"] },
+        {
+          "label": "How dramatic was your declaration?",
+          "options": ["Not at all", "Somewhat", "Very", "Music was involved"]
+        },
         "Tone of this sheet"
       ]
     },
     {
       "id": "declaration-method",
+      "family": "grievance",
       "type": "select",
-      "options": ["Direct message", "Public channel", "Antenna broadcast", "Signage", "In person", "Carrier pigeon", "Other"],
+      "options": [
+        "Direct message",
+        "Public channel",
+        "Antenna broadcast",
+        "Signage",
+        "In person",
+        "Carrier pigeon",
+        "Other"
+      ],
       "phrasings": [
         "How was the declaration of war delivered?",
         "By what means did your faction notify the Concern?",
@@ -809,11 +1321,16 @@
         "How did you tell the Concern?",
         "How will you tell the Concern next time?",
         "Medium of the original declaration",
-        { "label": "Was the declaration delivered on a form?", "type": "radio", "options": ["Yes", "No", "It is now"] }
+        {
+          "label": "Was the declaration delivered on a form?",
+          "type": "radio",
+          "options": ["Yes", "No", "It is now"]
+        }
       ]
     },
     {
       "id": "fee",
+      "family": "general",
       "type": "number",
       "min": 0,
       "placeholder": "{{sum}}",
@@ -828,42 +1345,69 @@
     },
     {
       "id": "fee-method",
+      "family": "general",
       "type": "radio",
       "options": ["Credit transfer", "Ore", "Components", "A promise", "Under protest"],
       "phrasings": [
         "Method of payment",
         "How will the filing fee be paid?",
         "Form of payment tendered",
-        { "label": "Would you like to dispute the filing fee?", "options": ["Yes — attach Form {{form}}", "No", "I was unaware there was a fee"] },
-        { "label": "Was the fee paid willingly?", "options": ["Yes", "No", "Under protest", "Is anything, now"] }
+        {
+          "label": "Would you like to dispute the filing fee?",
+          "options": ["Yes — attach Form {{form}}", "No", "I was unaware there was a fee"]
+        },
+        {
+          "label": "Was the fee paid willingly?",
+          "options": ["Yes", "No", "Under protest", "Is anything, now"]
+        }
       ]
     },
     {
       "id": "form-identity",
+      "family": "general",
       "type": "text",
       "phrasings": [
         "Title of the form you believe you are completing",
         "What is the name of this form?",
-        { "label": "Is this the form you meant to complete?", "type": "radio", "options": ["Yes", "No", "It was when I began"] },
+        {
+          "label": "Is this the form you meant to complete?",
+          "type": "radio",
+          "options": ["Yes", "No", "It was when I began"]
+        },
         "Form number shown at the top of this sheet",
         "Form number you expected to see at the top of this sheet",
-        { "label": "Have you seen this form before?", "type": "radio", "options": ["Yes", "No", "Something like it"] }
+        {
+          "label": "Have you seen this form before?",
+          "type": "radio",
+          "options": ["Yes", "No", "Something like it"]
+        }
       ]
     },
     {
       "id": "schedule",
+      "family": "general",
       "type": "select",
-      "options": ["Schedule A — Active", "Schedule B — Dormant", "Schedule C — Duplicative", "Schedule D — Unreadable", "Schedule Q — Reserved"],
+      "options": [
+        "Schedule A — Active",
+        "Schedule B — Dormant",
+        "Schedule C — Duplicative",
+        "Schedule D — Unreadable",
+        "Schedule Q — Reserved"
+      ],
       "phrasings": [
         "Schedule under which this grievance should be indexed",
         "Where should this sheet be filed?",
         "Preferred filing location",
         "Schedule the previous sheet should have been filed under",
-        { "label": "Drawer preference", "options": ["Drawer A", "Drawer B", "Drawer C (jammed)", "Any drawer"] }
+        {
+          "label": "Drawer preference",
+          "options": ["Drawer A", "Drawer B", "Drawer C (jammed)", "Any drawer"]
+        }
       ]
     },
     {
       "id": "reference",
+      "family": "general",
       "type": "text",
       "phrasings": [
         { "label": "Ledger reference, if known", "placeholder": "{{ledger}}" },
@@ -876,32 +1420,821 @@
     },
     {
       "id": "question-check",
+      "family": "general",
       "type": "radio",
       "phrasings": [
-        { "label": "Did you understand the previous question?", "options": ["Yes", "No", "There was no previous question"] },
+        {
+          "label": "Did you understand the previous question?",
+          "options": ["Yes", "No", "There was no previous question"]
+        },
         { "label": "Has this question been asked before?", "options": ["Yes", "No", "In different words"] },
         { "label": "Is this question necessary?", "options": ["Yes", "No", "The Office has decided"] },
-        { "label": "Do you feel you have answered this question already?", "options": ["Yes", "No", "Several times"] },
-        { "label": "Are these questions getting easier?", "options": ["Yes", "No", "They are the same questions"] },
-        { "label": "Would you like to change any earlier answer?", "options": ["Yes", "No", "It is too late"], "help": "Earlier answers cannot be changed. Changes are filed separately." },
-        { "label": "Did you answer the question above truthfully?", "options": ["Yes", "No", "There is no question above"] }
+        {
+          "label": "Do you feel you have answered this question already?",
+          "options": ["Yes", "No", "Several times"]
+        },
+        {
+          "label": "Are these questions getting easier?",
+          "options": ["Yes", "No", "They are the same questions"]
+        },
+        {
+          "label": "Would you like to change any earlier answer?",
+          "options": ["Yes", "No", "It is too late"],
+          "help": "Earlier answers cannot be changed. Changes are filed separately."
+        },
+        {
+          "label": "Did you answer the question above truthfully?",
+          "options": ["Yes", "No", "There is no question above"]
+        }
+      ]
+    },
+    {
+      "id": "c-order",
+      "family": "customer",
+      "type": "text",
+      "phrasings": [
+        "Order number",
+        "Invoice reference printed on your receipt",
+        "Contract number for the goods concerned",
+        "Number of the order you are dissatisfied with",
+        "Number of any other order you are dissatisfied with",
+        "Reference for the purchase in question, if you still have it",
+        "Order number, as remembered"
+      ]
+    },
+    {
+      "id": "c-product",
+      "family": "customer",
+      "type": "text",
+      "phrasings": [
+        "Product purchased",
+        "What did you buy from the Concern?",
+        "Description of the goods, as sold",
+        "Description of the goods, as received",
+        "Name of the item you would like to return",
+        "Which product is this survey about?",
+        "Product you expected to receive"
+      ]
+    },
+    {
+      "id": "c-satisfaction",
+      "family": "customer",
+      "type": "select",
+      "options": ["Very satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very dissatisfied", "Satisfied, grudgingly"],
+      "phrasings": [
+        "Overall satisfaction with your purchase",
+        "How satisfied are you with the Concern?",
+        "How satisfied are you with this survey?",
+        "How satisfied were you before starting this survey?",
+        "Satisfaction with the delivery",
+        "Satisfaction with the product, now that it has arrived",
+        "Satisfaction with the complaints process so far"
+      ]
+    },
+    {
+      "id": "c-return-reason",
+      "family": "customer",
+      "type": "radio",
+      "options": [
+        "Faulty",
+        "Not as described",
+        "No longer required",
+        "Arrived in pieces",
+        "Changed my mind",
+        "The Concern changed my mind"
+      ],
+      "phrasings": [
+        "Reason for return",
+        "Why are you returning this item?",
+        "Primary reason for dissatisfaction",
+        "Which best describes the fault?",
+        "Reason the goods are no longer wanted",
+        "Reason you would give a friend for returning this item",
+        "Reason for return (a different reason from any given before)"
+      ]
+    },
+    {
+      "id": "c-remedy",
+      "family": "customer",
+      "type": "radio",
+      "options": ["Refund", "Replacement", "Repair", "Voucher", "Apology"],
+      "phrasings": [
+        "Preferred resolution",
+        "What would you like the Concern to do?",
+        "Preferred form of compensation",
+        "If a refund is not possible, what would you accept?",
+        "If a replacement is not possible, what would you accept?",
+        {
+          "label": "How would you like your refund voucher delivered?",
+          "options": ["As a voucher", "As a form", "As a voucher for a form"]
+        },
+        "Resolution you would accept in the absence of any resolution"
+      ]
+    },
+    {
+      "id": "c-warranty",
+      "family": "customer",
+      "type": "radio",
+      "options": ["Yes", "No", "Expired", "Unsure"],
+      "phrasings": [
+        "Is the item under warranty?",
+        "Was a warranty purchased with this item?",
+        "Has the warranty been voided by use?",
+        {
+          "label": "Was the item used for its intended purpose?",
+          "options": ["Yes", "No", "Its purpose was never explained"]
+        },
+        "Is the warranty sticker still attached?",
+        {
+          "label": "Has the item been modified since purchase?",
+          "options": ["Yes", "No", "Only slightly", "Only to make it work"]
+        },
+        "Did you read the warranty terms?"
+      ]
+    },
+    {
+      "id": "c-recommend",
+      "family": "customer",
+      "type": "number",
+      "min": 0,
+      "max": 10,
+      "phrasings": [
+        "How likely are you to recommend the Concern to a friend? (0–10)",
+        "How likely are you to recommend the Concern to a rival? (0–10)",
+        "Rate your purchase out of ten",
+        "Rate your delivery pilot out of ten",
+        "Rate this survey out of ten",
+        "Likelihood of buying from the Concern again, out of ten",
+        { "label": "How many stars would you give the Concern?", "min": 1, "max": 5 }
+      ]
+    },
+    {
+      "id": "c-delivery",
+      "family": "customer",
+      "type": "date",
+      "phrasings": [
+        "Date the goods were promised",
+        "Date the goods arrived",
+        {
+          "label": "Where were the goods left?",
+          "type": "text",
+          "help": "Describe the place in words. No coordinates."
+        },
+        {
+          "label": "Condition of the packaging on arrival",
+          "type": "select",
+          "options": ["Intact", "Damaged", "Absent", "The packaging arrived; the goods did not"]
+        },
+        { "label": "Who signed for the delivery?", "type": "text" },
+        {
+          "label": "Was the delivery on time?",
+          "type": "radio",
+          "options": ["Yes", "No", "Early", "Which time?"]
+        },
+        { "label": "Number of pieces the delivery arrived in", "type": "number", "min": 1 }
+      ]
+    },
+    {
+      "id": "s-vessel-name",
+      "family": "shipyard",
+      "type": "text",
+      "phrasings": [
+        "Name of the vessel",
+        "What is the ship called?",
+        "Proposed name for the vessel",
+        "Name painted on the hull, if different from the registered name",
+        "Name the vessel was known by before the refit",
+        "Any nicknames the crew use for the vessel",
+        "Name you would give the vessel if starting again"
+      ]
+    },
+    {
+      "id": "s-hull-class",
+      "family": "shipyard",
+      "type": "select",
+      "options": ["Small grid", "Large grid", "Station", "Rover", "Unclear"],
+      "phrasings": [
+        "Grid size",
+        "Class of vessel",
+        "Is the vessel a ship, a station, or undecided?",
+        "Hull classification, as built",
+        "Hull classification, based on how it currently behaves",
+        { "label": "Does the vessel move?", "type": "radio", "options": ["Yes", "No", "Only downward"] },
+        "Classification the vessel would prefer"
+      ]
+    },
+    {
+      "id": "s-blocks",
+      "family": "shipyard",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Block count",
+        "Approximate number of blocks in the vessel",
+        "Number of blocks in the vessel on delivery",
+        "Number of blocks still in the vessel",
+        "Number of blocks you believe are unnecessary",
+        "Number of conveyor junctions (estimate)",
+        "Number of blocks the vessel was advertised as having"
+      ]
+    },
+    {
+      "id": "s-thrusters",
+      "family": "shipyard",
+      "type": "radio",
+      "options": ["All directions", "Most directions", "Forward only", "None"],
+      "phrasings": [
+        "Thruster coverage",
+        "In which directions can the vessel thrust?",
+        {
+          "label": "Were the thrusters fitted facing the right way?",
+          "options": ["Yes", "No", "Some of them"]
+        },
+        { "label": "Number of thrusters fitted", "type": "number", "min": 0 },
+        { "label": "Number of thrusters fitted backwards", "type": "number", "min": 0 },
+        { "label": "Can the vessel stop?", "options": ["Yes", "No", "Eventually"] },
+        { "label": "Does the vessel fly under gravity?", "options": ["Yes", "No", "Briefly"] }
+      ]
+    },
+    {
+      "id": "s-paint",
+      "family": "shipyard",
+      "type": "text",
+      "phrasings": [
+        "Requested paint colour",
+        "Colour the vessel was delivered in",
+        "Colour you would describe the vessel as, if pressed",
+        "Name of the paint scheme ordered",
+        "Reason the delivered colour is unacceptable",
+        {
+          "label": "Is the vessel the correct colour?",
+          "type": "radio",
+          "options": ["Yes", "No", "It depends on the lighting"]
+        },
+        "Colour of the vessel after the incident"
+      ]
+    },
+    {
+      "id": "s-use",
+      "family": "shipyard",
+      "type": "radio",
+      "options": ["Cargo", "Mining", "Passengers", "Leisure", "Definitely not war"],
+      "phrasings": [
+        "Intended use of the vessel",
+        "What will the vessel be used for?",
+        "Primary purpose of the vessel",
+        "Secondary purpose of the vessel",
+        {
+          "label": "Will the vessel be fitted with weapons?",
+          "options": ["No", "No, but hypothetically", "Only decorative ones", "The Concern does not need to know"]
+        },
+        "Purpose declared to the Concern at the time of purchase",
+        {
+          "label": "Is the vessel intended for war?",
+          "options": ["No", "Absolutely not", "Only defensively", "The Concern is pacifist and did not ask"]
+        }
+      ]
+    },
+    {
+      "id": "s-refit",
+      "family": "shipyard",
+      "type": "text",
+      "phrasings": [
+        "Describe the refit required",
+        "What changes would you like made to the vessel?",
+        "Work required, in order of priority",
+        "Work required, in order of cost",
+        "Parts to be removed",
+        "Parts to be put back",
+        {
+          "label": "Describe, in full, what the vessel should look like when finished.",
+          "type": "textarea",
+          "rows": 4
+        }
+      ]
+    },
+    {
+      "id": "s-crew",
+      "family": "shipyard",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Crew capacity",
+        "Number of cockpits",
+        "Number of seats that are not cockpits",
+        "Number of beds (cryo pods count as beds)",
+        "Number of crew who have agreed to fly in the vessel",
+        "Number of crew who have been asked",
+        "Maximum number of passengers, including stowaways"
+      ]
+    },
+    {
+      "id": "g-contents",
+      "family": "cargo",
+      "type": "text",
+      "phrasings": [
+        "Contents of the consignment",
+        "What was in the container?",
+        "Description of goods, for customs purposes",
+        "Description of goods, for all other purposes",
+        "What was in the container when it was sent?",
+        "What was in the container when it arrived?",
+        "List anything in the container you did not put there"
+      ]
+    },
+    {
+      "id": "g-containers",
+      "family": "cargo",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of containers",
+        "Number of containers sent",
+        "Number of containers received",
+        "Number of containers that are now smaller than they were",
+        "Number of containers still missing",
+        "Number of containers you would like returned",
+        "Container count, excluding empty containers"
+      ]
+    },
+    {
+      "id": "g-value",
+      "family": "cargo",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Declared value of the consignment, in credits",
+        "Value of the cargo for insurance purposes",
+        "Value of the cargo for customs purposes",
+        "Sentimental value of the cargo, in credits",
+        "Value of the cargo on arrival",
+        "What would you sell this cargo for today?",
+        "Value of the cargo, if found"
+      ]
+    },
+    {
+      "id": "g-route",
+      "family": "cargo",
+      "type": "text",
+      "help": "Describe places in words. The Office does not accept coordinates.",
+      "phrasings": [
+        "Origin of the consignment",
+        "Destination of the consignment",
+        "Where was the cargo meant to go?",
+        "Where did the cargo actually go?",
+        "Route taken, as far as you know",
+        "Route you would have preferred",
+        "Last place the cargo was seen"
+      ]
+    },
+    {
+      "id": "g-hazard",
+      "family": "cargo",
+      "type": "checkboxes",
+      "options": [
+        "Explosive",
+        "Flammable",
+        "Radioactive",
+        "Uranium, specifically",
+        "Ice",
+        "None of the above",
+        "All of the above, loosely packed"
+      ],
+      "phrasings": [
+        "Hazardous materials on board",
+        "Does the consignment contain any of the following?",
+        "Which of these did the container hold on departure?",
+        "Which of these did the container hold on arrival?",
+        "Hazard labels applied to the container",
+        "Hazards you would like the courier to know about",
+        "Hazards the courier found out about"
+      ]
+    },
+    {
+      "id": "g-perishable",
+      "family": "cargo",
+      "type": "radio",
+      "options": ["Yes", "No", "It is now"],
+      "phrasings": [
+        "Is the cargo perishable?",
+        "Has the cargo perished?",
+        "Does the cargo require refrigeration?",
+        "Was the cargo refrigerated?",
+        { "label": "Does the cargo require oxygen?", "options": ["Yes", "No", "Only if alive"] },
+        "Is the cargo alive?",
+        "Was the cargo alive when sent?"
+      ]
+    },
+    {
+      "id": "g-handling",
+      "family": "cargo",
+      "type": "text",
+      "phrasings": [
+        "Special handling instructions",
+        "Instructions the courier should have followed",
+        "Instructions the courier did follow",
+        "Which way up should the container be kept?",
+        "What should the courier do if the recipient is not in?",
+        "What should the courier do if the recipient is unfriendly?",
+        "Who may sign for the delivery on your behalf?"
+      ]
+    },
+    {
+      "id": "g-lost",
+      "family": "cargo",
+      "type": "date",
+      "phrasings": [
+        "Date the cargo was last seen",
+        { "label": "Describe the cargo, in case it is found.", "type": "textarea", "rows": 3 },
+        "Date you realised the cargo was missing",
+        {
+          "label": "Has anyone else reported this cargo missing?",
+          "type": "radio",
+          "options": ["Yes", "No", "The cargo has"]
+        },
+        "Date by which the cargo is needed",
+        "Date after which the cargo is no longer needed",
+        { "label": "Reward offered for the cargo’s return, in credits", "type": "number", "min": 0 }
+      ]
+    },
+    {
+      "id": "m-ore",
+      "family": "mining",
+      "type": "select",
+      "options": [
+        "Iron",
+        "Nickel",
+        "Silicon",
+        "Cobalt",
+        "Magnesium",
+        "Silver",
+        "Gold",
+        "Platinum",
+        "Uranium",
+        "Ice",
+        "Stone (disappointing)"
+      ],
+      "phrasings": [
+        "Type of ore extracted",
+        "Which ore is this claim for?",
+        "Ore you were hoping to find",
+        "Ore you actually found",
+        "Ore the Concern should buy from you",
+        "Ore most often found in your cargo by mistake",
+        "Your favourite ore, for the record"
+      ]
+    },
+    {
+      "id": "m-quantity",
+      "family": "mining",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Quantity extracted, in kilograms",
+        "Quantity sold to the Concern, in kilograms",
+        "Quantity the Concern says it received, in kilograms",
+        "Quantity still in your drill",
+        "Quantity lost to gravity",
+        "Quantity of stone extracted by accident",
+        "Quantity you intend to extract next quarter"
+      ]
+    },
+    {
+      "id": "m-claim",
+      "family": "mining",
+      "type": "text",
+      "phrasings": [
+        "Name of the asteroid or deposit",
+        "Claim name",
+        "What do you call the rock?",
+        "Name of the deposit, as marked on your map (do not attach the map)",
+        "Name of the nearest deposit you did not mine",
+        "Description of the hole you have made",
+        "Name of any other party mining the same rock"
+      ]
+    },
+    {
+      "id": "m-method",
+      "family": "mining",
+      "type": "radio",
+      "options": ["Hand drill", "Ship drill", "Drill array", "Explosives", "Collision"],
+      "phrasings": [
+        "Extraction method",
+        "How was the ore extracted?",
+        "Method used to make the hole",
+        "How the hole was later enlarged",
+        { "label": "Were explosives used?", "options": ["No", "Yes", "Not intentionally"] },
+        {
+          "label": "Did the extraction method involve a ship hitting something?",
+          "options": ["No", "Yes", "Mostly"]
+        },
+        "Method you would use if doing it again"
+      ]
+    },
+    {
+      "id": "m-holes",
+      "family": "mining",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of holes made",
+        "Depth of the deepest hole, in metres",
+        "Number of holes you have fallen into",
+        "Number of holes left unfilled",
+        "Number of holes you intend to fill",
+        "Number of holes the Concern should be aware of",
+        "Number of holes that were already there"
+      ]
+    },
+    {
+      "id": "m-refinery",
+      "family": "mining",
+      "type": "select",
+      "options": ["Normal", "Urgent", "Very urgent", "Whenever"],
+      "phrasings": [
+        "Refinery queue priority requested",
+        "How urgently do you need the ore refined?",
+        "Priority you would assign to someone else’s ore",
+        {
+          "label": "Should your ore be refined before another customer’s?",
+          "type": "radio",
+          "options": ["Yes", "No", "Only if they will not find out"]
+        },
+        "Refinery queue position you consider fair",
+        {
+          "label": "Do you consent to your ore being mixed with other ore?",
+          "type": "radio",
+          "options": ["Yes", "No", "It already has been"]
+        },
+        "Priority you expect to receive"
+      ]
+    },
+    {
+      "id": "m-environment",
+      "family": "mining",
+      "type": "checkbox",
+      "phrasings": [
+        "I confirm the asteroid was not inhabited.",
+        "I confirm the asteroid is still recognisably an asteroid.",
+        "I confirm that no ship was left inside the asteroid.",
+        "I have not mined anything the Concern was standing on.",
+        "I confirm the mining noise did not exceed reasonable levels, as determined by the asteroid.",
+        "I confirm the asteroid has been left tidy.",
+        "I confirm the ore was mined, and not taken from someone else’s container."
+      ]
+    },
+    {
+      "id": "p-crew-name",
+      "family": "personnel",
+      "type": "text",
+      "phrasings": [
+        "Name of crew member",
+        "Engineer’s name",
+        "Name of the person this survey is about",
+        "Name of the person this survey is about, if not you",
+        "Name printed on the crew member’s suit",
+        "Name the crew member answers to",
+        "Name of the crew member’s supervisor"
+      ]
+    },
+    {
+      "id": "p-hours",
+      "family": "personnel",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Hours worked this week",
+        "Hours spent grinding",
+        "Hours spent welding",
+        "Hours spent looking for the thing you were just holding",
+        "Hours spent in a cockpit",
+        "Hours spent waiting for the refinery",
+        "Hours of sleep, if any"
+      ]
+    },
+    {
+      "id": "p-oxygen",
+      "family": "personnel",
+      "type": "radio",
+      "options": ["Always", "Usually", "Sometimes", "Never"],
+      "phrasings": [
+        "How often does the crew have access to oxygen?",
+        "Frequency of adequate oxygen",
+        "How often must helmets be worn indoors?",
+        { "label": "Is the base airtight?", "options": ["Yes", "No", "Parts of it"] },
+        "How often does the hydrogen run out?",
+        "How often does the oxygen farm work?",
+        {
+          "label": "Have you ever run out of oxygen while filling in a form?",
+          "options": ["Yes", "No", "I am doing so now"]
+        }
+      ]
+    },
+    {
+      "id": "p-diet",
+      "family": "personnel",
+      "type": "text",
+      "phrasings": [
+        "Dietary requirements",
+        "Food allergies",
+        "Preferred ration flavour",
+        "Foods the crew member will not eat",
+        "Foods the crew member has been eating instead",
+        "What did the crew member have for breakfast?",
+        "Dietary requirements, as they apply to vending machines"
+      ]
+    },
+    {
+      "id": "p-morale",
+      "family": "personnel",
+      "type": "select",
+      "options": ["High", "Adequate", "Low", "Unmeasurable", "Improving since this form began"],
+      "phrasings": [
+        "Crew morale",
+        "How would you rate morale aboard your vessel?",
+        "Morale after the last delivery",
+        "Morale before the last delivery",
+        "Morale of the engineer who built the vessel",
+        "Morale of the engineer who has to fix the vessel",
+        "Expected morale once this form is complete"
+      ]
+    },
+    {
+      "id": "p-training",
+      "family": "personnel",
+      "type": "checkboxes",
+      "options": ["Welding", "Grinding", "Jetpack use", "Landing", "Landing gently", "Form completion"],
+      "phrasings": [
+        "Training completed",
+        "Which skills does the crew member have?",
+        "Which skills does the crew member claim to have?",
+        "Which skills should the crew member acquire?",
+        "Training the crew member would like to receive",
+        "Training the crew member received by accident",
+        "Qualifications relevant to this form"
+      ]
+    },
+    {
+      "id": "p-emergency",
+      "family": "personnel",
+      "type": "text",
+      "phrasings": [
+        "Emergency contact",
+        "Who should be told in the event of an accident?",
+        "Who should be told in the event of another form?",
+        "Name of next of kin",
+        "Name of next of kin, if different from the emergency contact",
+        "Relationship of the emergency contact to the crew member",
+        "Medical bay the crew member should respawn at"
+      ]
+    },
+    {
+      "id": "i-policy",
+      "family": "insurance",
+      "type": "text",
+      "phrasings": [
+        "Policy number",
+        "Name on the insurance policy",
+        "Policy number, from memory",
+        "Insurer, if not the Concern",
+        "Date the policy was taken out, in words",
+        "Type of cover held",
+        "Policy you wish you had taken out"
+      ]
+    },
+    {
+      "id": "i-cause",
+      "family": "insurance",
+      "type": "radio",
+      "options": ["Collision", "Meteor strike", "Gravity", "Engineering error", "Act of Clang", "Unexplained"],
+      "phrasings": [
+        "Cause of damage",
+        "What caused the damage?",
+        "Primary cause of the incident",
+        "Secondary cause of the incident",
+        "Cause of damage, as stated to the insurer",
+        "Cause of damage, as stated to your crew",
+        "Cause of damage, as you privately believe it to be"
+      ]
+    },
+    {
+      "id": "i-damaged",
+      "family": "insurance",
+      "type": "text",
+      "phrasings": [
+        "Components damaged",
+        "Which parts of the grid were damaged?",
+        "Blocks destroyed in the incident",
+        "Blocks damaged but still technically attached",
+        "Parts that were already damaged before the incident",
+        "Parts that were improved by the incident",
+        "Parts you would like to claim for that were not involved"
+      ]
+    },
+    {
+      "id": "i-repair",
+      "family": "insurance",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Estimated repair cost, in credits",
+        "Replacement cost, in credits",
+        "Components required for repair (count)",
+        "Steel plates required",
+        "Hours of welding required",
+        "Excess payable, in credits",
+        "Amount you expect the insurer to pay"
+      ]
+    },
+    {
+      "id": "i-incident",
+      "family": "insurance",
+      "type": "date",
+      "phrasings": [
+        "Date of incident",
+        { "label": "Describe the incident.", "type": "textarea", "rows": 4 },
+        { "label": "Describe the incident as the grid would describe it.", "type": "textarea", "rows": 4 },
+        "Date the damage was discovered",
+        "Date the damage was reported",
+        { "label": "Time of incident", "type": "text", "placeholder": "Local time, approximately" },
+        {
+          "label": "Was anyone flying the vessel at the time?",
+          "type": "radio",
+          "options": ["Yes", "No", "Nobody admits it"]
+        }
+      ]
+    },
+    {
+      "id": "i-third-party",
+      "family": "insurance",
+      "type": "radio",
+      "options": ["Yes", "No", "Unclear"],
+      "phrasings": [
+        "Was another party involved?",
+        "Was another grid involved?",
+        "Did another party admit fault?",
+        "Did you admit fault?",
+        { "label": "Name of any other party involved", "type": "text" },
+        "Was the Concern involved in any way?",
+        {
+          "label": "Is the other party also a customer of the Concern?",
+          "options": ["Yes", "No", "Everyone is"]
+        }
+      ]
+    },
+    {
+      "id": "i-history",
+      "family": "insurance",
+      "type": "number",
+      "min": 0,
+      "phrasings": [
+        "Number of previous claims",
+        "Number of claims made this month",
+        "Number of claims made about this grid",
+        "Number of claims rejected",
+        "Number of claims you would describe as successful",
+        "Number of times this grid has been rebuilt",
+        "Number of meteors this grid has attracted"
       ]
     }
   ],
-
+  "misfileNotes": [
+    "*The following question was misfiled from {{family}}. It must be answered here.*",
+    "**Note:** the next question belongs to {{family}}. It has been included for completeness.",
+    "*Question transferred from {{family}}, pending the appropriate transfer form.*",
+    "*The next question was received from {{family}} and could not be returned.*"
+  ],
   "restatePrefixes": [
-    "Re-confirm:", "For the record:", "Supplementary:", "Once more:", "Cross-check:", "Amended:",
-    "Restated:", "Second request:", "Clarification required:", "Verification:", "For {{ledger}}:",
-    "Duplicate entry (required):", "Without reference to any earlier answer:",
-    "As at the date of this sheet:", "Final request:"
+    "Re-confirm:",
+    "For the record:",
+    "Supplementary:",
+    "Once more:",
+    "Cross-check:",
+    "Amended:",
+    "Restated:",
+    "Second request:",
+    "Clarification required:",
+    "Verification:",
+    "For {{ledger}}:",
+    "Duplicate entry (required):",
+    "Without reference to any earlier answer:",
+    "As at the date of this sheet:",
+    "Final request:"
   ],
   "restateSuffixes": [
-    "(restated)", "(again)", "(for the avoidance of doubt)", "(second entry)", "(confirm)",
-    "(as previously requested)", "(answer independently of earlier sheets)",
-    "(this is a different question)", "(updated)", "(supersedes the earlier question)",
-    "(for audit purposes)", "(if unchanged, restate)"
+    "(restated)",
+    "(again)",
+    "(for the avoidance of doubt)",
+    "(second entry)",
+    "(confirm)",
+    "(as previously requested)",
+    "(answer independently of earlier sheets)",
+    "(this is a different question)",
+    "(updated)",
+    "(supersedes the earlier question)",
+    "(for audit purposes)",
+    "(if unchanged, restate)"
   ],
-
   "interjections": [
     "*The remainder of this section has been removed pending review of the review procedure.*",
     "**Note:** some questions on this sheet may appear to repeat earlier questions. They are new questions. Answer them.",
@@ -919,50 +2252,25 @@
     "**Please note:** the following questions are asked in a different order for your convenience.",
     "*An earlier draft of this section was more concise. It was rejected.*"
   ],
-
   "titles": [
-    "Supplementary Grievance Particulars",
-    "Declaration of Hostile Intent — Continuation Sheet",
-    "Casus Belli Substantiation Worksheet",
-    "Proof of Standing to Declare",
-    "Certificate of Grievance Severity",
-    "Severity Pre-Assessment Worksheet",
-    "Statement of Non-Duplicative Grievance",
     "Request for Alternate Notarisation",
     "Coordinate Non-Disclosure Attestation",
-    "Schedule of Assets Alleged Lost",
     "Evidence Cover Sheet",
     "Declaring Party Name Confirmation",
-    "Belligerent Entity Registration",
-    "Notice of Intent to Continue Intending",
-    "War Aims Itemisation Schedule",
-    "Contractor & Mercenary Disclosure",
     "Acknowledgement of Non-Acknowledgement",
-    "Grievance Chronology Reconstruction",
-    "Neutrality Challenge Submission",
     "Application to Dispute a Filing Fee",
     "Request for Expedited Review (Denied in Advance)",
-    "Standing Grievance Renewal Notice",
-    "Quarterly Hostility Reconciliation",
     "Amendment to a Form Not Yet Filed",
     "Notice of Correspondence Received",
-    "Declaration Regarding Declarations",
-    "Claim for Emotional Damage to a Corporation",
-    "Statement of Intent to Escalate",
-    "Escalation De-Escalation Worksheet",
     "Preliminary Findings Acknowledgement Sheet",
-    "Terminal Grievance Summary (Non-Terminal)",
     "Restatement of Particulars Previously Stated",
     "Consistency Verification Questionnaire",
     "Re-Declaration of Facts Already Declared",
     "Supplementary Supplement",
     "Confirmation of Confirmations",
-    "Settlement Interest Survey",
     "Commercial Opportunity Disclosure",
-    "Faction Census Return",
-    "Peace Terms Pre-Qualification Form"
+    "Faction Census Return"
   ],
-
   "subtitles": [
     "“Omnis Questus, Nullus Sanguis” — All Profit, No Blood",
     "“Every Grievance a Line Item”",
@@ -974,25 +2282,17 @@
     "Page 1 of an indeterminate number.",
     "Neutral by policy. Thorough by temperament.",
     "A continuation of a matter that has not yet begun.",
-    "Some of these questions will seem familiar. They are not."
+    "Some of these questions will seem familiar. They are not.",
+    "This form may not concern you. Complete it regardless."
   ],
-
   "departments": [
-    "Office of Interdepartmental Grievance Review",
-    "Bureau of Hostile Correspondence Intake",
-    "Directorate of Polite Refusal",
-    "Office of Retroactive Peace",
-    "Standing Committee on Standing",
-    "Non-Combat Operations — Paperwork Division",
     "Asset Valuation & Mourning",
     "Accounts Receivable (Grievances)",
     "Office of the Notary (Sabbatical)",
     "Sub-Office of Duplicate Filings",
-    "Registry of Declared Intentions",
     "Department of Vibes Adjudication",
     "Bureau of Restated Particulars"
   ],
-
   "metaLines": [
     "SHEET RETAINED REGARDLESS",
     "DO NOT DETACH",
@@ -1005,40 +2305,22 @@
     "ROUTING: {{ledger}}",
     "CLERK: {{officer}}"
   ],
-
   "instructions": [
     "**Before you begin:** this sheet must be completed in full before the matter it concerns can be considered to exist. Incomplete sheets are not rejected — they are filed alongside complete ones, in the same drawer, in no particular order.",
     "**Notice:** answers given on this sheet may contradict answers given on a previous sheet. Where they do, both are kept and neither is preferred.",
     "**Important:** do not leave any field blank. A blank field is read by {{officer}} as an admission, though of what has not been determined.",
     "**Please note:** the Concern is a pacifist commercial entity and will not respond to this filing with force. It will respond with correspondence, which is worse.",
     "**Before proceeding:** confirm that you have read Form {{form}}. You have not. Confirm it anyway.",
-    "**Declaring parties are reminded** that the Concern knows where every faction in this sector is and discloses none of them, including yours, including to you.",
+    "**Filers are reminded** that the Concern knows where every faction in this sector is and discloses none of them, including yours, including to you.",
     "**Warning:** completing this sheet does not advance your matter. Nothing advances your matter. Your matter is stationary by design.",
     "**Procedural note:** some information requested below has been requested before. The Office requires it again, in the form now asked.",
-    "**Attention:** the Office does not accept spoken declarations, broadcasts, or strongly worded signage. Those are not filings. They are kept without being read.",
-    "**Guidance:** where a question resembles one you have already answered, answer it as though you had not."
+    "**Guidance:** where a question resembles one you have already answered, answer it as though you had not.",
+    "**Routing note:** this sheet may have been issued by the wrong department. It must be completed regardless, and returned to the right one."
   ],
-
   "sectionTitles": [
     "Declaring Party Information",
     "Entity Particulars",
     "Identity & Nomenclature",
-    "Standing & Capacity",
-    "Casus Belli Classification",
-    "Grounds Asserted",
-    "Statement of Grievance",
-    "Chronology of Events",
-    "Asset Schedule",
-    "Losses Claimed",
-    "Evidentiary Matters",
-    "Third-Party Involvement",
-    "Allies & Contractors",
-    "Neutrality Assessment",
-    "War Aims",
-    "Intended Outcomes",
-    "Escalation Particulars",
-    "Settlement Particulars",
-    "Commercial Matters",
     "Location (Undisclosed)",
     "Financial Position",
     "Fees & Disbursements",
@@ -1055,9 +2337,10 @@
     "Consistency Check",
     "Supplementary Matters",
     "Matters Not Otherwise Classified",
-    "Closing Declarations"
+    "Closing Declarations",
+    "Routing Particulars",
+    "Matters for Another Department"
   ],
-
   "sectionNotes": [
     "Answers in this section are cross-checked against Form {{form}}, which does not exist. Discrepancies will be noted.",
     "This section is kept by {{officer}} and is not returned.",
@@ -1072,7 +2355,6 @@
     "This section is identical to a section on Form {{form}}. Both must be completed separately.",
     "Questions in this section may repeat questions elsewhere. Each answer is filed independently."
   ],
-
   "officeUseTitles": [
     "For Office Use Only",
     "Office Use — Do Not Complete",
@@ -1080,7 +2362,6 @@
     "Clerk’s Strip",
     "Internal Routing"
   ],
-
   "officeUse": [
     { "label": "RECEIVED BY", "value": "—" },
     { "label": "QUEUE POSITION", "value": "Unassigned" },
@@ -1100,9 +2381,10 @@
     { "label": "SUPERSEDES", "value": "Nothing" },
     { "label": "SUPERSEDED BY", "value": "Everything" },
     { "label": "ACTION REQUIRED", "value": "None, by anyone" },
-    { "label": "REVIEWED", "value": "Not yet, and not soon" }
+    { "label": "REVIEWED", "value": "Not yet, and not soon" },
+    { "label": "CORRECT DEPARTMENT", "value": "To be determined" },
+    { "label": "MISROUTED FROM", "value": "{{dept}}" }
   ],
-
   "finePrint": [
     "By filing, the declaring party acknowledges that this form does not constitute acceptance, rejection, or acknowledgement of any grievance, hostility, or correspondence, and may generate further forms.",
     "Filing creates no obligation on the part of the Concern, and no right on the part of the declaring party, other than the right to file again.",
@@ -1113,7 +2395,6 @@
     "Answers may be used to generate additional questions. This is the intended operation of the system, not a defect.",
     "Neither the completion nor the abandonment of this form affects the underlying matter, which is stationary."
   ],
-
   "transmittals": [
     "**Transmittal:** send this copy to the Consolidated Industrial Concern together with every copy saved before it. Copies sent out of order are re-ordered, then filed out of order.",
     "**Transmittal:** this copy must accompany Form GC-1 and all continuation sheets. A missing sheet invalidates nothing, and is noted.",
@@ -1122,7 +2403,6 @@
     "**Transmittal:** this sheet is to be filed with the Concern in its entirety. Partial sheets are accepted and treated as entire.",
     "**Transmittal:** forward this copy to the Concern for entry in {{ledger}}. Receipt will not be acknowledged, which constitutes acknowledgement."
   ],
-
   "submitLabels": [
     "SAVE COPY & FILE",
     "KEEP COPY & LODGE",
@@ -1133,12 +2413,20 @@
     "SAVE COPY & RESTATE",
     "RETAIN & PROCEED"
   ],
-
   "stamps": [
-    "RETAINED", "FILED", "LODGED", "NOTED", "PENDING",
-    "COPIED", "RECORDED", "ENTERED", "DUPLICATED", "PROCESSED"
+    "RETAINED",
+    "FILED",
+    "LODGED",
+    "NOTED",
+    "PENDING",
+    "COPIED",
+    "RECORDED",
+    "ENTERED",
+    "DUPLICATED",
+    "PROCESSED",
+    "MISROUTED",
+    "FORWARDED"
   ],
-
   "receiptMessages": [
     "Your copy of **{{code}}** has been saved as **{{file}}**, reference **{{ref}}**. Send it to {{dept}}. Before this matter can proceed, please complete **Form {{next}}** (attached).",
     "Sheet **{{code}}** saved as **{{file}}** and provisionally entered in {{ledger}} at position **{{queue}}**. The matter now requires **Form {{next}}**.",
@@ -1147,9 +2435,10 @@
     "Kept. Reference **{{ref}}**, queue position **{{queue}}**. {{officer}} has been notified and is not available. Proceed to **Form {{next}}**.",
     "Your copy of **{{code}}** (**{{file}}**) is acknowledged without prejudice. The next sheet in this matter is **{{next}}**.",
     "**{{code}}** has been saved as **{{file}}**. This is sheet **{{count}}** of an indeterminate number. Send all of them. Please continue with **Form {{next}}**.",
-    "**{{code}}** saved as **{{file}}**. Some of your answers require confirmation. **Form {{next}}** asks for them again."
+    "**{{code}}** saved as **{{file}}**. Some of your answers require confirmation. **Form {{next}}** asks for them again.",
+    "Your copy of **{{code}}** has been saved as **{{file}}** and forwarded to {{dept}}, which is not the department you wanted. That department requires **Form {{next}}**.",
+    "**{{code}}** saved as **{{file}}** and routed to the wrong department, as is customary. The right department will be identified on **Form {{next}}**."
   ],
-
   "receiptFootnotes": [
     "Note: Form {{next}} supersedes this sheet but does not invalidate it. Both remain on file, indefinitely, in the same drawer.",
     "Note: This is not a duplicate grievance. Each subsequent filing is a new and legally distinct grievance for accounting purposes.",
@@ -1170,9 +2459,10 @@
     "Note: The Concern has assessed the vibes and found them unchanged.",
     "Note: A form resolving this matter was proposed and rejected on the grounds that it would resolve the matter.",
     "Note: Sheet kept. Contents assumed. Reading scheduled for a later date.",
-    "Note: Some answers on this sheet match answers on earlier sheets. The Office will ask again until they do not."
+    "Note: Some answers on this sheet match answers on earlier sheets. The Office will ask again until they do not.",
+    "Note: This sheet concerned a different matter from yours. Your matter has been noted on it regardless.",
+    "Note: The Concern does not make war. Your paperwork has been processed as though it might."
   ],
-
   "nextLabels": [
     "Open Form {{next}} →",
     "Continue to Form {{next}} →",

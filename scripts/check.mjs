@@ -79,7 +79,7 @@ if (vb.warnings.length) list(vb.warnings.map((w) => 'warning: ' + w));
 
 const reach = bankReach(bank);
 check('bank asks each thing many ways', reach.phrasings >= 300 && reach.phrasings / reach.topics >= 5,
-  reach.topics + ' topics, ' + reach.phrasings + ' wordings (' +
+  reach.families + ' families, ' + reach.topics + ' topics, ' + reach.phrasings + ' wordings (' +
   (reach.phrasings / reach.topics).toFixed(1) + ' per topic)');
 
 /* ---------- near-duplicate wordings ---------- */
@@ -126,6 +126,9 @@ if (alike.length) list(alike);
 /* ---------- visitor sessions ---------- */
 
 // Same base the page uses (assets/app.js drawSheet).
+const families = bank.families || [];
+const topicFamily = new Map(bank.topics.map((t) => [t.id, t.family || 'general']));
+
 const base = {
   id: n1.id, code: n1.code, org: n1.org, department: n1.department, title: n1.title,
   enforceRequired: true, requireAll: n1.requireAll,
@@ -143,14 +146,22 @@ let firstRestated = [];
 let topicReturns = 0;
 let totalSheets = 0;
 let optionalOnSheets = 0;
+let backToBack = 0;
+let offTheme = 0;
+let misfiled = 0;
+const familiesSeen = new Set();
+let slowestRotation = 0;
 let exemptOnSheets = 0;
 const looks = new Set();
 
 for (let s = 0; s < SESSIONS; s++) {
-  let used = { phrasings: [], texts: formTexts(n1), interjections: [] };
+  let used = { phrasings: [], texts: formTexts(n1), interjections: [], families: [] };
   const shown = new Map(used.texts.map((t) => [t, 'GC-1']));
   const topicSeen = new Set();
   let restatedAt = null;
+  const rotation = new Set();
+  let rotatedBy = null;
+  let prevFamily = null;
 
   for (let step = 1; step <= SHEETS; step++) {
     const page = generatePage(bank, base, seed(), step, used);
@@ -168,6 +179,16 @@ for (let s = 0; s < SESSIONS; s++) {
       .filter((f) => f.type !== 'static');
     optionalOnSheets += normalised.filter((f) => !f.disabled && !f.required).length;
     exemptOnSheets += normalised.filter((f) => f.disabled).length;
+
+    if (page.family === prevFamily) backToBack++;
+    prevFamily = page.family;
+    familiesSeen.add(page.family);
+    rotation.add(page.family);
+    if (rotatedBy === null && rotation.size === families.length) rotatedBy = step;
+    const famOf = (f) => (topicFamily.get(f.topic) || 'general');
+    const foreign = inputs.filter((f) => famOf(f) !== page.family && famOf(f) !== 'general').length;
+    if (foreign > 1) offTheme++;
+    misfiled += foreign;
 
     const topicsHere = inputs.map((f) => f.topic);
     if (new Set(topicsHere).size < topicsHere.length) sheetsWithEcho++;
@@ -193,9 +214,11 @@ for (let s = 0; s < SESSIONS; s++) {
       phrasings: used.phrasings.concat(page.usage.phrasings),
       texts: used.texts.concat(page.usage.texts),
       interjections: used.interjections.concat(page.usage.interjections),
+      families: used.families.concat(page.usage.family ? [page.usage.family] : []),
     };
   }
   firstRestated.push(restatedAt === null ? '>' + SHEETS : restatedAt);
+  slowestRotation = Math.max(slowestRotation, rotatedBy === null ? Infinity : rotatedBy);
 }
 
 check(SESSIONS + ' visitors × ' + SHEETS + ' sheets: no question is ever shown twice', repeats.length === 0,
@@ -210,6 +233,12 @@ check('topics come back, reworded', topicReturns > totalSheets * 5,
   (topicReturns / totalSheets).toFixed(1) + ' returning topics per sheet');
 check('most sheets ask something twice, differently', sheetsWithEcho >= totalSheets * 0.75,
   Math.round(100 * sheetsWithEcho / totalSheets) + '% of sheets');
+check('every kind of paperwork turns up', familiesSeen.size === families.length,
+  familiesSeen.size + ' of ' + families.length + ' families; all seen within ' + slowestRotation + ' sheets');
+check('the same kind of paperwork never comes twice in a row', backToBack === 0,
+  backToBack ? backToBack + ' repeat(s)' : '');
+check('sheets stay on their own theme, bar one misfiled question', offTheme === 0,
+  offTheme ? offTheme + ' sheet(s) drift' : misfiled + ' misfiled questions across ' + totalSheets + ' sheets');
 check('every field on every random sheet must be filled before it saves', optionalOnSheets === 0,
   optionalOnSheets ? optionalOnSheets + ' optional field(s)'
     : exemptOnSheets + ' greyed-out field(s) exempt across ' + totalSheets + ' sheets');

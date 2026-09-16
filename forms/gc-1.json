@@ -1,15 +1,16 @@
 {
   "id": "gc-1",
   "code": "GC-1",
-  "title": "Grievance & Casus Belli Intake Form",
+  "title": "Customer Dissatisfaction Intake Form",
   "subtitle": "“Omnis Questus, Nullus Sanguis” — All Profit, No Blood",
   "mode": "static",
   "org": "CONSOLIDATED INDUSTRIAL CONCERN",
-  "department": "Office of Interdepartmental Grievance Review",
+  "department": "Department of Customer Satisfaction (Provisional)",
   "revision": "REV. 47",
-  "meta": ["FILED THIS SESSION"],
+  "meta": ["GENERAL COMPLAINT — GOODS & SERVICES"],
   "enforceRequired": true,
   "requireAll": true,
+  "copyStamp": "CUSTOMER’S COPY",
 
   "style": {
     "stock": "cream",
@@ -25,60 +26,39 @@
     "office": "grid",
     "numbering": "section",
     "watermark": false,
-    "motto": "PROFIT ABOVE ALL · NEUTRAL BY POLICY ·"
+    "motto": "YOUR CUSTOM IS VALUED · AT MARKET RATE ·"
   },
 
-  "instructions": "**Before you begin:** this form must be completed in full before any declaration of hostilities against the Consolidated Industrial Concern will be acknowledged, reviewed, tabled, or otherwise considered to exist. Incomplete submissions are not rejected — they are simply filed alongside complete ones, in the same drawer, in no particular order.",
+  "instructions": "**Thank you for your feedback.** This form must be completed in full before any complaint regarding the goods or services of the Consolidated Industrial Concern will be acknowledged, reviewed, escalated, or otherwise considered to have happened. Incomplete complaints are not rejected — they are simply filed alongside complete ones, in the same drawer, in no particular order.",
 
   "sections": [
     {
-      "title": "Nature of Correspondence",
+      "title": "Customer Particulars",
       "fields": [
         {
           "type": "static",
-          "text": "**Matter:** declaration of hostilities against the Consolidated Industrial Concern. **Status:** received. Filed under *Correspondence*. Not read."
+          "text": "We are sorry to hear you are dissatisfied. Your dissatisfaction has been recorded in Ledger 7 at its current market value."
         },
         {
-          "name": "correspondence_type",
-          "type": "checkboxes",
-          "label": "Your correspondence with the Concern is best described as (select all that apply):",
-          "options": [
-            "A formal declaration of war",
-            "A warning",
-            "An ultimatum",
-            "A demand for reparations",
-            "A threat of an unspecified kind",
-            "A request for a meeting, phrased aggressively",
-            "None of the above; this is a social call"
-          ]
-        }
-      ],
-      "note": "Where more than one box is selected, each is treated as a separate declaration and requires its own Form GC-1."
-    },
-    {
-      "title": "Declaring Party Information",
-      "fields": [
-        {
-          "name": "party_name",
+          "name": "customer_name",
           "type": "text",
-          "label": "Name of declaring party / organization",
-          "placeholder": "As it will appear in Ledger 7",
-          "required": true,
+          "label": "Customer name or faction",
+          "placeholder": "As it appears on your invoice",
           "width": "half"
         },
         {
-          "name": "signatory",
+          "name": "complainant",
           "type": "text",
-          "label": "Authorized signatory",
+          "label": "Name of the person complaining",
           "placeholder": "Rank, callsign, or alias",
-          "required": true,
           "width": "half"
         },
         {
-          "name": "other_names",
+          "name": "account_no",
           "type": "text",
-          "label": "Any other names, tags, or spellings under which the declaring party has operated",
-          "help": "Each name listed is registered as a separate entity and must file its own Form GC-1."
+          "label": "Customer account number",
+          "placeholder": "If you do not have one, one will be assigned and billed",
+          "help": "Your account number is printed on your invoice, beneath your other account number."
         },
         {
           "name": "channel",
@@ -87,89 +67,173 @@
           "placeholder": "Frequency, relay, or carrier pigeon designation"
         },
         {
-          "name": "not_at_war",
-          "type": "checkbox",
-          "label": "I attest that I am not currently at war with the CIC as of the date of this filing.",
-          "help": "If checked in error, see Form GC-1b, “Retroactive Peace.”"
+          "name": "tenure",
+          "type": "radio",
+          "label": "How long have you been a customer of the Concern?",
+          "options": [
+            "This was my first purchase",
+            "Less than a month",
+            "Longer than I would like",
+            "I was not aware I was a customer"
+          ]
         }
       ]
     },
     {
-      "title": "Casus Belli Classification",
+      "title": "Goods or Services Concerned",
       "fields": [
         {
-          "name": "casus_belli",
+          "name": "service",
           "type": "checkboxes",
-          "label": "Grounds on which hostilities are declared (select all that apply)",
+          "label": "Which of the Concern’s services are you dissatisfied with? (select all that apply)",
           "options": [
-            "Grid or cargo theft",
-            "Territorial dispute",
-            "Commercial dispute (price, delivery, or refusal to sell)",
-            "Aesthetic grievance (paint scheme, ship silhouette, or station lighting)",
-            "Conduct attributed to a member of the Concern",
-            "The Concern’s refusal to take sides",
-            "Vibes",
-            "Unspecified / classified — grounds to be disclosed only to a notary who is currently on sabbatical",
+            "Shipbuilding & refit",
+            "Trade & brokerage",
+            "Cargo delivery",
+            "Ore purchasing & refining",
+            "Station construction",
+            "Contracted security (arranged, but never performed, by the Concern)",
+            "The Concern’s complaints process",
             "Other — attach Form GC-4, “Explain Yourself”"
+          ]
+        },
+        {
+          "name": "order_no",
+          "type": "text",
+          "label": "Order, contract, or manifest number",
+          "width": "half"
+        },
+        {
+          "name": "order_date",
+          "type": "date",
+          "label": "Date of purchase or contract",
+          "width": "half"
+        },
+        {
+          "name": "item",
+          "type": "text",
+          "label": "Name or designation of the ship, cargo, or goods concerned",
+          "placeholder": "Hull number, manifest line, or whatever you have been calling it"
+        },
+        {
+          "name": "amount_paid",
+          "type": "number",
+          "label": "Amount paid, in credits",
+          "min": 0,
+          "width": "half"
+        },
+        {
+          "name": "value_received",
+          "type": "number",
+          "label": "Value actually received, in credits",
+          "min": 0,
+          "width": "half"
+        }
+      ],
+      "note": "Where more than one service is selected, each is treated as a separate complaint and invoiced accordingly."
+    },
+    {
+      "title": "Nature of Complaint",
+      "fields": [
+        {
+          "name": "problem",
+          "type": "checkboxes",
+          "label": "The problem is best described as (select all that apply)",
+          "options": [
+            "Delivered late",
+            "Delivered early, before we were ready to be disappointed",
+            "Delivered to the wrong place",
+            "Delivered to the right place, which turned out to be wrong",
+            "Delivered in more pieces than it was sold in",
+            "Container arrived; cargo did not",
+            "Not delivered",
+            "Ship does not fly",
+            "Ship flies, but not in the direction intended",
+            "Paint scheme not as ordered",
+            "Price higher than quoted",
+            "Price exactly as quoted, which somehow felt higher",
+            "The Concern also sold one to my competitor",
+            "Vibes"
+          ]
+        },
+        {
+          "name": "dissatisfaction",
+          "type": "select",
+          "label": "How dissatisfied are you?",
+          "options": [
+            "Mildly",
+            "Moderately",
+            "Considerably",
+            "Profoundly",
+            "Beyond the scale provided",
+            "I am satisfied and am completing this in error"
           ]
         }
       ],
       "note": "Selecting every box is treated as selecting none, per Subsection 12(c)(iv)(iv). Selecting none is not permitted."
     },
     {
-      "title": "Statement of Grievance",
+      "title": "Statement of Complaint",
       "fields": [
         {
           "name": "statement",
           "type": "textarea",
-          "label": "Describe the grievance in no fewer than 500 words. Testimony is preferred in the third person.",
-          "placeholder": "Begin with: “On the date in question, the aggrieved party…”",
+          "label": "Describe the problem in no fewer than 500 words. Testimony is preferred in the third person.",
+          "placeholder": "Begin with: “On the date in question, the customer…”",
           "minWords": 500,
           "rows": 6
         },
         {
-          "name": "grievance_date",
+          "name": "noticed_on",
           "type": "date",
-          "label": "Date on which the grievance arose",
+          "label": "Date the problem was first noticed",
           "width": "half"
         },
         {
-          "name": "named_individual",
+          "name": "staff",
           "type": "text",
-          "label": "Name of any individual whose conduct is complained of",
+          "label": "Name of any Concern employee who dealt with you",
+          "placeholder": "If they said “Accounts”, write “Accounts”",
           "width": "half"
         }
       ],
-      "note": "Statements under 500 words will not be rejected, but will be quietly assumed to be Section 5 material and re-filed accordingly."
+      "note": "Statements under 500 words will not be rejected, but will be quietly assumed to be a compliment and filed accordingly."
     },
     {
-      "title": "Losses & Assets",
+      "title": "Desired Resolution",
       "fields": [
         {
-          "name": "asset",
-          "type": "text",
-          "label": "Designation of any asset the declaring party claims to have lost or had damaged",
-          "placeholder": "Ship, station, or grid name, with registry number"
+          "name": "remedy",
+          "type": "radio",
+          "label": "Which remedy would you prefer?",
+          "options": [
+            "A refund",
+            "A replacement",
+            "A repair",
+            "An apology",
+            "A voucher towards a future purchase",
+            "The satisfaction of having filed this form"
+          ],
+          "help": "Refunds are issued as vouchers. Vouchers are issued as forms."
         },
         {
-          "name": "loss_value",
-          "type": "number",
-          "label": "Estimated value of losses, in credits",
-          "min": 0,
-          "width": "half"
-        },
-        {
-          "name": "settlement",
-          "type": "number",
-          "label": "Sum that would settle the matter, in credits",
-          "min": 0,
-          "width": "half"
+          "name": "collection",
+          "type": "checkbox",
+          "label": "I confirm the goods are available for collection in their current condition, including any parts that are no longer attached."
         },
         {
           "name": "no_coordinates",
           "type": "checkbox",
           "label": "I confirm that no coordinates have been written on this form.",
-          "help": "The Concern knows where every faction is and discloses none of them. It asks the same courtesy of you."
+          "help": "The Concern knows where every customer is and discloses none of them. Collection will be arranged without asking."
+        },
+        {
+          "name": "recommend",
+          "type": "number",
+          "label": "On a scale of 0 to 10, how likely are you to recommend the Concern to a friend?",
+          "min": 0,
+          "max": 10,
+          "help": "Scores below 7 are recorded as 7."
         }
       ]
     },
@@ -179,13 +243,13 @@
         {
           "name": "attachments",
           "type": "checkboxes",
-          "label": "Attachments enclosed with this form (select all that apply)",
+          "label": "Documents enclosed with this form (select all that apply)",
           "options": [
+            "Proof of purchase (the original invoice, not the invoice for the invoice)",
+            "Pictures of the goods, before and after the disappointment",
             "Proof of Standing (Form GC-2)",
-            "Certificate of Grievance Severity (Form GC-3, which itself requires Form GC-3a)",
-            "Notarized copy of this form, in triplicate, notarized by someone other than the notary listed in Section 7",
-            "Declaration of Non-Duplicative Grievance, swearing this filing is not a duplicate of any Form GC-1 already on file, including this one",
-            "Statement of Intended Outcome (Form GC-5)"
+            "Certificate of Dissatisfaction Severity (Form GC-3, which itself requires Form GC-3a)",
+            "Declaration of Non-Duplicative Complaint, swearing this complaint is not a duplicate of any Form GC-1 already on file, including this one"
           ]
         }
       ]
@@ -198,9 +262,8 @@
         {
           "name": "signature",
           "type": "signature",
-          "label": "Signature of declaring party",
+          "label": "Signature of customer",
           "placeholder": "Sign here",
-          "required": true,
           "width": "half"
         },
         {
@@ -217,31 +280,31 @@
           "disabled": true
         },
         {
-          "name": "correspondence_ack",
+          "name": "acknowledgement",
           "type": "checkbox",
-          "label": "I acknowledge that completing this form constitutes correspondence with the Concern, and that correspondence may generate further forms.",
-          "required": true
+          "label": "I acknowledge that this complaint does not constitute a return, refund, exchange, or admission of fault by the Concern, and may generate further forms."
         }
       ]
     }
   ],
 
+  "officeUseTitle": "For Customer Relations Use Only",
   "officeUse": [
     { "label": "RECEIVED BY", "value": "—" },
-    { "label": "QUEUE POSITION", "value": "Unassigned" },
-    { "label": "ESTIMATED REVIEW", "value": "47 – ∞ business days" }
+    { "label": "COMPLAINT STATUS", "value": "Valued" },
+    { "label": "ESTIMATED RESPONSE", "value": "47 – ∞ business days" }
   ],
 
-  "finePrint": "By filing, the declaring party acknowledges that this form does not constitute acceptance, rejection, or acknowledgment of any grievance, hostility, or correspondence, and may generate further forms.",
+  "finePrint": "The Consolidated Industrial Concern values your custom. Filing this form does not constitute acceptance, rejection, or acknowledgment of any complaint, fault, or delivery, and may generate further forms. Goods sold are not returnable, except as scrap, at scrap value.",
   "submitLabel": "SAVE COPY & FILE",
 
-  "transmittal": "**Transmittal:** send this copy to the Consolidated Industrial Concern by the channel through which your declaration was made. Retain a duplicate. The Concern will retain the original, and will not read it.",
+  "transmittal": "**Transmittal:** send this copy to the Consolidated Industrial Concern by the channel through which you made your purchase. Retain a duplicate. The Concern will retain the original, and will not read it.",
 
   "receipt": {
-    "stamp": "RETAINED",
-    "message": "Your copy of **{{code}}** has been saved as **{{file}}**. Send it to the Concern. Before this matter can proceed, please complete **Form {{next}}** (attached).",
+    "stamp": "LOGGED",
+    "message": "Thank you. Your complaint has been saved as **{{file}}** and forwarded to the appropriate department or, failing that, another one. Before it can proceed, please complete **Form {{next}}** (attached).",
     "footnotes": [
-      "Note: Form {{next}} supersedes Form {{code}} but does not invalidate it. Both remain on file, indefinitely, in the same drawer."
+      "Note: Form {{next}} may not appear to relate to your complaint. It supersedes your complaint regardless, and does not resolve it."
     ],
     "next": { "mode": "generate", "label": "Open Form {{next}} →" }
   }

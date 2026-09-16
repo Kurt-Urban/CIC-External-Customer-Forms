@@ -1,24 +1,27 @@
 # CIC Paperwork
 
-The Consolidated Industrial Concern's response to declarations of war: paperwork.
+The Consolidated Industrial Concern's response to any complaint: more paperwork.
 
-1. The declaring party opens the site and is handed **Form GC-1**. It is always the same
-   form, and it always looks the same.
+1. The customer opens the site and is handed **Form GC-1**, a customer dissatisfaction form
+   for the Concern's goods and services — shipbuilding, trade, cargo delivery. It is always
+   the same form, and it always looks the same.
 2. They fill in **every field** and press **Save copy & file**. Nothing saves until the
    sheet is complete. The sheet is turned into a filled-in
    paper copy — typed answers, ticked boxes, a handwritten signature, a rubber stamp and a
    reference number — and downloaded as a PDF.
-3. Only then can they continue, to **Form GC-1a**: a new sheet drawn at random, with its
-   own title, questions and stationery.
-4. Saving that unlocks GC-1b. And so on, indefinitely.
+3. Only then can they continue, to **Form GC-1a** — which is some other kind of paperwork
+   entirely: a mining permit, a crew dietary survey, a hull registration, a war grievance
+   form (the Concern is pacifist; it is issued anyway). Each sheet has its own title,
+   questions and stationery.
+4. Saving that unlocks GC-1b, a different kind again. And so on, indefinitely.
 
 No question is ever shown to the same person twice, but the same things keep being asked
 in different words, often twice on one sheet.
 
-It works for any faction: nothing in it refers to a particular war.
+It works for anyone: nothing in it refers to a particular customer or dispute.
 
 It is a static site. There is no server and nothing is stored anywhere except the PDFs the
-declaring party saves on their own machine. They send those to you.
+customer saves on their own machine. They send those to you.
 
 ---
 
@@ -86,14 +89,33 @@ under the button, and jumps to the first one. Each mark clears as soon as the fi
 filled.
 
 The `transmittal` line is printed at the foot of the PDF — it is where you tell the
-declaring party what to do with their copy.
+customer what to do with their copy. `copyStamp` is the rubber stamp on that copy
+("CUSTOMER’S COPY"); the random sheets use "DECLARANT’S COPY".
 
 ## Editing the random sheets
 
 Everything after GC-1 comes from [`forms/bank.json`](forms/bank.json).
 
-The bank is organised by **topic** — something the Office wants to know, like the
-faction's name, the grievance, or the losses — and each topic is written many ways:
+Every random sheet belongs to a **family** — a kind of paperwork — picked with no regard
+for what the customer actually came about:
+
+| Family | Sample titles |
+| --- | --- |
+| Grievance & Casus Belli | Certificate of Grievance Severity, War Aims Itemisation Schedule |
+| Customer Satisfaction & Returns | Returns Authorisation Request, Refund Voucher Application |
+| Shipyard Services & Hull Registration | Thruster Orientation Survey, Refit Request (Cosmetic) |
+| Cargo, Customs & Logistics | Lost Cargo Report, Hazardous Goods Declaration |
+| Mining Permits & Resource Claims | Voxel Removal Consent Form, Drilling Noise Assessment |
+| Personnel & Crew Welfare | Dietary Requirements Notice, Oxygen Entitlement Claim |
+| Insurance & Damage Claims | Meteor Strike Notification, Claim Withdrawal Form (Pre-Emptive) |
+
+Families rotate: a visitor gets all seven before any comes round again, and never the same
+one twice in a row. Most of a sheet's questions come from its own family and the rest are
+general filing questions (names, signatures, reference numbers). About half of all sheets
+also carry one question "misfiled" from another family, with a note saying so.
+
+Within a family, the bank is organised by **topic** — something that paperwork wants to
+know — and each topic is written many ways:
 
 ```json
 { "id": "party-name", "type": "text", "phrasings": [
@@ -109,14 +131,14 @@ That is what drives the loop:
   including GC-1's, and never shows it to them again.
 - **The same things keep being asked.** Topics come back on later sheets in new words, and
   almost every sheet asks one or two things twice.
-- **It doesn't run dry.** The shipped bank has 56 topics and 477 wordings, which lasts
-  about 45 sheets before any wording is reused. After that, used wordings come back with a
+- **It doesn't run dry.** The shipped bank has 7 families, 101 topics and 792 wordings,
+  which lasts about 55 sheets before any wording is reused. After that, used wordings come back with a
   prefix or suffix from `restatePrefixes` / `restateSuffixes` ("Re-confirm: …",
   "… (for the avoidance of doubt)"), so the text is still new.
 
-To add material, add wordings to the end of an existing topic, or add a new topic.
-Everything else — titles, section headings, footnotes, office strips — is a plain list the
-sheet picks from.
+To add material, add wordings to the end of an existing topic, add a new topic (give it a
+`family`), or add a whole new family with its own titles and section headings.
+Everything else — footnotes, office strips, receipts — is a plain list the sheet picks from.
 
 `slots` are word lists substituted into `{{double braces}}`, so
 *"Name the {{asset}} said to have been {{verb}}"* becomes dozens of distinct questions.
@@ -138,8 +160,8 @@ Full reference for both files: [docs/form-schema.md](docs/form-schema.md).
 | File | Job |
 | --- | --- |
 | `index.html` | The page. |
-| `assets/app.js` | The loop: GC-1, then a random sheet per step. Keeps the current sheet, the answers typed so far, and every wording already shown in `sessionStorage`, so a reload changes nothing. |
-| `assets/generator.js` | Builds a sheet from the bank: a fresh random seed, no wording the visitor has seen, and a topic or two asked twice. |
+| `assets/app.js` | The loop: GC-1, then a random sheet per step. Keeps the current sheet, the answers typed so far, every wording already shown, and the families already issued in `sessionStorage`, so a reload changes nothing. |
+| `assets/generator.js` | Builds a sheet from the bank: picks the next family, fills it with wordings the visitor has not seen, asks a topic or two twice, and sometimes misfiles a question from elsewhere. |
 | `assets/theme.js` | Picks the stationery — paper stock, ink, typefaces, letterhead, rules, field style, numbering, watermark — one component per axis. |
 | `assets/cic.css` | Every one of those components, as CSS classes. |
 | `assets/render.js` | Turns a form definition into the sheet on screen. |
@@ -162,5 +184,5 @@ The PDF is an image of the sheet, so its text is not selectable.
 
 If the libraries cannot be loaded (offline, blocked CDN), the page offers the browser's own
 print dialog instead, where *Save as PDF* is a destination. The page cannot tell whether a
-file was actually saved in that case, so it lets the declaring party continue once the
+file was actually saved in that case, so it lets the visitor continue once the
 dialog closes.

@@ -190,7 +190,11 @@ export const BANK_POOLS = [
   'sectionTitles', 'sectionNotes', 'officeUse', 'officeUseTitles',
   'finePrint', 'submitLabels', 'stamps', 'receiptMessages', 'receiptFootnotes',
   'nextLabels', 'transmittals', 'interjections', 'restatePrefixes', 'restateSuffixes',
+  'misfileNotes',
 ];
+
+/** Lists a family may define to give its sheets their own character. */
+export const FAMILY_POOLS = ['titles', 'departments', 'sectionTitles', 'instructions', 'sectionNotes'];
 
 /**
  * A bank is a list of topics, each asked several ways:
@@ -208,7 +212,28 @@ export function validateBank(raw) {
     errors.push('"topics" must be a non-empty array.');
   }
 
+  const familyIds = new Set(['general']);
+  if (raw.families != null && !Array.isArray(raw.families)) {
+    errors.push('"families" must be an array if present.');
+  }
+  (Array.isArray(raw.families) ? raw.families : []).forEach((f, i) => {
+    const where = 'Family ' + (i + 1) + (f && f.id ? ' ("' + f.id + '")' : '');
+    if (!f || typeof f !== 'object') { errors.push(where + ' is not an object.'); return; }
+    if (!f.id || !ID_RE.test(String(f.id)) || f.id === 'general') {
+      errors.push(where + ': needs an "id" of lowercase letters, numbers and hyphens (not "general").');
+    } else if (familyIds.has(f.id)) {
+      errors.push(where + ': duplicate family id.');
+    } else {
+      familyIds.add(f.id);
+    }
+    if (!f.name) errors.push(where + ': needs a "name".');
+    for (const pool of FAMILY_POOLS) {
+      if (f[pool] != null && !Array.isArray(f[pool])) errors.push(where + ': "' + pool + '" must be an array.');
+    }
+  });
+
   const ids = new Set();
+  const perFamily = {};
   (Array.isArray(raw.topics) ? raw.topics : []).forEach((t, i) => {
     const where = 'Topic ' + (i + 1) + (t && t.id ? ' ("' + t.id + '")' : '');
     if (!t || typeof t !== 'object') { errors.push(where + ' is not an object.'); return; }
@@ -219,6 +244,9 @@ export function validateBank(raw) {
     } else {
       ids.add(t.id);
     }
+    const fam = t.family || 'general';
+    if (!familyIds.has(fam)) errors.push(where + ': unknown family "' + fam + '".');
+    perFamily[fam] = (perFamily[fam] || 0) + 1;
     if (!Array.isArray(t.phrasings) || t.phrasings.length === 0) {
       errors.push(where + ': needs a non-empty "phrasings" array.');
       return;
@@ -236,6 +264,12 @@ export function validateBank(raw) {
       else checkField(merged, pw, errors, warnings);
     });
   });
+
+  for (const id of familyIds) {
+    if (id !== 'general' && (perFamily[id] || 0) < 3) {
+      warnings.push('Family "' + id + '" has ' + (perFamily[id] || 0) + ' topics; its sheets will be mostly general questions.');
+    }
+  }
 
   for (const pool of BANK_POOLS) {
     if (raw[pool] != null && !Array.isArray(raw[pool])) {
@@ -267,7 +301,8 @@ export function bankReach(bank) {
     if (Array.isArray(slots[k]) && slots[k].length > 1) slotFactor *= slots[k].length;
     if (slotFactor > 1e12) { slotFactor = 1e12; break; }
   }
-  return { topics: topics.length, phrasings, slotCombinations: slotFactor };
+  const families = Array.isArray(bank.families) ? bank.families.length : 0;
+  return { families, topics: topics.length, phrasings, slotCombinations: slotFactor };
 }
 
 /** Spreadsheet-style suffix: 1 -> a, 26 -> z, 27 -> aa. */
