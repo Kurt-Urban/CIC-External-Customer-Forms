@@ -1,0 +1,13 @@
+{
+  "id": "gc-1",
+  "code": "GC-1",
+  "title": "Grievance & Casus Belli Intake Form",
+  "mode": "generated",
+  "bankId": "cic-core",
+  "order": 10,
+  "chip": "CONTINUOUS",
+  "indexBlurb": "Mandatory before any declaration of hostilities against the Concern will be acknowledged, reviewed, tabled, or otherwise considered to exist. Generates its own continuation sheets.",
+  "org": "CONSOLIDATED INDUSTRIAL CONCERN",
+  "department": "Office of Interdepartmental Grievance Review",
+  "enforceRequired": false
+}

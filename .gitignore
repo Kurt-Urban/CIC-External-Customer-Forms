@@ -1,0 +1,12 @@
+node_modules/
+.netlify/
+.cic-data/
+.env
+.DS_Store
+Thumbs.db
+
+# The admin shell is copied into public/<ADMIN_PATH>/ at build time.
+# Ignore every generated subdirectory of public, but keep the assets.
+/public/*/
+!/public/assets/
+/public/.generated.json

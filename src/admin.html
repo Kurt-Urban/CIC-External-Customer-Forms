@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIC — Registry</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/cic.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='78' font-size='80'%3E%F0%9F%97%84%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ===== login ===== -->
+<main id="loginView">
+  <div class="sheet login-sheet stock-buff ink-oxblood edge-punched rule-heavy disp-elite body-plex" data-watermark="RESTRICTED">
+    <header class="letterhead head-stacked">
+      <div class="org" id="loginOrg">
+        <div class="org-name">
+          CONSOLIDATED INDUSTRIAL CONCERN
+          <small>Registry &amp; Records — Authorised Personnel Only</small>
+        </div>
+      </div>
+      <div class="form-meta">
+        <div class="form-id">CABINET 7</div>
+        <div>ACCESS CONTROLLED</div>
+      </div>
+    </header>
+
+    <div class="subhead">
+      <h1>Registry Access</h1>
+      <p>Unauthorised access is a breach of contract and, worse, of procedure.</p>
+    </div>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="field">
+        <label for="pw">Access phrase</label>
+        <input type="password" id="pw" name="password" autocomplete="current-password" required
+               style="width:100%;background:var(--field-bg);border:1px solid var(--field-border);border-radius:2px;padding:9px 10px;font-family:var(--font-body);font-size:14px;color:var(--ink)">
+      </div>
+      <div id="loginNotice"></div>
+      <div class="submit-row" style="margin-top:20px">
+        <p class="fine-print">Sessions expire after eight hours, or when the Concern feels they should.</p>
+        <button class="stamp-btn" type="submit" id="loginBtn">UNLOCK</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<!-- ===== console ===== -->
+<main id="adminView" class="hidden">
+  <div class="sheet stock-onionskin ink-slate edge-tractor rule-hair office-inline disp-elite body-plex" id="adminSheet">
+
+    <header class="letterhead head-split">
+      <div class="org" id="adminOrg">
+        <div class="org-name">
+          CONSOLIDATED INDUSTRIAL CONCERN
+          <small>Registry &amp; Records — Cabinet 7</small>
+        </div>
+      </div>
+      <div class="form-meta">
+        <div class="form-id">REGISTRY</div>
+        <div id="statLine">—</div>
+        <div><button class="mini-btn" id="logoutBtn" type="button">Lock</button></div>
+      </div>
+    </header>
+
+    <div class="admin-tabs" role="tablist">
+      <button class="admin-tab" role="tab" id="tab-subs" aria-selected="true" data-panel="panel-subs">Submissions</button>
+      <button class="admin-tab" role="tab" id="tab-registry" aria-selected="false" data-panel="panel-registry">Forms &amp; Banks</button>
+      <button class="admin-tab" role="tab" id="tab-add" aria-selected="false" data-panel="panel-add">Add / Upload</button>
+    </div>
+
+    <!-- submissions -->
+    <section id="panel-subs" role="tabpanel" aria-labelledby="tab-subs">
+      <div class="toolbar">
+        <select id="formFilter" aria-label="Filter by form">
+          <option value="">All forms</option>
+        </select>
+        <button class="mini-btn" id="refreshBtn" type="button">Refresh</button>
+        <button class="mini-btn" id="expandAllBtn" type="button">Expand all</button>
+        <span style="flex:1"></span>
+        <button class="mini-btn" id="exportCsvBtn" type="button">Export CSV</button>
+        <button class="mini-btn" id="exportJsonBtn" type="button">Export JSON</button>
+      </div>
+      <div id="subsNotice"></div>
+      <div id="subsList"><p class="empty-note">Opening the drawer…</p></div>
+      <div class="toolbar" style="margin-top:14px">
+        <button class="mini-btn" id="prevPageBtn" type="button">← Newer</button>
+        <span class="swatch-label" id="pageInfo">—</span>
+        <button class="mini-btn" id="nextPageBtn" type="button">Older →</button>
+      </div>
+    </section>
+
+    <!-- registry -->
+    <section id="panel-registry" role="tabpanel" aria-labelledby="tab-registry" class="hidden">
+      <h2 style="font-family:var(--font-display);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:6px">Forms</h2>
+      <div id="formsList"><p class="empty-note">Loading…</p></div>
+
+      <h2 style="font-family:var(--font-display);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:6px;margin-top:26px">Question banks</h2>
+      <div id="banksList"><p class="empty-note">Loading…</p></div>
+
+      <div id="editorWrap" class="hidden" style="margin-top:24px">
+        <h2 style="font-family:var(--font-display);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--rule);padding-bottom:6px">
+          Editing <span id="editorTitle"></span>
+        </h2>
+        <div id="editorNotice"></div>
+        <textarea class="code-area" id="editorArea" spellcheck="false" aria-label="Document JSON"></textarea>
+        <div class="toolbar" style="margin-top:10px">
+          <button class="mini-btn" id="editorSaveBtn" type="button">Save</button>
+          <button class="mini-btn" id="editorCheckBtn" type="button">Check only</button>
+          <button class="mini-btn" id="editorCancelBtn" type="button">Close</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- add -->
+    <section id="panel-add" role="tabpanel" aria-labelledby="tab-add" class="hidden">
+      <p class="static-note">
+        Drop a <code>.json</code> file here, or paste one below. A form appears on the public index
+        as soon as it is saved — no deploy, no code. A document with <code>"kind": "bank"</code> is
+        stored as a question bank instead.
+      </p>
+
+      <div class="drop-zone" id="dropZone" tabindex="0" role="button"
+           aria-label="Drop a JSON file here, or press Enter to choose one">
+        <p class="dz-title">Drop a form or bank here</p>
+        <p>…or press Enter / click to choose a <code>.json</code> file</p>
+        <p id="dropFileName" class="swatch-label"></p>
+      </div>
+      <input type="file" id="fileInput" accept="application/json,.json" class="hidden">
+
+      <div class="toolbar" style="margin-top:14px">
+        <button class="mini-btn" id="tplFormBtn" type="button">Download form template</button>
+        <button class="mini-btn" id="tplBankBtn" type="button">Download bank template</button>
+        <span style="flex:1"></span>
+        <a class="mini-btn" href="/" target="_blank" rel="noopener">View public index ↗</a>
+      </div>
+
+      <div id="addNotice"></div>
+      <textarea class="code-area" id="addArea" spellcheck="false"
+                aria-label="Form or bank JSON"
+                placeholder='{ "id": "gc-3", "code": "GC-3", "title": "Certificate of Grievance Severity", "sections": [ … ] }'></textarea>
+
+      <div id="previewWrap" class="hidden" style="margin-top:14px">
+        <p class="office-use-title">Template this form will be given</p>
+        <div class="swatch-row" id="previewSwatches"></div>
+      </div>
+
+      <div class="toolbar" style="margin-top:12px">
+        <button class="mini-btn" id="validateBtn" type="button">Validate</button>
+        <button class="mini-btn" id="saveBtn" type="button">Save to registry</button>
+        <button class="mini-btn" id="clearBtn" type="button">Clear</button>
+      </div>
+    </section>
+
+    <p class="fine-print" style="margin-top:28px;border-top:1px solid var(--rule);padding-top:12px">
+      Submissions are stored in Netlify Blobs on your own site. This page reads them through an
+      authenticated endpoint; nothing here is reachable without the access phrase.
+    </p>
+
+  </div>
+</main>
+
+<script type="module" src="/assets/admin.js"></script>
+</body>
+</html>
