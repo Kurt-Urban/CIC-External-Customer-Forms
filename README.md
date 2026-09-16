@@ -1,8 +1,8 @@
-# CIC Paperwork
+# CIC External Customer Forms
 
 The Consolidated Industrial Concern's response to any complaint: more paperwork.
 
-**Live:** https://kurt-urban.github.io/cic-paperwork/
+**Live:** https://kurt-urban.github.io/CIC-External-Customer-Forms/
 
 1. The customer opens the site and is handed **Form GC-1**, a customer dissatisfaction form
    for the Concern's goods and services — shipbuilding, trade, cargo delivery. It is always
