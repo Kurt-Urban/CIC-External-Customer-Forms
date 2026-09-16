@@ -4,7 +4,8 @@ The Consolidated Industrial Concern's response to declarations of war: paperwork
 
 1. The declaring party opens the site and is handed **Form GC-1**. It is always the same
    form, and it always looks the same.
-2. They fill it in and press **Save copy & file**. The sheet is turned into a filled-in
+2. They fill in **every field** and press **Save copy & file**. Nothing saves until the
+   sheet is complete. The sheet is turned into a filled-in
    paper copy — typed answers, ticked boxes, a handwritten signature, a rubber stamp and a
    reference number — and downloaded as a PDF.
 3. Only then can they continue, to **Form GC-1a**: a new sheet drawn at random, with its
@@ -75,9 +76,14 @@ Everything about GC-1 is in [`forms/gc-1.json`](forms/gc-1.json): the wording, t
 sections, which fields are required, the stamp and message after saving, and its look
 (pinned in the `style` block so it never changes). Edit the file, refresh the page.
 
-Fields marked `"required": true` must be filled before GC-1 will save. Currently that is the
-party name, the signatory, the signature, and the acknowledgement that filling in the form
-may generate further forms.
+`"requireAll": true` means every field on GC-1 must be filled in before it will save: text
+typed, boxes ticked, an option chosen, at least one box in each tick list. Greyed-out
+fields such as the notary on sabbatical are exempt, since nobody can fill them. Set it to
+`false` to require only the fields individually marked `"required": true`.
+
+Pressing save on an incomplete sheet marks every missing field, says how many are left
+under the button, and jumps to the first one. Each mark clears as soon as the field is
+filled.
 
 The `transmittal` line is printed at the foot of the PDF — it is where you tell the
 declaring party what to do with their copy.
@@ -118,7 +124,8 @@ sheet picks from.
 `page` controls sheet length: 3–4 sections of 2–3 questions plus the repeated ones, at
 most one long answer box — about one printed page.
 
-Random sheets never enforce required fields, so the loop never stalls.
+Random sheets follow GC-1's `requireAll` setting, so every field on them must be filled
+in too.
 
 `npm run check` flags any two wordings so alike they would read as the same question.
 

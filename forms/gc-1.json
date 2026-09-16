@@ -9,6 +9,7 @@
   "revision": "REV. 47",
   "meta": ["FILED THIS SESSION"],
   "enforceRequired": true,
+  "requireAll": true,
 
   "style": {
     "stock": "cream",
@@ -99,6 +100,7 @@
         {
           "name": "casus_belli",
           "type": "checkboxes",
+          "label": "Grounds on which hostilities are declared (select all that apply)",
           "options": [
             "Grid or cargo theft",
             "Territorial dispute",
@@ -112,7 +114,7 @@
           ]
         }
       ],
-      "note": "Select all that apply. Selecting none is treated as selecting all, per Subsection 12(c)(iv)(iv)."
+      "note": "Selecting every box is treated as selecting none, per Subsection 12(c)(iv)(iv). Selecting none is not permitted."
     },
     {
       "title": "Statement of Grievance",
@@ -177,6 +179,7 @@
         {
           "name": "attachments",
           "type": "checkboxes",
+          "label": "Attachments enclosed with this form (select all that apply)",
           "options": [
             "Proof of Standing (Form GC-2)",
             "Certificate of Grievance Severity (Form GC-3, which itself requires Form GC-3a)",

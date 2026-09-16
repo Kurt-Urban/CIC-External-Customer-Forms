@@ -348,6 +348,7 @@ export function generatePage(bank, base, seed, pageIndex, used) {
     finePrint: expand(rnd, pickOne(rnd, bank.finePrint) || '', slots),
     submitLabel: expand(rnd, pickOne(rnd, bank.submitLabels) || 'SAVE COPY & FILE', slots),
     enforceRequired: base.enforceRequired !== false,
+    requireAll: base.requireAll === true,
     // Each sheet is a different document, so it gets a different look.
     style: { seed: String(seed) + '::' + pageIndex },
     receipt: {

@@ -63,6 +63,8 @@ export function normalizeForm(raw) {
   form.org = form.org || 'CONSOLIDATED INDUSTRIAL CONCERN';
   form.revision = form.revision || 'REV. 1';
   form.enforceRequired = form.enforceRequired !== false;
+  // requireAll: every field that can be filled in must be, whatever its own flag says.
+  form.requireAll = form.requireAll === true;
   form.submitLabel = form.submitLabel || 'SAVE COPY & FILE';
   form.sections = Array.isArray(form.sections) ? form.sections : [];
   form.officeUse = Array.isArray(form.officeUse) ? form.officeUse : [];
@@ -100,7 +102,8 @@ export function normalizeForm(raw) {
         f.options = (Array.isArray(f.options) ? f.options : []).map(normOption);
       }
       f.width = f.width === 'half' ? 'half' : 'full';
-      f.required = f.required === true;
+      f.disabled = f.disabled === true;
+      f.required = f.type !== 'static' && !f.disabled && (form.requireAll || f.required === true);
     });
   });
 

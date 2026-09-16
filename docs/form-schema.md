@@ -22,6 +22,7 @@ Run `npm run check` after editing either.
   "revision": "REV. 47",
   "meta": ["FILED THIS SESSION"],
   "enforceRequired": true,
+  "requireAll": true,
   "style": { … },
   "instructions": "**Before you begin:** …",
   "sections": [ … ],
@@ -39,7 +40,8 @@ Run `npm run check` after editing either.
 | `title`, `subtitle` | The title block. |
 | `org`, `department` | Letterhead lines. `department` is also the default for random sheets. |
 | `revision`, `meta` | Small letterhead lines on the right; `meta` is a list. |
-| `enforceRequired` | `false` lets GC-1 save with required fields empty. |
+| `requireAll` | `true`: every field that can be filled in must be, before saving. Greyed-out (`disabled`) fields are exempt. Random sheets follow this setting. |
+| `enforceRequired` | `false` lets GC-1 save with required fields empty — turns off all checking. |
 | `style` | The pinned look — see *Styling*. |
 | `instructions` | The shaded notice above the first section. |
 | `sections` | See below. |
@@ -80,7 +82,7 @@ Give the bare title. The "Section 1 —" prefix comes from the `numbering` style
 | `type` | all | See below. |
 | `name` | all | Must be unique within the form. Used to remember answers across a reload. |
 | `label` | all but `static` | A `checkboxes` field may leave it out if the section title says it all. |
-| `required` | inputs | GC-1 will not save while it is empty. |
+| `required` | inputs | The form will not save while it is empty. Implied for every field when `requireAll` is on. A tick list needs at least one box; a single checkbox must be ticked. |
 | `width` | inputs | `"half"` puts two consecutive half-width fields side by side. |
 | `placeholder` | text-like | Faint hint text. For a `disabled` field it is printed on the PDF. |
 | `help` | most | Italic footnote under the field. |

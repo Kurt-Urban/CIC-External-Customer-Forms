@@ -56,8 +56,13 @@ if (v1.warnings.length) list(v1.warnings.map((w) => 'warning: ' + w));
 const n1 = normalizeForm(gc1);
 const gcFields = n1.sections.flatMap((s) => s.fields).filter((f) => f.type !== 'static');
 check('GC-1 has fields', gcFields.length > 0,
-  n1.sections.length + ' sections, ' + gcFields.length + ' fields, required: ' +
-  (gcFields.filter((f) => f.required).map((f) => f.name).join(', ') || 'none'));
+  n1.sections.length + ' sections, ' + gcFields.length + ' fields, ' +
+  gcFields.filter((f) => f.required).length + ' required');
+
+const optionalOnGc1 = gcFields.filter((f) => !f.disabled && !f.required).map((f) => f.name);
+check('every GC-1 field must be filled before it saves', optionalOnGc1.length === 0,
+  optionalOnGc1.length ? 'optional: ' + optionalOnGc1.join(', ')
+    : gcFields.filter((f) => f.disabled).length + ' greyed-out field(s) exempt');
 
 const pinned = Object.keys(AXES).every((k) => Object.prototype.hasOwnProperty.call(n1.style, k));
 check('GC-1 look is fully pinned (same every time)', pinned,
@@ -120,7 +125,11 @@ if (alike.length) list(alike);
 
 /* ---------- visitor sessions ---------- */
 
-const base = { id: n1.id, code: n1.code, org: n1.org, department: n1.department, title: n1.title, enforceRequired: false };
+// Same base the page uses (assets/app.js drawSheet).
+const base = {
+  id: n1.id, code: n1.code, org: n1.org, department: n1.department, title: n1.title,
+  enforceRequired: true, requireAll: n1.requireAll,
+};
 const seed = () => Math.random().toString(16).slice(2, 18);
 
 let repeats = [];
@@ -133,6 +142,8 @@ let sheetsWithEcho = 0;
 let firstRestated = [];
 let topicReturns = 0;
 let totalSheets = 0;
+let optionalOnSheets = 0;
+let exemptOnSheets = 0;
 const looks = new Set();
 
 for (let s = 0; s < SESSIONS; s++) {
@@ -153,6 +164,11 @@ for (let s = 0; s < SESSIONS; s++) {
       shown.set(key, 'sheet ' + step);
       if (topicSeen.has(f.topic)) topicReturns++;
     }
+    const normalised = normalizeForm(page).sections.flatMap((x) => x.fields)
+      .filter((f) => f.type !== 'static');
+    optionalOnSheets += normalised.filter((f) => !f.disabled && !f.required).length;
+    exemptOnSheets += normalised.filter((f) => f.disabled).length;
+
     const topicsHere = inputs.map((f) => f.topic);
     if (new Set(topicsHere).size < topicsHere.length) sheetsWithEcho++;
     topicsHere.forEach((t) => topicSeen.add(t));
@@ -194,6 +210,9 @@ check('topics come back, reworded', topicReturns > totalSheets * 5,
   (topicReturns / totalSheets).toFixed(1) + ' returning topics per sheet');
 check('most sheets ask something twice, differently', sheetsWithEcho >= totalSheets * 0.75,
   Math.round(100 * sheetsWithEcho / totalSheets) + '% of sheets');
+check('every field on every random sheet must be filled before it saves', optionalOnSheets === 0,
+  optionalOnSheets ? optionalOnSheets + ' optional field(s)'
+    : exemptOnSheets + ' greyed-out field(s) exempt across ' + totalSheets + ' sheets');
 check('sheets are about one page each', minF >= 6 && maxF <= 18, minF + '–' + maxF + ' items');
 check('never more than one long-answer box per sheet', overLong === 0, overLong ? overLong + ' sheets' : '');
 check('field names are unique on every sheet', dupNames === 0, dupNames ? dupNames + ' sheets' : '');

@@ -10,7 +10,10 @@
    the answers typed so far, so a reload changes nothing.
    ============================================================ */
 
-import { renderForm, collectAnswers, restoreAnswers, validateAnswers, mdInline, escapeHTML } from './render.js';
+import {
+  renderForm, collectAnswers, restoreAnswers, validateAnswers, watchRequired,
+  incompleteMessage, mdInline, escapeHTML,
+} from './render.js';
 import { generatePage, formTexts } from './generator.js';
 import { letterSuffix } from './schema.js';
 import { saveCopy, printCopy } from './pdf.js';
@@ -75,7 +78,9 @@ function drawSheet() {
     org: docs.gc1.org,
     department: docs.gc1.department,
     title: docs.gc1.title,
-    enforceRequired: false,
+    // Random sheets are held to the same standard as GC-1.
+    enforceRequired: true,
+    requireAll: docs.gc1.requireAll === true,
   };
   const page = generatePage(docs.bank, base, state.seed, state.step, state.used);
   const u = page.usage;
@@ -174,6 +179,7 @@ function show() {
   rendered.sheet.addEventListener('input', persist);
   rendered.sheet.addEventListener('change', persist);
 
+  watchRequired(rendered.form, rendered.sheet);
   rendered.submitBtn.addEventListener('click', onSave);
 
   if (state.step > 0) {
@@ -196,11 +202,22 @@ async function onSave() {
   const { form, sheet, submitBtn, resultPanel } = state.rendered;
 
   const answers = collectAnswers(form, sheet);
-  if (validateAnswers(form, sheet, answers).length) {
+  const problems = validateAnswers(form, sheet, answers);
+  const saveError = sheet.querySelector('[data-role="save-error"]');
+  if (problems.length) {
+    if (saveError) {
+      saveError.textContent = incompleteMessage(problems.length);
+      saveError.hidden = false;
+    }
     const first = sheet.querySelector('.field.invalid');
-    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (first) {
+      first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const control = first.querySelector('input:not([disabled]), textarea, select');
+      if (control) control.focus({ preventScroll: true });
+    }
     return;
   }
+  if (saveError) saveError.hidden = true;
 
   const ref = makeRef();
   const filename = 'CIC-' + form.code + '-' + ref + '.pdf';

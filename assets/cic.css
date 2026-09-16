@@ -260,8 +260,13 @@ section.block { margin-bottom: 26px; }
 }
 .field-error {
   font-family: var(--font-display); font-size: 10.5px; color: var(--stamp);
-  margin-top: 4px; letter-spacing: 0.03em;
+  margin: 4px 0 0; letter-spacing: 0.03em;
 }
+/* tick boxes and option lists cannot take a red border, so mark the whole list */
+.field.invalid .checklist {
+  border-left: 3px solid var(--stamp); padding-left: 9px; margin-left: -12px;
+}
+.field.invalid .checklist input { outline: 2px solid var(--stamp); outline-offset: 1px; }
 
 /* signatures are written, not typed */
 .field input.sig:not([disabled]) {
@@ -434,6 +439,11 @@ button.stamp-btn[disabled] { opacity: 0.6; cursor: wait; }
   font-size: 10px; color: var(--ink-soft); text-align: right; line-height: 1.4;
   font-style: italic;
 }
+.save-error {
+  margin: 2px 0 0; max-width: 220px; text-align: right;
+  font-family: var(--font-display); font-size: 11px; line-height: 1.4;
+  letter-spacing: 0.03em; color: var(--stamp);
+}
 .empty-note {
   border: 1px dashed var(--rule); padding: 18px; text-align: center;
   color: var(--ink-soft); font-size: 13px; font-style: italic;
@@ -512,7 +522,7 @@ button.stamp-btn[disabled] { opacity: 0.6; cursor: wait; }
   .submit-row { flex-direction: column; align-items: stretch; }
   .fine-print { max-width: none; }
   .stamp-wrap { align-items: stretch; }
-  .btn-caption { text-align: center; }
+  .btn-caption, .save-error { text-align: center; max-width: none; }
   .pdf-stamp { align-self: center; }
 }
 

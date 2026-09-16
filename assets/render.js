@@ -39,6 +39,13 @@ function el(tag, className, html) {
 
 /* ---------- field components ---------- */
 
+function errorLine() {
+  const err = el('p', 'field-error');
+  err.hidden = true;
+  err.setAttribute('role', 'alert');
+  return err;
+}
+
 function labelFor(field) {
   const req = field.required ? ' <span class="req">*</span>' : '';
   return mdInline(field.label || '') + req;
@@ -84,6 +91,7 @@ function buildField(field, form) {
     list.appendChild(lab);
     wrap.appendChild(list);
     if (field.help) wrap.appendChild(el('p', 'footnote', mdInline(field.help)));
+    wrap.appendChild(errorLine());
     return { node: wrap, control: box };
   }
 
@@ -109,6 +117,7 @@ function buildField(field, form) {
     });
     wrap.appendChild(list);
     if (field.help) wrap.appendChild(el('p', 'footnote', mdInline(field.help)));
+    wrap.appendChild(errorLine());
     return { node: wrap, control: controls, group: true };
   }
 
@@ -174,9 +183,7 @@ function buildField(field, form) {
 
   if (field.help) wrap.appendChild(el('p', 'footnote', mdInline(field.help)));
 
-  const err = el('p', 'field-error');
-  err.hidden = true;
-  wrap.appendChild(err);
+  wrap.appendChild(errorLine());
 
   return { node: wrap, control };
 }
@@ -298,7 +305,14 @@ export function renderForm(rawForm, mount, opts) {
   btn.className = 'stamp-btn';
   btn.textContent = form.submitLabel;
   btnWrap.appendChild(btn);
-  btnWrap.appendChild(el('div', 'btn-caption', 'Saves a PDF copy of this sheet.<br>Required before the next form.'));
+  btnWrap.appendChild(el('div', 'btn-caption',
+    (form.requireAll ? 'Every field must be completed.<br>' : '') +
+    'Saves a PDF copy of this sheet.<br>Required before the next form.'));
+  const saveError = el('p', 'save-error');
+  saveError.setAttribute('data-role', 'save-error');
+  saveError.setAttribute('aria-live', 'polite');
+  saveError.hidden = true;
+  btnWrap.appendChild(saveError);
   row.appendChild(btnWrap);
   sheet.appendChild(row);
 
@@ -383,6 +397,23 @@ const REFUSALS = [
   'Missing. Filing cannot proceed to the drawer.',
 ];
 
+function refusalFor(field, n) {
+  switch (field.type) {
+    case 'checkbox': return 'Unticked. This box must be ticked before the sheet can be filed.';
+    case 'checkboxes': return 'Nothing selected. Select at least one.';
+    case 'radio':
+    case 'select': return 'No option chosen. The Office does not choose on your behalf.';
+    case 'signature': return 'Unsigned. Unsigned sheets are not sheets.';
+    default: return REFUSALS[n % REFUSALS.length];
+  }
+}
+
+function isEmpty(field, v) {
+  if (field.type === 'checkbox') return v !== true;
+  if (field.type === 'checkboxes') return !(Array.isArray(v) && v.length);
+  return !String(v == null ? '' : v).trim();
+}
+
 export function validateAnswers(form, sheet, answers) {
   const problems = [];
   if (form.enforceRequired === false) return problems;
@@ -393,11 +424,7 @@ export function validateAnswers(form, sheet, answers) {
   (form.sections || []).forEach((sec) => {
     (sec.fields || []).forEach((f) => {
       if (f.type === 'static' || !f.required || f.disabled) return;
-      const v = answers[f.name];
-      const empty = f.type === 'checkbox' ? v !== true
-        : f.type === 'checkboxes' ? !(Array.isArray(v) && v.length)
-        : !String(v == null ? '' : v).trim();
-      if (!empty) return;
+      if (!isEmpty(f, answers[f.name])) return;
 
       problems.push({ field: f });
       const anyControl = sheet.querySelector('[name="' + CSS.escape(f.name) + '"]');
@@ -406,7 +433,7 @@ export function validateAnswers(form, sheet, answers) {
         wrap.classList.add('invalid');
         const err = wrap.querySelector('.field-error');
         if (err) {
-          err.textContent = REFUSALS[problems.length % REFUSALS.length];
+          err.textContent = refusalFor(f, problems.length);
           err.hidden = false;
         }
       }
@@ -414,4 +441,45 @@ export function validateAnswers(form, sheet, answers) {
   });
 
   return problems;
+}
+
+/** Wording for the line under the save button. */
+export function incompleteMessage(count) {
+  return count === 1
+    ? '1 field is incomplete. Nothing has been saved.'
+    : count + ' fields are incomplete. Nothing has been saved.';
+}
+
+/**
+ * Clear a field's error as soon as it is filled in, and keep the count
+ * under the save button current, so nobody has to press save to find out.
+ */
+export function watchRequired(form, sheet) {
+  const byName = new Map();
+  (form.sections || []).forEach((sec) => (sec.fields || []).forEach((f) => {
+    if (f.name) byName.set(f.name, f);
+  }));
+
+  const recheck = (e) => {
+    const target = e.target;
+    const wrap = target && target.closest && target.closest('.field.invalid');
+    if (!wrap) return;
+    const field = byName.get(target.name);
+    if (!field) return;
+    const value = collectAnswers({ sections: [{ fields: [field] }] }, sheet)[field.name];
+    if (isEmpty(field, value)) return;
+
+    wrap.classList.remove('invalid');
+    const err = wrap.querySelector('.field-error');
+    if (err) { err.hidden = true; err.textContent = ''; }
+
+    const line = sheet.querySelector('[data-role="save-error"]');
+    if (line && !line.hidden) {
+      const left = sheet.querySelectorAll('.field.invalid').length;
+      if (left) line.textContent = incompleteMessage(left);
+      else line.hidden = true;
+    }
+  };
+  sheet.addEventListener('input', recheck);
+  sheet.addEventListener('change', recheck);
 }
